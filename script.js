@@ -559,7 +559,7 @@ window.exportClassBackup=exportClassBackup;
  const adminMenu=document.getElementById('adminControlLink');
  function syncAdminMenu(){const u=getSession();if(adminMenu)adminMenu.hidden=!(u&&u.role==='admin');if(typeof syncFaceAttendanceMenu==='function')syncFaceAttendanceMenu();}
  function initials(n){return n.split(/\s+/).filter(Boolean).slice(0,2).map(x=>x[0]).join('').toUpperCase()||'XI'}
- function openAccount(){modal?.classList.add('show');modal?.setAttribute('aria-hidden','false');renderAccount()}
+ function openAccount(){const u=getSession();if(u){renderAccount()}else{renderAccount()}modal?.classList.add('show');modal?.setAttribute('aria-hidden','false');}
  function closeAccount(){modal?.classList.remove('show');modal?.setAttribute('aria-hidden','true')}
  function updateMobileAccount(u){const label=document.getElementById('mobileAccountLabel');const link=document.getElementById('mobileAccountLink');const img=document.getElementById('mobileAccountAvatar'),fallback=document.getElementById('mobileAccountAvatarFallback');if(label)label.textContent=u?(u.name):'Account / Login';if(link)link.title=u?('Akun: '+u.name):'Account / Login';if(!u){if(img)img.hidden=true;if(fallback){fallback.hidden=false;fallback.textContent='A'}return}const photos=getPhotos();if(photos[u.key]){if(img){img.hidden=false;img.src=photos[u.key]}if(fallback)fallback.hidden=true}else{if(img)img.hidden=true;if(fallback){fallback.hidden=false;fallback.textContent=initials(u.name)}}}
  function getProfiles(){try{return JSON.parse(localStorage.getItem(profileKey)||'{}')}catch{return {}}}
@@ -594,7 +594,8 @@ function renderAccount(){
  if(topPill){topPill.querySelector('b').textContent=displayName;topPill.title='Akun: '+displayName;const topImg=document.getElementById('topAvatarImg'),topFallback=document.getElementById('topAvatarFallback');if(photos[u.key]){topImg.hidden=false;topFallback.hidden=true;topImg.src=photos[u.key]}else{topImg.hidden=true;topFallback.hidden=false;topFallback.textContent=initials(displayName)}}
  updateMobileAccount(Object.assign({},u,{name:displayName}));renderStudents()
 }
- function syncAccountBio(){const u=getSession();if(!u||u.role!=='student')return;const prof=getProfile(u);const bioEl=document.getElementById('accountBio'),input=document.getElementById('accountBioInput');if(bioEl)bioEl.textContent=prof.bio||'Belum ada bio.';if(input)input.value=prof.bio||'';}
+ window.addEventListener('xi-force-account-refresh',renderAccount);
+function syncAccountBio(){const u=getSession();if(!u||u.role!=='student')return;const prof=getProfile(u);const bioEl=document.getElementById('accountBio'),input=document.getElementById('accountBioInput');if(bioEl)bioEl.textContent=prof.bio||'Belum ada bio.';if(input)input.value=prof.bio||'';}
  function guestTop(){syncAdminMenu();updateMobileAccount(null);if(topPill){topPill.querySelector('b').textContent='Account';topPill.title='Account / Login';const topImg=document.getElementById('topAvatarImg'),topFallback=document.getElementById('topAvatarFallback');if(topImg)topImg.hidden=true;if(topFallback){topFallback.hidden=false;topFallback.textContent='AC'}}}
  document.querySelectorAll('[data-open-account]').forEach(a=>a.addEventListener('click',e=>{e.preventDefault();mobileMenu?.classList.remove('show');openAccount()}));topPill?.addEventListener('click',openAccount);document.getElementById('accountModalClose')?.addEventListener('click',closeAccount);modal?.addEventListener('click',e=>{if(e.target===modal)closeAccount()});
  document.querySelectorAll('[data-auth-modal-view]').forEach(b=>b.addEventListener('click',()=>{
@@ -883,13 +884,13 @@ function saveFaceAttendanceLocal(dateKey,data){
 function faceSession(){
  try{return JSON.parse(sessionStorage.getItem('xi-account-session')||'null')}catch{return null}
 }
-function compressFaceImage(dataUrl,maxSide=3840,quality=.92){
+function compressFaceImage(dataUrl,maxSide=2200,quality=.82){
  return new Promise((resolve,reject)=>{
   const img=new Image();
   img.onload=()=>{
    try{
-    // Target 4K: 3840 px on the longest side. Upscale smaller originals when needed.
-    const scale=maxSide/Math.max(img.width,img.height);
+    // Jangan upscale foto kecil. Ukuran ini sengaja dijaga agar upload ke Apps Script stabil.
+    const scale=Math.min(1,maxSide/Math.max(img.width,img.height));
     const w=Math.max(1,Math.round(img.width*scale)),h=Math.max(1,Math.round(img.height*scale));
     const c=document.createElement('canvas');c.width=w;c.height=h;
     const ctx=c.getContext('2d',{alpha:false});
@@ -935,55 +936,63 @@ function addAttendanceWatermark(dataUrl,record){
     const ctx=c.getContext('2d');
     ctx.drawImage(img,0,0,c.width,c.height);
 
-    // Watermark kecil dan clean di kanan bawah seperti contoh.
-    const pad=Math.max(14,Math.round(c.width*.018));
-    const fs=Math.max(13,Math.round(c.width*.020));
-    const smallFs=Math.max(12,Math.round(c.width*.017));
-    const maxTextWidth=Math.min(c.width*.78,Math.max(220,c.width-pad*2));
-    const location=String(record.locationText||record.address||'Lokasi tidak tersedia')
-      .replace(/\s*,\s*/g,', ');
-
-    ctx.textBaseline='top';
-    ctx.font='600 '+fs+'px "Trebuchet MS", "Segoe UI", Arial, sans-serif';
-    const locationLines=wrapWatermarkLine(ctx,location,maxTextWidth);
-    ctx.font='600 '+smallFs+'px "Trebuchet MS", "Segoe UI", Arial, sans-serif';
+    const pad=Math.max(18,Math.round(c.width*.018));
+    const titleFs=Math.max(20,Math.round(c.width*.028));
+    const bodyFs=Math.max(15,Math.round(c.width*.020));
+    const smallFs=Math.max(13,Math.round(c.width*.017));
+    const maxW=Math.min(c.width*.82,Math.max(280,c.width-pad*2));
+    const name=String(record.name||'Siswa');
+    const location=String(record.locationText||record.address||'Lokasi tidak tersedia');
+    const coords='Koordinat: '+String(record.latitude??'-')+', '+String(record.longitude??'-');
     const dateLine=formatAttendanceWatermarkDate(record.date,record.time);
 
-    const lineH=Math.round(fs*1.18);
-    const dateH=Math.round(smallFs*1.25);
-    const boxH=pad+locationLines.length*lineH+dateH+pad;
-    const y=c.height-boxH-pad;
+    function wrap(text,font){
+      ctx.font=font;
+      const words=String(text||'').trim().split(/\\s+/).filter(Boolean),lines=[];
+      let line='';
+      for(const word of words){
+       const test=line?line+' '+word:word;
+       if(ctx.measureText(test).width<=maxW-pad*2||!line) line=test;
+       else {lines.push(line);line=word}
+      }
+      if(line)lines.push(line);
+      return lines.slice(0,3);
+    }
 
-    // Panel gelap tipis + shadow agar premium dan tetap terbaca.
-    ctx.fillStyle='rgba(0,0,0,.20)';
-    const widths=[];
-    ctx.font='600 '+fs+'px "Trebuchet MS", "Segoe UI", Arial, sans-serif';
-    locationLines.forEach(x=>widths.push(ctx.measureText(x).width));
-    ctx.font='600 '+smallFs+'px "Trebuchet MS", "Segoe UI", Arial, sans-serif';
-    widths.push(ctx.measureText(dateLine).width);
-    const boxW=Math.min(c.width-pad*2,Math.max(...widths)+pad*2);
-    const x=c.width-boxW-pad;
+    const titleFont='800 '+titleFs+'px Arial, sans-serif';
+    const bodyFont='650 '+bodyFs+'px Arial, sans-serif';
+    const smallFont='600 '+smallFs+'px Arial, sans-serif';
+    const locationLines=wrap(location,bodyFont);
+    const coordLines=wrap(coords,smallFont);
+    const rows=[
+      {text:'ABSEN FOTO MUKA',font:titleFont,h:titleFs*1.25},
+      {text:name,font:bodyFont,h:bodyFs*1.25},
+      ...locationLines.map(x=>({text:x,font:bodyFont,h:bodyFs*1.18})),
+      ...coordLines.map(x=>({text:x,font:smallFont,h:smallFs*1.18})),
+      {text:dateLine,font:smallFont,h:smallFs*1.22}
+    ];
+    const boxH=pad*2+rows.reduce((a,r)=>a+r.h,0)+10;
+    let widest=0;
+    rows.forEach(r=>{ctx.font=r.font;widest=Math.max(widest,ctx.measureText(r.text).width)});
+    const boxW=Math.min(c.width-pad*2,Math.max(320,widest+pad*2));
+    const x=c.width-boxW-pad, y=c.height-boxH-pad;
+
+    ctx.fillStyle='rgba(7,12,28,.78)';
     ctx.beginPath();
-    const r=Math.max(8,Math.round(fs*.45));
-    ctx.roundRect(x,y,boxW,boxH,r);
+    ctx.roundRect(x,y,boxW,boxH,Math.max(12,Math.round(titleFs*.35)));
     ctx.fill();
+    ctx.strokeStyle='rgba(255,255,255,.22)';ctx.lineWidth=1.5;ctx.stroke();
 
-    ctx.shadowColor='rgba(0,0,0,.72)';
-    ctx.shadowBlur=Math.max(3,Math.round(fs*.45));
-    ctx.shadowOffsetY=1;
-    ctx.fillStyle='#fff';
-    ctx.font='600 '+fs+'px "Trebuchet MS", "Segoe UI", Arial, sans-serif';
     let ty=y+pad;
-    locationLines.forEach(line=>{
-      ctx.fillText(line,x+pad,ty);
-      ty+=lineH;
+    rows.forEach((r,i)=>{
+      ctx.font=r.font;
+      ctx.fillStyle=i===0?'#ffffff':(i===rows.length-1?'rgba(255,255,255,.84)':'#f4f7ff');
+      ctx.shadowColor='rgba(0,0,0,.45)';ctx.shadowBlur=4;ctx.shadowOffsetY=1;
+      ctx.fillText(r.text,x+pad,ty);
+      ctx.shadowColor='transparent';
+      ty+=r.h;
     });
-    ctx.font='600 '+smallFs+'px "Trebuchet MS", "Segoe UI", Arial, sans-serif';
-    ctx.fillStyle='rgba(255,255,255,.92)';
-    ctx.fillText(dateLine,x+pad,ty+1);
-    ctx.shadowColor='transparent';
-
-    resolve(c.toDataURL('image/jpeg',.95));
+    resolve(c.toDataURL('image/jpeg',.88));
    }catch(e){reject(e)}
   };
   img.onerror=()=>reject(new Error('Foto gagal diproses'));
@@ -1203,13 +1212,35 @@ function uploadFaceToDrive(record){
    form.method='POST'; form.action=DRIVE_UPLOAD_URL; form.target=iframe.name;
    form.enctype='application/x-www-form-urlencoded'; form.acceptCharset='UTF-8';
    form.style.display='none';
-   const fields={action:'uploadFaceAttendance',date:record.date,time:record.time,nisn:record.nisn,name:record.name,mimeType:'image/jpeg',imageData:record.image.split(',')[1],latitude:record.latitude,longitude:record.longitude,accuracy:record.accuracy,mapsUrl:record.mapsUrl,locationText:record.locationText||record.address||''};
-   Object.entries(fields).forEach(([k,v])=>{const input=document.createElement('textarea');input.name=k;input.value=String(v??'');input.style.display='none';form.appendChild(input)});
+   const imageData=String(record.image||'').split(',')[1]||'';
+   const fields={
+    action:'uploadFaceAttendance',date:record.date,time:record.time,
+    nisn:record.nisn,name:record.name,kelas:'XI TKJ 1',mimeType:'image/jpeg',
+    imageData:imageData,latitude:record.latitude,longitude:record.longitude,
+    accuracy:record.accuracy,mapsUrl:record.mapsUrl,
+    locationText:record.locationText||record.address||''
+   };
+   Object.entries(fields).forEach(([k,v])=>{
+    const input=document.createElement('textarea');input.name=k;input.value=String(v??'');input.style.display='none';form.appendChild(input)
+   });
    document.body.appendChild(form);
    let settled=false;
    const finish=(ok,err)=>{if(settled)return;settled=true;clearTimeout(timer);form.remove();iframe.remove();ok?resolve():reject(err)};
-   const timer=setTimeout(()=>finish(false,new Error('Apps Script timeout')),20000);
-   iframe.addEventListener('load',()=>finish(true),{once:true});
+   const timer=setTimeout(()=>finish(false,new Error('Upload foto timeout.')),30000);
+   iframe.addEventListener('load',async()=>{
+    // Cross-origin iframe tidak boleh dibaca. Konfirmasi penyimpanan lewat endpoint status Drive.
+    let tries=0;
+    const verify=async()=>{
+      tries++;
+      try{
+       const status=await getAttendanceStatusJsonp(record.date,record.nisn);
+       if(status?.faceDone){finish(true);return}
+      }catch(_){ }
+      if(tries<6){setTimeout(verify,1200);return}
+      finish(false,new Error('Foto belum terkonfirmasi masuk Google Drive.'));
+    };
+    setTimeout(verify,900);
+   },{once:true});
    form.submit();
   }catch(e){reject(e)}
  });
@@ -1601,3 +1632,18 @@ document.getElementById('facePhotoViewerImage')?.addEventListener('click',e=>{
  };
  update();setInterval(update,1000);
 })();
+
+/* Account button hardening: never navigate away to #dashboard-pro. */
+document.addEventListener('click',e=>{
+ const target=e.target.closest?.('#accountShortcut,[data-open-account],#mobileAccountLink');
+ if(!target)return;
+ const modal=document.getElementById('accountModal');
+ if(!modal)return;
+ e.preventDefault();
+ e.stopPropagation();
+ modal.classList.add('show');
+ modal.setAttribute('aria-hidden','false');
+ window.setTimeout(()=>{
+   try{window.dispatchEvent(new CustomEvent('xi-force-account-refresh'))}catch(_){}
+ },0);
+},true);

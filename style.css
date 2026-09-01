@@ -1944,3 +1944,48 @@ body.dark .admin-portal-foot{background:#0c1228}
  .admin-portal-box{height:calc(100vh - 12px);width:calc(100% - 12px);border-radius:22px}
  .admin-content{padding:18px}
 }
+
+
+/* ===== V7.1 VISUAL POLISH ===== */
+.navbar{
+  width:min(1320px,calc(100% - 24px));
+  min-height:76px;
+  padding:8px 12px 8px 14px;
+  border-radius:24px;
+  background:linear-gradient(135deg,rgba(255,255,255,.88),rgba(245,247,255,.72));
+  box-shadow:0 18px 60px rgba(35,45,95,.13), inset 0 1px 0 rgba(255,255,255,.9);
+}
+body.dark .navbar{background:linear-gradient(135deg,rgba(12,18,40,.92),rgba(16,22,48,.78));box-shadow:0 18px 60px rgba(0,0,0,.35),inset 0 1px 0 rgba(255,255,255,.05)}
+.brand{padding:6px 9px;border-radius:18px;transition:.25s}
+.brand:hover{background:rgba(64,85,255,.07);transform:translateY(-1px)}
+.brand-logo{width:47px;height:47px;border-radius:15px;box-shadow:0 12px 30px rgba(64,85,255,.28)}
+.brand-text strong{font-size:15px;letter-spacing:-.2px}.brand-text small{font-size:8px;font-weight:800}
+.music-button{height:46px;min-width:78px;padding:0 14px;border-radius:15px;background:linear-gradient(135deg,rgba(64,85,255,.11),rgba(112,72,255,.08));border-color:rgba(64,85,255,.13);box-shadow:0 8px 25px rgba(64,85,255,.08)}
+.music-button:hover,.account-pill:hover,.theme-button:hover,.nav-search-btn:hover,.notification-button:hover{transform:translateY(-2px);border-color:rgba(64,85,255,.24);box-shadow:0 10px 28px rgba(64,85,255,.12)}
+.music-glyph{font-size:19px}.music-label{font-size:10px;letter-spacing:.8px}
+.nav-right{gap:7px}.nav-search-btn,.notification-button,.theme-button,.menu-button{width:44px;height:44px;border-radius:14px;border:1px solid transparent;transition:.25s}
+.account-pill{height:46px;padding:0 13px 0 7px;border:1px solid var(--border);border-radius:15px;background:rgba(100,110,150,.06);display:flex;align-items:center;gap:8px;color:var(--text);transition:.25s}
+.top-avatar-wrap{width:34px;height:34px;border-radius:11px;overflow:hidden;display:grid;place-items:center;background:linear-gradient(135deg,#4059ff,#7048ff);color:#fff;font-size:10px;font-weight:900}
+.top-avatar-wrap img{width:100%;height:100%;object-fit:cover}.account-pill b{font-size:10px;max-width:110px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+
+/* Account modal feels like a real profile area instead of a generic login popup. */
+.account-modal .account-modal-box{width:min(1120px,96vw);border-radius:30px;overflow:hidden;box-shadow:0 35px 120px rgba(10,15,40,.34)}
+.account-modal .profile-cover{min-height:230px;background:radial-gradient(circle at 85% 15%,rgba(120,95,255,.34),transparent 28%),linear-gradient(135deg,#0a1026,#151e49 58%,#4055ff)}
+.account-modal .profile-cover-content{padding:32px}.account-modal .profile-avatar-wrap{width:112px;height:112px;border-radius:30px;box-shadow:0 18px 45px rgba(0,0,0,.3)}
+.account-modal .profile-name{letter-spacing:-1px}
+
+/* Admin control center */
+.admin-portal-box{background:linear-gradient(145deg,rgba(9,14,31,.98),rgba(17,24,52,.98));border-color:rgba(111,126,255,.18);box-shadow:0 35px 120px rgba(0,0,0,.55)}
+.admin-portal-head{padding:12px 8px 22px;border-bottom:1px solid rgba(255,255,255,.07);margin-bottom:18px}
+.admin-portal-head h2{font-size:30px;letter-spacing:-.8px}.admin-portal-head .eyebrow{color:#8290ff}
+.admin-portal-box .admin-side{background:rgba(255,255,255,.025);border:1px solid rgba(255,255,255,.07);border-radius:20px;padding:8px}
+.admin-portal-box .admin-tab{border-radius:13px;transition:.2s}.admin-portal-box .admin-tab:hover{transform:translateX(2px);background:rgba(64,85,255,.10)}
+.admin-portal-box .admin-main{border-radius:22px;background:rgba(255,255,255,.025);border:1px solid rgba(255,255,255,.06);padding:18px}
+
+@media(max-width:900px){
+ .navbar{min-height:68px;padding:7px 8px}.brand{gap:8px;padding-left:3px}.brand-logo{width:42px;height:42px}.brand-text strong{font-size:13px}.music-button{min-width:46px;width:46px;padding:0}.music-label{display:none}.account-pill{width:46px;padding:0;justify-content:center}.account-pill b{display:none}
+}
+@media(max-width:600px){
+ .navbar{width:calc(100% - 12px);margin-top:7px;border-radius:19px}.nav-right{gap:4px}.nav-search-btn,.notification-button,.theme-button,.menu-button{width:38px;height:38px;border-radius:12px}.music-button,.account-pill{width:40px;height:40px}.top-avatar-wrap{width:29px;height:29px;border-radius:9px}.brand-logo{width:39px;height:39px;border-radius:12px}.brand-text small{font-size:7px}.brand-text strong{font-size:12px}
+ .account-modal .account-modal-box{width:100vw;max-width:100vw;border-radius:24px}.account-modal .profile-cover-content{padding:24px}.account-modal .profile-avatar-wrap{width:82px;height:82px;border-radius:23px}
+}

@@ -1,0 +1,42 @@
+SETUP ABSENSI XI TKJ 1 — DRIVE ONLY
+
+Sistem sudah diubah:
+- Google Sheets dihapus dari alur absensi.
+- Absensi manual H/I/A di Admin Panel dihapus.
+- Absensi hanya:
+  1. Foto Muka dari akun siswa.
+  2. Scan Barcode oleh admin.
+- Semua bukti absensi disimpan langsung ke Google Drive.
+- Barcode membuat file GAMBAR SVG di Drive yang berisi teks:
+  "ACH. YUDI CAHYONO"
+  "Absen Dengan Barcode"
+  "Tanggal + Waktu"
+  "HADIR • BARCODE"
+
+FOLDER DRIVE:
+https://drive.google.com/drive/folders/1Flcbrukb1Ln2x-uhDhUyWUc0eHp8EZoQ
+
+APPS SCRIPT PROJECT:
+https://script.google.com/d/1mf2YHNNjMRioiAzF1zHDPI55qn4qfJ9PYOD6LKxa_fCNb4izfpHwFPN_/edit
+
+1. Buka project Apps Script di atas.
+2. Hapus kode lama.
+3. Salin seluruh isi:
+   google-apps-script/Code.gs
+4. Pastikan appsscript.json menggunakan scope Drive saja.
+5. Jalankan fungsi setup() sekali untuk memberikan izin Drive.
+6. Deploy → New deployment → Web app.
+7. Execute as: Me.
+8. Who has access: Anyone.
+9. Salin URL Web App yang berakhiran /exec.
+10. Buka drive-config.js.
+11. Ganti:
+    window.DRIVE_UPLOAD_URL = "PASTE_WEB_APP_EXEC_URL_HERE";
+    dengan URL /exec tersebut.
+12. Upload website.
+
+CATATAN:
+- URL editor /d/.../edit BUKAN URL Web App. Website harus memakai URL deployment /exec.
+- File absensi otomatis diberi metadata di Description Google Drive.
+- Script mencoba membuat file dapat dilihat oleh siapa pun yang memiliki link. Jika akun sekolah melarang public sharing, file tetap tersimpan di Drive tetapi preview dari website dapat terbatas.
+- Tidak ada Spreadsheet ID atau spreadsheet scope di backend baru.

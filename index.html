@@ -1,0 +1,657 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#4055ff">
+<title>XI TKJ 1 — Class Website</title>
+<link rel="stylesheet" href="style.css?v=barcode-absensi-2">
+<meta name="description" content="XI TKJ 1 digital class website untuk informasi, tugas, materi, jadwal, dan akun siswa.">
+
+<link rel="icon" href="assets/kyou-logo.svg">
+
+<style>
+/* HERO FIX FINAL: foto asli 16:9 + tulisan selalu di tengah */
+@media (max-width:700px){
+  .hero.section{padding-top:25px!important}
+  .hero-card.hero-class-photo{width:100%!important;height:auto!important;min-height:0!important;aspect-ratio:16/9!important;display:grid!important;place-items:center!important}
+  .hero-class-photo-bg{width:100%!important;height:100%!important;object-fit:cover!important;object-position:center center!important}
+  .hero-class-photo .hero-content{position:absolute!important;inset:0!important;z-index:10!important;display:flex!important;align-items:center!important;justify-content:center!important;padding:18px!important}
+  .hero-class-photo .typewriter-title{display:block!important;visibility:visible!important;opacity:1!important;color:#fff!important;font-size:clamp(46px,16vw,76px)!important;line-height:1!important;text-shadow:0 3px 18px rgba(0,0,0,.85)!important}
+  .hero-class-photo .welcome{display:block!important;position:absolute!important;top:50%!important;transform:translateY(-125%)!important;color:#fff!important}
+  .hero-class-photo .hero-description,.hero-class-photo .hero-buttons,.hero-class-photo .hero-live-strip,.hero-class-photo .badge{display:none!important}
+}
+</style>
+</head>
+<body>
+
+<div class="background"><div class="orb orb1"></div><div class="orb orb2"></div><div class="orb orb3"></div></div>
+
+<header class="navbar">
+<a href="#home" class="brand"><div class="brand-logo">XI</div><div class="brand-text"><strong>XI TKJ 1</strong><small>CLASS WEBSITE</small></div></a>
+<button class="music-button" id="musicButton" type="button" title="Music"><span class="music-glyph">♫</span><span class="music-label">Music</span></button>
+<nav class="nav-links" aria-label="Navigasi utama">
+<a href="#home">Home</a>
+<a href="#students">Kelas</a>
+<a href="#tasks">Tugas</a>
+<a href="#knowledge">Materi</a>
+<a href="#tools">TKJ</a>
+<a href="#calendar">Kalender</a>
+<a href="#notifications">Info</a>
+<a href="#dashboard-pro" data-open-account="1">Account</a>
+</nav>
+<div class="nav-right">
+<button class="nav-search-btn" id="globalSearchButton" title="Cari di website">⌕</button>
+<button class="notification-button" id="notificationButton" title="Notifikasi">◉<span id="notificationCount">0</span></button>
+<button class="account-pill" id="accountShortcut" title="Account"><span class="top-avatar-wrap"><img id="topAvatarImg" alt="" hidden><span id="topAvatarFallback">AC</span></span><b>Account</b></button>
+<button class="theme-button" id="themeButton">☀</button>
+<button class="menu-button menu-dots" id="menuButton" title="Menu" aria-label="Menu">⋮</button>
+</div>
+</header>
+
+<div class="mobile-menu" id="mobileMenu" role="dialog" aria-label="Navigasi kelas">
+  <div class="mobile-menu-head">
+    <div class="mobile-menu-title"><span class="menu-title-icon">XI</span><div><b>NAVIGASI KELAS</b><small>Semua menu XI TKJ 1 dalam satu tempat</small></div></div>
+    <button class="mobile-menu-close" id="mobileMenuClose" type="button" aria-label="Tutup menu">×</button>
+  </div>
+  <div class="mobile-menu-scroll">
+    <div class="menu-section">
+      <div class="menu-section-label">UTAMA</div>
+      <div class="menu-grid">
+        <a href="#home" class="menu-feature"><span class="menu-icon">⌂</span><span><b>Beranda</b><small>Kembali ke halaman utama</small></span></a>
+        <a href="#dashboard-pro" class="menu-feature"><span class="menu-icon">▦</span><span><b>Dashboard</b><small>Aktivitas dan akses akun</small></span></a>
+      </div>
+    </div>
+    <div class="menu-section">
+      <div class="menu-section-label">NAVIGASI KELAS</div>
+      <div class="menu-list">
+        <a href="#students"><span class="menu-icon">♙</span><span><b>Siswa</b><small>Daftar anggota kelas</small></span><em>›</em></a>
+        <a href="#about"><span class="menu-icon">◈</span><span><b>Tentang Kelas</b><small>Cerita, visi dan informasi XI TKJ 1</small></span><em>›</em></a>
+        <a href="#schedule"><span class="menu-icon">◷</span><span><b>Jadwal</b><small>Pelajaran dan agenda hari ini</small></span><em>›</em></a>
+        <a href="#piket"><span class="menu-icon">✓</span><span><b>Piket</b><small>Jadwal tugas kebersihan</small></span><em>›</em></a>
+      </div>
+    </div>
+    <div class="menu-section">
+      <div class="menu-section-label">AKADEMIK & INFORMASI</div>
+      <div class="menu-list">
+        <a href="#tasks"><span class="menu-icon">T</span><span><b>Tugas</b><small>Daftar tugas aktif</small></span><em>›</em></a>
+        <a href="#knowledge"><span class="menu-icon">M</span><span><b>Materi</b><small>Knowledge base pembelajaran</small></span><em>›</em></a>
+        <a href="#tools"><span class="menu-icon">⚙</span><span><b>TKJ Tools</b><small>Tools dan utilitas teknik</small></span><em>›</em></a>
+        <a href="#announcements"><span class="menu-icon">i</span><span><b>Pengumuman</b><small>Info penting kelas</small></span><em>›</em></a>
+        <a href="#notifications"><span class="menu-icon">!</span><span><b>Notifikasi</b><small>Pembaruan terbaru</small></span><em>›</em></a>
+      </div>
+    </div>
+    <div class="menu-section">
+      <div class="menu-section-label">KELAS & AKTIVITAS</div>
+      <div class="menu-list">
+        <a href="#finance"><span class="menu-icon">K</span><span><b>Kas Kelas</b><small>Ringkasan keuangan kelas</small></span><em>›</em></a>
+        <a href="#events"><span class="menu-icon">E</span><span><b>Event</b><small>Kegiatan dan agenda kelas</small></span><em>›</em></a>
+        <a href="#links"><span class="menu-icon">↗</span><span><b>Link Hub</b><small>Tautan penting kelas</small></span><em>›</em></a>
+        <a href="#faceAttendance" id="faceAttendanceLink" hidden><span class="menu-icon">A</span><span><b>Absen Foto Muka</b><small>Absensi khusus siswa</small></span><strong class="menu-new-badge">ABSEN</strong></a>
+        <a href="#studentBarcode" id="studentBarcodeLink" hidden><span class="menu-icon">▦</span><span><b>Barcode Saya</b><small>Tampilkan barcode NISN untuk absensi</small></span><strong class="menu-new-badge">ID</strong></a>
+      </div>
+    </div>
+  </div>
+  <div class="mobile-menu-footer">
+    <a href="#dashboard-pro" data-open-account="1" id="mobileAccountLink" class="mobile-account-card"><span class="menu-account-avatar"><img id="mobileAccountAvatar" alt="" hidden><span id="mobileAccountAvatarFallback">A</span></span><span><b id="mobileAccountLabel">Account / Login</b><small>Kelola akun dan profil</small></span><em>›</em></a>
+    <a href="#adminPortal" id="adminControlLink" class="admin-menu-card" hidden><span class="menu-icon">CP</span><span><b>Admin Control Panel</b><small>Pengaturan khusus administrator</small></span><em>›</em></a>
+  </div>
+</div>
+
+<main>
+
+
+
+<section class="hero section" id="home">
+<div class="hero-card hero-class-photo">
+  <img class="hero-class-photo-bg" src="assets/foto-kelas.jpg" alt="Foto bersama XI TKJ 1">
+  <div class="hero-photo-overlay"></div>
+<div class="hero-content">
+<div class="badge"><span class="status-dot"></span>Website Kelas Aktif</div>
+<p class="welcome">WELCOME TO</p>
+<h1 id="typingTitle" class="typewriter-title" aria-label="XI TKJ 1">XI TKJ 1</h1>
+<p class="hero-description">Website digital resmi untuk jadwal, piket, siswa, guru, pengumuman, tugas, dan informasi XI TKJ 1.</p>
+<div class="hero-buttons">
+<a href="#students" class="btn btn-primary">Jelajahi Kelas →</a>
+<a href="#tasks" class="btn btn-glass">Lihat Tugas</a>
+<button class="btn btn-glass" id="infoButton">Tentang Website</button>
+</div>
+<div class="hero-live-strip"><span><i></i> Website aktif</span><span>36 anggota</span><span>TKJ • Academic • Class Hub</span></div>
+</div>
+
+</div>
+
+<div class="stats-grid">
+<div class="stat-card"><div class="stat-icon">👨‍🎓</div><div><strong data-count="36">0</strong><span>Siswa</span></div></div>
+<div class="stat-card"><div class="stat-icon">📚</div><div><strong data-count="14">0</strong><span>Mata Pelajaran</span></div></div>
+<div class="stat-card"><div class="stat-icon">🧹</div><div><strong data-count="5">0</strong><span>Hari Piket</span></div></div>
+<div class="stat-card"><div class="stat-icon">🏆</div><div><strong data-count="0">0</strong><span>Prestasi</span></div></div>
+</div>
+</section>
+
+<section class="pro-dashboard section" id="dashboard-pro">
+<div class="section-heading"><div><p>XI TKJ COMMAND CENTER</p><h2>Dashboard <span>Kelas</span></h2></div><div class="dashboard-status"><span class="pulse-dot"></span>System Online</div></div>
+<div class="dashboard-shell">
+<div class="dashboard-main"><div class="dash-mobile-title"><div><span class="eyebrow">WELCOME BACK</span><h3>Dashboard XI TKJ 1</h3></div><div class="live-clock" id="liveClock">00:00:00</div></div>
+<div class="dash-view active" id="dash-overview">
+<div class="dash-hero premium-hero"><div><span class="eyebrow">LIVE CLASS STATUS</span><h3>Selamat datang, <span>XI TKJ 1</span> 👋</h3><p>Semua aktivitas kelas dalam satu website yang cepat, responsif, dan nyaman di HP maupun laptop.</p><div class="hero-mini-actions"><button class="dash-action" data-jump="#tasks">📝 Lihat Tugas</button><button class="dash-action" data-jump="#knowledge">📚 Materi</button><button class="dash-action" data-jump="#schedule">📅 Jadwal</button></div></div><div class="hero-clock"><span>LOCAL TIME</span><strong id="dashboardTime">00:00:00</strong><small id="dashboardDate">Memuat tanggal...</small></div></div>
+<div class="dash-stat-grid"><article class="dash-stat modern-stat"><div class="stat-symbol">📝</div><div><b id="taskStat">3</b><span>Tugas aktif</span></div><small>Terpantau</small></article><article class="dash-stat modern-stat"><div class="stat-symbol">📚</div><div><b id="materialStat">14</b><span>Materi belajar</span></div><small>Knowledge base</small></article><article class="dash-stat modern-stat"><div class="stat-symbol">👥</div><div><b id="studentStat">36</b><span>Anggota kelas</span></div><small>XI TKJ 1</small></article><article class="dash-stat modern-stat"><div class="stat-symbol">🏆</div><div><b>0</b><span>Prestasi</span></div><small>Achievements</small></article></div>
+<div class="dashboard-two-col">
+<article class="dash-panel activity-panel" style="grid-column:1/-1"><div class="panel-head"><div><span class="eyebrow">QUICK ACTIVITY</span><h3>Aktivitas Kelas</h3></div><span class="live-chip"><i></i> Live</span></div><div class="activity-list"><div class="activity-item"><span>📢</span><div><b>Website kelas aktif</b><small>Semua modul siap digunakan</small></div><time>Now</time></div><div class="activity-item"><span>📝</span><div><b>Tugas dapat dikelola dari Control Panel</b><small>Periksa deadline di menu Tugas</small></div><time>Today</time></div><div class="activity-item"><span>📚</span><div><b>Knowledge Base diperbarui</b><small>Linux, jaringan, coding & security</small></div><time>Today</time></div></div></article></div>
+<div class="dashboard-two-col"><article class="dash-panel"><div class="panel-head"><div><span class="eyebrow">SYSTEM</span><h3>Status Website</h3></div></div><div class="system-list"><div><span><i class="system-dot"></i>Frontend</span><b>Online</b></div><div><span><i class="system-dot"></i>Backend API</span><b id="backendStatus">Checking...</b></div><div><span><i class="system-dot"></i>Session</span><b id="sessionStatus">Guest</b></div><div><span><i class="system-dot"></i>Responsive UI</span><b>Ready</b></div></div></article></div>
+</div>
+<div class="dash-view" id="dash-messages"><div class="dash-empty-state"><span>▣</span><h3>Pesan & Notifikasi</h3><p>Notifikasi kelas, tugas, dan pengumuman terbaru tersedia di bagian Info.</p><button class="btn btn-primary" data-jump="#notifications">Buka Notifikasi →</button></div></div>
+<div class="dash-view" id="dash-files"><div class="dash-empty-state"><span>□</span><h3>File Manager</h3><p>Kelola file dan link kelas dari modul File Center.</p><button class="btn btn-primary" data-jump="#files">Buka File Center →</button></div></div>
+<div class="dash-view" id="dash-settings"><div class="dash-empty-state"><span>⚙</span><h3>Pengaturan</h3><p>Gunakan tombol tema di navbar untuk mengganti mode terang dan gelap.</p><button class="btn btn-primary" id="dashThemeShortcut">Ganti Tema</button></div></div>
+<nav class="dashboard-mobile-nav"><button class="mobile-dash-btn active" data-dash-target="dash-overview"><span>⌂</span><small>Home</small></button><button class="mobile-dash-btn mobile-dash-main" data-jump="#tasks"><span>＋</span><small>Tambah</small></button><button class="mobile-dash-btn" data-dash-target="dash-messages"><span>▣</span><small>Pesan</small></button><button class="mobile-dash-btn" data-dash-target="dash-settings"><span>⚙</span><small>Setting</small></button></nav>
+</div></div></section>
+
+<section class="section" id="tasks">
+  <div class="section-heading"><div><p>CLASS TASK MANAGER</p><h2>Tugas <span>XI TKJ 1</span></h2></div></div>
+  <div class="feature-toolbar"><div class="search-box"><span>⌕</span><input id="taskSearch" placeholder="Cari tugas..."></div><select id="taskFilter"><option value="all">Semua status</option><option value="todo">Belum</option><option value="doing">Dikerjakan</option><option value="done">Selesai</option></select><button class="btn btn-primary admin-only-task-action" id="addTaskBtn" hidden>＋ Tambah Tugas</button></div>
+  <div class="task-grid" id="taskGrid"></div>
+</section>
+
+<section class="section" id="knowledge">
+  <div class="section-heading"><div><p>TKJ KNOWLEDGE BASE</p><h2>Materi <span>Belajar</span></h2></div></div>
+  <div class="feature-toolbar"><div class="search-box"><span>⌕</span><input id="knowledgeSearch" placeholder="Cari materi, topik, atau command..."></div><select id="knowledgeFilter"><option value="all">Semua kategori</option><option value="network">Jaringan</option><option value="linux">Linux</option><option value="coding">Coding</option><option value="security">Security</option><option value="database">Database</option></select></div>
+  <div class="knowledge-grid" id="knowledgeGrid"></div>
+  <div class="modal" id="materialModal" aria-hidden="true"><div class="modal-box material-detail-box"><button class="modal-close" id="materialClose">×</button><div id="materialDetail"></div></div></div>
+</section>
+
+<section class="section" id="tools">
+  <div class="section-heading"><div><p>TKJ TOOLBOX</p><h2>Tools <span>Teknologi</span></h2></div></div>
+  <div class="tools-grid">
+    <button class="tool-card" data-tool="ip"><span>🌐</span><b>IP Calculator</b><small>IPv4 & subnet mask</small></button>
+    <button class="tool-card" data-tool="password"><span>🔐</span><b>Password Generator</b><small>Password kuat & aman</small></button>
+    <button class="tool-card" data-tool="base64"><span>🔤</span><b>Base64</b><small>Encode / decode teks</small></button>
+    <button class="tool-card" data-tool="json"><span>{ }</span><b>JSON Formatter</b><small>Rapikan JSON</small></button>
+    <button class="tool-card" data-tool="qr"><span>▦</span><b>QR Generator</b><small>Buat QR dari teks/link</small></button>
+    <button class="tool-card" data-tool="hash"><span>#</span><b>Hash SHA-256</b><small>Hash teks di browser</small></button>
+    <button class="tool-card" data-tool="color"><span>🎨</span><b>Color Picker</b><small>Palet warna cepat</small></button>
+    <button class="tool-card" data-tool="regex"><span>.*</span><b>Regex Tester</b><small>Uji pola teks</small></button>
+  </div>
+</section>
+
+
+
+
+
+
+<section class="section" id="schedule">
+<div class="section-heading"><div><p>CLASS SCHEDULE</p><h2>Jadwal <span>Pelajaran</span></h2></div></div>
+<div class="schedule-tabs"><button class="day-button active" data-day="senin">Senin</button><button class="day-button" data-day="selasa">Selasa</button><button class="day-button" data-day="rabu">Rabu</button><button class="day-button" data-day="kamis">Kamis</button><button class="day-button" data-day="jumat">Jumat</button></div>
+<div class="schedule-list" id="scheduleList"></div>
+</section>
+
+
+<section class="section" id="piket">
+<div class="section-heading"><div><p>CLASS DUTY SYSTEM</p><h2>Jadwal <span>Piket</span></h2></div></div>
+<div class="piket-toolbar">
+  <div class="search-box"><span>⌕</span><input id="piketSearch" type="text" placeholder="Cari nama siswa..."></div>
+  <select id="piketDay">
+    <option value="all">Semua Hari</option>
+    <option value="Senin">Senin</option><option value="Selasa">Selasa</option>
+    <option value="Rabu">Rabu</option><option value="Kamis">Kamis</option><option value="Jumat">Jumat</option>
+  </select>
+</div>
+<div class="piket-grid" id="piketGrid"></div>
+<div class="piket-result" id="piketResult">Cari nama siswa untuk menemukan hari piket.</div>
+</section>
+
+<section class="section" id="students">
+<div class="section-heading"><div><p>OUR MEMBERS</p><h2>Anggota <span>Kelas</span></h2></div></div>
+<div class="class-structure" aria-label="Struktur Kelas XI TKJ 1"><div class="structure-title"><span>CLASS ORGANIZATION</span><h3>Struktur Kelas</h3></div>
+  <div class="class-structure-leader"><span class="structure-role">WALI KELAS</span><strong>Bu Luluk</strong></div>
+  <div class="structure-connector leader-connector"></div>
+  <div class="structure-top-row">
+    <div class="structure-item"><span>Ketua Kelas</span><b>Irfan</b></div>
+    <div class="structure-item"><span>Wakil Ketua</span><b>Lucky</b></div>
+  </div>
+  <div class="structure-connector branch-connector"></div>
+  <div class="structure-bottom-row">
+    <div class="structure-item"><span>Bendahara 1</span><b>Savira</b></div>
+    <div class="structure-item"><span>Bendahara 2</span><b>Reyhana</b></div>
+    <div class="structure-item"><span>Sekertaris 1</span><b>Dina</b></div>
+    <div class="structure-item"><span>Sekertaris 2</span><b>Alya</b></div>
+  </div>
+</div>
+<div class="student-toolbar"><div class="search-box"><span>⌕</span><input type="text" id="studentSearch" placeholder="Cari nama siswa..."></div><select id="studentFilter"><option value="all">Semua</option><option value="L">Laki-laki</option><option value="P">Perempuan</option></select></div>
+<div class="students-grid" id="studentsGrid"></div>
+</section>
+
+
+
+<section class="section" id="announcements">
+<div class="section-heading"><div><p>LATEST INFORMATION</p><h2>Pengumuman <span>Kelas</span></h2></div></div>
+<div class="announcement-grid">
+<article class="announcement-card"><div class="announcement-date"><strong>10</strong><span>AGU</span></div><div><span class="announcement-label">INFO KELAS</span><h3>Selamat datang di website XI TKJ 1!</h3><p>Semua informasi kelas akan ditampilkan melalui website ini.</p></div></article>
+<article class="announcement-card"><div class="announcement-date"><strong>11</strong><span>AGU</span></div><div><span class="announcement-label">KEGIATAN</span><h3>Jangan lupa jadwal piket kelas.</h3><p>Pastikan datang tepat waktu dan melaksanakan piket sesuai jadwal.</p></div></article>
+</div>
+</section>
+
+
+<section class="section" id="achievements">
+<div class="section-heading"><div><p>CLASS ACHIEVEMENTS</p><h2>Prestasi <span>Kelas</span></h2></div></div>
+<div class="achievement-grid" id="achievementGrid"><div class="empty-state">Prestasi kelas belum ada.</div></div>
+</section>
+
+
+
+<section class="section" id="calendar">
+  <div class="section-heading"><div><p>CLASS CALENDAR</p><h2>Kalender <span>Kegiatan</span></h2></div></div>
+  <div class="calendar-layout">
+    <div class="calendar-card">
+      <div class="calendar-head"><button id="calPrev">‹</button><h3 id="calTitle">Kalender</h3><button id="calNext">›</button></div>
+      <div class="calendar-week"><span>Min</span><span>Sen</span><span>Sel</span><span>Rab</span><span>Kam</span><span>Jum</span><span>Sab</span></div>
+      <div id="calendarGrid" class="calendar-grid"></div>
+    </div>
+    <div class="agenda-card"><div class="panel-head"><h3>📅 Agenda terdekat</h3><span id="agendaCount">0 agenda</span></div><div id="agendaList"></div></div>
+  </div>
+</section>
+
+
+<section class="section" id="files">
+  <div class="section-heading"><div><p>CLASS FILE CENTER</p><h2>File <span>Center</span></h2></div></div>
+  <div class="file-toolbar"><div class="search-box"><span>⌕</span><input id="fileSearch" placeholder="Cari modul, PDF, link..."></div><button class="btn btn-primary" id="addFileBtn">＋ Tambah File/Link</button></div>
+  <div id="fileGrid" class="file-grid"></div>
+</section>
+
+<section class="section" id="notifications">
+  <div class="section-heading"><div><p>CLASS NOTIFICATION CENTER</p><h2>Notifikasi <span>Kelas</span></h2></div></div>
+  <div class="notification-layout"><div id="notificationList" class="notification-list"></div><div class="notification-info"><span class="eyebrow">SMART ALERTS</span><h3>Semua aktivitas penting dalam satu tempat.</h3><p>Notifikasi dibuat dari tugas, jadwal, pengumuman, dan aktivitas terbaru. Data dibaca dari penyimpanan lokal.</p><button class="mini-btn" id="markNotifications">Tandai semua dibaca</button></div></div>
+</section>
+
+<section class="section" id="finance">
+  <div class="section-heading"><div><p>CLASS FINANCE</p><h2>Kas <span>Kelas</span></h2></div><div class="section-live"><i></i> Ringkasan terbaru</div></div>
+  <div class="finance-layout">
+    <div class="finance-main">
+      <div class="finance-balance"><span>Saldo kas saat ini</span><strong id="cashBalance">Rp 850.000</strong><small>Contoh dashboard • data dapat dikelola admin</small></div>
+      <div class="finance-stats">
+        <div><span>↗ Pemasukan</span><b id="cashIncome">Rp 300.000</b></div>
+        <div><span>↘ Pengeluaran</span><b id="cashExpense">Rp 150.000</b></div>
+        <div><span>👥 Iuran</span><b>36 siswa</b></div>
+      </div>
+    </div>
+    <div class="finance-list">
+      <div class="panel-head"><h3>Transaksi terbaru</h3><span>3 item</span></div>
+      <div class="transaction"><span class="transaction-icon in">↗</span><div><b>Iuran kelas</b><small>Agustus 2026</small></div><strong>+ Rp 300.000</strong></div>
+      <div class="transaction"><span class="transaction-icon out">↘</span><div><b>Perlengkapan kelas</b><small>12 Agustus 2026</small></div><strong>- Rp 100.000</strong></div>
+      <div class="transaction"><span class="transaction-icon out">↘</span><div><b>Dokumentasi kegiatan</b><small>10 Agustus 2026</small></div><strong>- Rp 50.000</strong></div>
+      <button class="mini-btn full-btn" id="financeNoteBtn">ℹ️ Kelola melalui Control Panel</button>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="events">
+  <div class="section-heading"><div><p>CLASS EVENTS</p><h2>Event & <span>Agenda</span></h2></div><button class="mini-btn" id="addEventDemo">＋ Tambah agenda</button></div>
+  <div class="event-layout">
+    <div class="event-feature">
+      <span class="event-badge">UPCOMING</span><h3 id="nextEventTitle">Project Landing Page</h3><p id="nextEventDesc">Presentasi project web kelas.</p>
+      <div class="countdown-row" id="eventCountdown"><div><b>--</b><small>Hari</small></div><div><b>--</b><small>Jam</small></div><div><b>--</b><small>Menit</small></div><div><b>--</b><small>Detik</small></div></div>
+    </div>
+    <div class="event-list" id="eventList"></div>
+  </div>
+</section>
+
+<section class="section" id="links">
+  <div class="section-heading"><div><p>CLASS LINK HUB</p><h2>Link <span>Penting</span></h2></div></div>
+  <div class="linkhub-grid">
+    <a class="linkhub-card" href="#" data-link-placeholder="Google Classroom"><span>📚</span><div><b>Google Classroom</b><small>Ruang tugas dan pembelajaran</small></div><em>↗</em></a>
+    <a class="linkhub-card" href="#" data-link-placeholder="Google Drive"><span>📂</span><div><b>Google Drive</b><small>Dokumen dan file kelas</small></div><em>↗</em></a>
+    <a class="linkhub-card" href="#" data-link-placeholder="E-Learning"><span>🌐</span><div><b>E-Learning Sekolah</b><small>Website pembelajaran sekolah</small></div><em>↗</em></a>
+    <a class="linkhub-card" href="#" data-link-placeholder="Website Sekolah"><span>🏫</span><div><b>Website Sekolah</b><small>Informasi resmi sekolah</small></div><em>↗</em></a>
+    <a class="linkhub-card" href="#" data-link-placeholder="Link Ujian"><span>📝</span><div><b>Link Ujian</b><small>Tambahkan link ujian aktif</small></div><em>↗</em></a>
+    <a class="linkhub-card" href="#" data-link-placeholder="Link Grup"><span>💬</span><div><b>Grup Kelas</b><small>Tambahkan link grup resmi kelas</small></div><em>↗</em></a>
+  </div>
+</section>
+
+<section class="section" id="about">
+<div class="section-heading"><div><p>ABOUT XI TKJ 1</p><h2>Tentang <span>XI TKJ 1</span></h2></div></div>
+<div class="class-showcase">
+  <div class="class-showcase-main">
+    <div class="class-showcase-top"><span class="class-chip">XI TKJ 1</span><span class="class-line"></span><small>DIGITAL CLASSROOM</small></div>
+    <div class="class-showcase-copy">
+      <span class="eyebrow">MORE THAN A CLASS</span>
+      <h3>Tempat belajar,<br><em>berproses & bertumbuh.</em></h3>
+      <p>XI TKJ 1 bukan sekadar ruang kelas. Ini adalah tempat 36 siswa berbagi ide, pengalaman, tugas, jadwal, dan momen yang akan terus diingat.</p>
+      <div class="class-showcase-stats"><div><b>36</b><small>SISWA</small></div><div><b>5</b><small>HARI BELAJAR</small></div><div><b>01</b><small>RUANG KELAS</small></div></div>
+    </div>
+  </div>
+  <div class="class-showcase-side">
+    <article class="class-quote-card"><span>01</span><b>VISION</b><h4>Kompak.<br>Kreatif.<br>Berprestasi.</h4><p>Membangun kelas yang saling mendukung dan berani berkembang.</p></article>
+    <article class="class-quote-card accent"><span>02</span><b>MISSION</b><h4>Learn.<br>Build.<br>Grow.</h4><p>Belajar bersama, membuat sesuatu yang nyata, lalu tumbuh bersama.</p></article>
+  </div>
+</div>
+</section>
+
+</main>
+
+<div class="modal admin-portal-modal" id="adminPortal" aria-hidden="true">
+  <div class="admin-portal-box">
+    <div class="admin-portal-head"><div><span class="eyebrow">XI TKJ 1 • PRIVATE</span><h2>Control Panel</h2></div><button class="modal-close" id="adminPortalClose">×</button></div>
+    <div class="admin-layout">
+      <aside class="admin-side">
+  <div class="admin-brand">
+    <div class="admin-brand-mark">XI</div>
+    <div><b>CONTROL</b><small>XI TKJ 1 • ADMIN</small></div>
+  </div>
+  <div class="admin-nav-label">WORKSPACE</div>
+  <button class="admin-tab active" data-admin="overview"><span>⌂</span>Overview</button>
+  <button class="admin-tab" data-admin="website"><span>◈</span>Website</button>
+  <button class="admin-tab" data-admin="tasks"><span>✓</span>Tugas</button>
+  <button class="admin-tab" data-admin="materials"><span>▤</span>Materi</button>
+  <button class="admin-tab" data-admin="students"><span>♙</span>Siswa</button>
+  <button class="admin-tab" data-admin="accounts"><span>◎</span>Manage Account</button>
+  <div class="admin-nav-label">CLASSROOM</div>
+  <button class="admin-tab" data-admin="schedule"><span>◷</span>Jadwal</button>
+  <button class="admin-tab" data-admin="piket"><span>◌</span>Piket</button>
+  <button class="admin-tab" data-admin="attendance"><span>▦</span>Scan Absensi</button>
+  <button class="admin-tab" data-admin="face-attendance"><span>◉</span>Cek Absensi</button>
+  <button class="admin-tab" data-admin="finance"><span>Rp</span>Kas Kelas</button>
+  <button class="admin-tab" data-admin="announcements"><span>!</span>Pengumuman</button>
+  <button class="admin-tab" data-admin="events"><span>✦</span>Event</button>
+  <button class="admin-tab" data-admin="links"><span>↗</span>Link Hub</button>
+  <button class="admin-tab" data-admin="files"><span>□</span>File Center</button>
+  <button class="admin-tab" data-admin="settings"><span>⚙</span>Pengaturan</button>
+</aside>
+      <div class="admin-content" id="adminContent"></div>
+    </div>
+    <div class="admin-portal-foot"><span>🔐 Sesi admin aktif di perangkat ini.</span><button class="mini-btn" id="adminLogout">Keluar</button></div>
+  </div>
+</div>
+
+<div class="modal account-modal" id="accountModal" aria-hidden="true">
+  <div class="account-modal-box">
+    <button class="modal-close" id="accountModalClose" aria-label="Tutup">×</button>
+    <div id="accountGuestView" class="login-shell student-mode">
+      <div class="login-showcase">
+        <div class="login-orb login-orb-a"></div><div class="login-orb login-orb-b"></div>
+        <div class="login-showcase-top"><span class="login-brand-dot">XI</span><span>XI TKJ 1</span><span class="login-private">PRIVATE AREA</span></div>
+        <div class="login-showcase-copy">
+          <span class="eyebrow">DIGITAL CLASSROOM</span>
+          <h2 class="login-showcase-title student-title">Welcome to your<br><strong>class account.</strong></h2>
+          <h2 class="login-showcase-title admin-title">Welcome<br><strong>Administrator.</strong></h2>
+          <p class="student-copy">Satu akun untuk membuka profil, aktivitas siswa, tugas, materi, dan seluruh ruang kelas XI TKJ 1.</p><p class="admin-copy">Kelola website, tugas, materi, absensi, akun siswa, dan seluruh sistem kelas dari Control Panel.</p>
+        </div>
+        <div class="login-showcase-points"><span><b>01</b> Profil personal</span><span><b>02</b> Absensi terhubung</span><span><b>03</b> Data kelas terpusat</span></div>
+      </div>
+      <div class="login-panel">
+        <div class="login-panel-head"><div><span class="eyebrow">ACCOUNT ACCESS</span><h2 class="login-panel-title student-panel-title">Welcome back.</h2><h2 class="login-panel-title admin-panel-title">Welcome Admin.</h2><p class="student-panel-copy">Masukkan akun siswa untuk melanjutkan.</p><p class="admin-panel-copy">Masuk sebagai administrator untuk mengelola kelas.</p></div><div class="login-live"><i></i> SYSTEM READY</div></div>
+        <div class="auth-choice"><button class="auth-choice-btn active" data-auth-modal-view="student"><span class="auth-choice-mark">S</span><b>Akun Siswa</b><small>NISN + password</small><em>›</em></button><button class="auth-choice-btn" data-auth-modal-view="admin"><span class="auth-choice-mark">AD</span><b>Administrator</b><small>Control Panel</small><em>›</em></button></div>
+        <div class="login-security-note"><span>SECURE ACCESS</span><small>Gunakan akun yang sudah terdaftar. Jangan bagikan password.</small></div>
+        <div class="modal-login-view active" id="studentModalAuth"><form id="studentLoginForm"><label><span>NISN</span><div class="login-input-wrap"><b>01</b><input id="studentUsername" inputmode="numeric" autocomplete="username" placeholder="Masukkan NISN" required></div></label><label><span>Password</span><div class="login-input-wrap"><b>02</b><input id="studentPassword" type="password" autocomplete="current-password" placeholder="Masukkan password" required><button type="button" class="password-toggle" data-toggle-password="studentPassword">Tampilkan</button></div></label><div class="login-options"><span>● Session aman</span><span>XI TKJ 1</span></div><button class="btn btn-primary auth-submit" type="submit"><span>Masuk sebagai Siswa</span><b>→</b></button><small id="studentLoginError" class="auth-error"></small></form></div>
+        <div class="modal-login-view" id="adminModalAuth"><form id="adminLoginForm"><label><span>Username Admin</span><div class="login-input-wrap"><b>01</b><input id="adminUsername" autocomplete="username" placeholder="Masukkan username admin" required></div></label><label><span>Password</span><div class="login-input-wrap"><b>02</b><input id="adminPassword" type="password" autocomplete="current-password" placeholder="Masukkan password admin" required><button type="button" class="password-toggle" data-toggle-password="adminPassword">Tampilkan</button></div></label><div class="login-options"><span>● Admin session</span><span>PRIVATE CONTROL</span></div><button class="btn btn-primary auth-submit" type="submit"><span>Masuk ke Control Panel</span><b>→</b></button><small id="adminLoginError" class="auth-error"></small></form></div>
+        <div class="login-foot"><span>XI TKJ 1 • DIGITAL CLASS</span><span>v2.0</span></div>
+      </div>
+    </div>
+    <div id="profileToast" class="profile-toast" aria-live="polite"></div>
+    <div id="accountProfileView" hidden>
+      <div class="profile-cover"><div class="profile-cover-glow"></div><div class="profile-cover-content"><div><span class="eyebrow" id="profileRole">SISWA • XI TKJ 1</span><h2 id="profileName">Akun</h2><p id="profileNisn">NISN: -</p></div><div class="profile-avatar-wrap"><img id="profileAvatarImg" alt="Foto profil" hidden><div id="profileAvatarFallback">XI</div></div></div></div>
+      <div class="profile-feature-grid" id="profileFeatureGrid">
+        <article><span class="profile-feature-icon">ROLE</span><div><b id="profileFeatureRole">Siswa</b><small id="profileFeatureRoleSub">XI TKJ 1</small></div></article>
+        <article><span class="profile-feature-icon">ID</span><div><b id="profileFeatureId">NISN</b><small id="profileFeatureIdSub">Identitas akun</small></div></article>
+        <article><span class="profile-feature-icon">STATUS</span><div><b id="profileFeatureStatus">Aktif</b><small>Sesi sedang berjalan</small></div></article>
+        <article><span class="profile-feature-icon">DATA</span><div><b id="profileFeatureData">Lokal</b><small>Profil tersimpan di perangkat</small></div></article>
+      </div>
+      <div class="profile-info-grid profile-info-compact">
+        <div><small>Nama akun</small><b id="profileName2">-</b></div>
+        <div><small id="profileLoginLabel">Login</small><b id="profileLoginValue">NISN</b></div>
+        <div><small>Peran</small><b id="profileRoleValue">Siswa</b></div>
+        <div><small>Status akun</small><b id="profileStatusValue">Aktif</b></div>
+      </div>
+      <div class="profile-editor" id="profileEditor">
+        <div class="profile-editor-heading"><div><span class="eyebrow">PERSONAL DATA</span><h3>Edit Profile</h3></div><small id="profileEditorHint">Data profile dapat diubah setelah login.</small></div>
+        <div class="profile-edit-grid">
+          <label>Nama Profile<input id="profileNameInput" type="text" maxlength="60" placeholder="Nama profile"></label>
+          <label>Username Profile<input id="profileUsernameInput" type="text" maxlength="30" placeholder="Username profile"></label>
+          <label>Bio<textarea id="profileBioInput" maxlength="220" placeholder="Tulis bio singkat..."></textarea></label>
+          <label>Minat<input id="profileInterestsInput" type="text" maxlength="120" placeholder="Contoh: desain, jaringan, coding"></label>
+          <label>Skill<input id="profileSkillsInput" type="text" maxlength="120" placeholder="Contoh: networking, editing"></label>
+        </div>
+      </div>
+      <input type="file" id="profilePhotoInput" accept="image/*" hidden>
+      <div class="profile-actions profile-actions-bottom">
+        <button class="mini-btn" id="saveAccountProfile">Simpan Profile</button>
+        <button class="mini-btn" id="changePhotoBtn">Ganti Foto Profile</button>
+        <button class="mini-btn danger" id="deletePhotoBtn">Hapus Foto Profile</button>
+        <button class="mini-btn danger" id="accountLogout">Logout</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal profile-confirm-modal" id="profileConfirmModal" aria-hidden="true">
+  <div class="profile-confirm-box">
+    <span class="eyebrow">KONFIRMASI</span>
+    <h3>Yakin Untuk Merubah Profile</h3>
+    <p>Perubahan profile akan diterapkan pada account ini.</p>
+    <div class="profile-confirm-actions"><button class="mini-btn" id="profileConfirmNo">Tidak</button><button class="btn btn-primary" id="profileConfirmYes">Ya</button></div>
+  </div>
+</div>
+
+<div class="modal crop-modal" id="cropModal" aria-hidden="true">
+  <div class="crop-box">
+    <button class="modal-close" id="cropClose" aria-label="Tutup">×</button>
+    <span class="eyebrow">FOTO PROFILE</span>
+    <h3>Sesuaikan Foto</h3>
+    <p>Geser foto dan atur zoom agar pas di kotak.</p>
+    <div class="crop-stage" id="cropStage"><canvas id="cropCanvas"></canvas><div class="crop-square"></div></div>
+    <label class="crop-zoom">Zoom<input id="cropZoom" type="range" min="1" max="3" step="0.01" value="1"></label>
+    <div class="crop-actions"><button class="mini-btn" id="cropCancel">Batal</button><button class="btn btn-primary" id="cropApply">Pakai Foto</button></div>
+  </div>
+</div>
+
+<div class="modal student-profile-modal" id="studentProfileModal" aria-hidden="true">
+  <div class="student-profile-box">
+    <button class="modal-close" id="studentProfileClose" aria-label="Tutup">×</button>
+    <div class="student-profile-hero">
+      <div class="student-profile-avatar" id="studentProfileAvatar">XI</div>
+      <div><span class="eyebrow">STUDENT PROFILE • XI TKJ 1</span><h2 id="studentProfileName">Profil Siswa</h2><p id="studentProfileSubtitle">Siswa XI TKJ 1</p></div>
+      <span class="profile-online-badge">● AKTIF</span>
+    </div>
+    <div class="student-profile-tabs"><button class="active" data-profile-tab="overview">Overview</button><button data-profile-tab="bio">Bio & Minat</button><button data-profile-tab="activity">Aktivitas</button></div>
+    <div class="student-profile-tab active" id="studentProfileOverview">
+      <div class="student-profile-stat-grid">
+        <article><small>Kelas</small><b>XI TKJ 1</b></article><article><small>Gender</small><b id="studentProfileGender">-</b></article><article><small>Status</small><b>Aktif</b></article><article><small>Login</small><b id="studentProfileLogin">NISN</b></article>
+      </div>
+      <div class="student-profile-detail-grid">
+        <article><span>👤</span><div><small>Nama lengkap</small><b id="studentProfileFullName">-</b></div></article>
+        <article><span>🪪</span><div><small>NISN</small><b id="studentProfileNisn">Belum tersedia</b></div></article>
+        <article><span>🎓</span><div><small>Fokus belajar</small><b>Teknik Komputer & Jaringan</b></div></article>
+        <article><span>💻</span><div><small>Keahlian</small><b id="studentProfileSkills">Networking • Computer • TKJ</b></div></article>
+        <article><span>📚</span><div><small>Mapel favorit</small><b id="studentProfileFavoriteSubject">Teknik Komputer & Jaringan</b></div></article>
+        <article><span>🎯</span><div><small>Target belajar</small><b id="studentProfileGoal">Mengembangkan kemampuan TKJ</b></div></article>
+      </div>
+    </div>
+    <div class="student-profile-tab" id="studentProfileBio">
+      <div class="profile-bio-card"><span class="eyebrow">BIO</span><h3 id="studentProfileBioText">Belum ada bio.</h3><p>Bio dapat diubah dari halaman Account setelah siswa login.</p></div>
+      <div class="student-profile-detail-grid"><article><span>✨</span><div><small>Minat</small><b id="studentProfileInterests">Teknologi, jaringan, dan komputer</b></div></article><article><span>🏆</span><div><small>Pencapaian</small><b id="studentProfileAchievement">Belum ada data</b></div></article><article><span>🟢</span><div><small>Status profil</small><b id="studentProfileStatus">Aktif</b></div></article></div>
+    </div>
+    <div class="student-profile-tab" id="studentProfileActivity">
+      <div class="student-profile-activity-grid"><article><b>3</b><span>Tugas aktif</span></article><article><b>0</b><span>Prestasi kelas</span></article><article><b>5</b><span>Jadwal piket</span></article><article><b>100%</b><span>Status akun</span></article></div>
+      <div class="profile-bio-card"><span class="eyebrow">CLASS ACTIVITY</span><h3>Aktivitas siswa</h3><p>Data tugas, materi, piket, dan pencapaian dapat dikembangkan lebih lanjut melalui Control Panel admin.</p></div>
+    </div>
+  </div>
+</div>
+
+
+<div class="modal face-attendance-modal" id="faceAttendanceModal" aria-hidden="true">
+  <div class="face-attendance-box">
+    <button class="modal-close" id="faceAttendanceClose" type="button">×</button>
+    <div class="face-attendance-head">
+      <span class="eyebrow">XI TKJ 1 • ABSENSI</span>
+      <h2>Absen Foto Muka</h2>
+      <p>Ambil foto wajah secara langsung. Foto disimpan di perangkat dan, jika Google Drive diaktifkan, dikirim ke folder Drive admin.</p>
+    </div>
+    <div class="face-attendance-thanks" id="faceAttendanceThanks" hidden>
+      <div class="face-thanks-mark">✓</div>
+      <span class="eyebrow">ABSENSI HARI INI SELESAI</span>
+      <h3>Terimakasih Sudah<br>Melakukan Absen.</h3>
+      <p>Jangan Lupa Besok Absen Lagi!</p>
+      <small id="faceAttendanceThanksMeta"></small>
+      <button type="button" class="face-thanks-close" id="faceAttendanceThanksClose">Tutup</button>
+    </div>
+    <div class="face-camera">
+      <video id="faceCameraVideo" autoplay playsinline muted></video>
+      <canvas id="faceCameraCanvas" hidden></canvas>
+      <div class="face-camera-placeholder" id="faceCameraPlaceholder"><span class="camera-placeholder-icon">⌾</span><b>Kamera siap digunakan</b><small>Tekan Buka Kamera untuk mulai</small></div>
+      <div class="face-camera-overlay" aria-hidden="true">
+        <span class="camera-badge"><i></i> KAMERA DEPAN</span><div class="face-guide"></div>
+      </div>
+    </div>
+    <div class="face-camera-status" id="faceCameraStatus"><span class="status-dot"></span><span class="status-text">Tekan “Buka Kamera” untuk mulai.</span></div>
+    <div class="face-control-bar">
+      <button class="face-control secondary" id="faceCameraStart" type="button"><span>↻</span><b>Buka Kamera</b></button>
+      <button class="face-control primary" id="faceCameraCapture" type="button" disabled><span>●</span><b>Ambil Foto</b></button>
+      <label class="face-control secondary face-upload-fallback"><span>▧</span><b>Pilih Foto</b><input id="facePhotoFile" type="file" accept="image/*" capture="user" hidden></label>
+    </div>
+    <button class="face-preview-wrap" id="facePreviewWrap" type="button" hidden aria-label="Buka preview foto absensi">
+      <span class="face-preview-image"><img id="facePreview" alt="Preview foto absensi"></span>
+      <span class="face-preview-info"><span class="face-preview-label">PREVIEW ABSENSI</span><b>Foto siap dikirim</b><small id="facePreviewMeta"></small><em>Ketuk untuk melihat foto penuh</em></span>
+      <span class="face-preview-open">↗</span>
+      <span class="face-preview-check">✓</span>
+    </button>
+    <div class="face-submit-row" id="faceSubmitActions" hidden>
+      <button class="face-control secondary" id="faceRetake" type="button">Ambil Ulang</button>
+      <button class="face-control primary submit" id="faceSubmit" type="button">✓ &nbsp; Kirim Absensi</button>
+    </div>
+    <div class="face-quick-tips">
+      <span>☼ Cahaya cukup</span><span>◎ Wajah terlihat jelas</span><span>1× per hari</span>
+    </div>
+    <p class="face-note"><span>LOCK</span> Foto hanya digunakan sebagai bukti absensi kelas.</p>
+  </div>
+</div>
+
+<div class="modal face-photo-viewer" id="facePhotoViewer" aria-hidden="true">
+  <div class="face-photo-viewer-box">
+    <button class="modal-close" id="facePhotoViewerClose" type="button" aria-label="Tutup preview">×</button>
+    <div class="face-photo-viewer-head"><span class="eyebrow">PREVIEW ABSENSI</span><h3 id="facePhotoViewerTitle">Foto Absensi</h3><small id="facePhotoViewerMeta"></small></div>
+    <div class="face-photo-viewer-image"><img id="facePhotoViewerImage" alt="Foto absensi ukuran penuh"></div>
+  </div>
+</div>
+
+<div class="modal file-center-modal" id="fileCenterModal" aria-hidden="true">
+  <div class="file-center-box">
+    <button class="modal-close" id="fileCenterClose" type="button">×</button>
+    <div class="file-center-head"><span class="eyebrow">CONTROL PANEL • FILE CENTER</span><h2>Tambah File / Link</h2><p>Tambahkan materi atau tautan kelas dengan tampilan yang sama rapi seperti form tugas.</p></div>
+    <div class="file-center-form">
+      <label>Nama file / materi<input id="fileCenterTitle" type="text" placeholder="Contoh: Modul Jaringan Dasar"></label>
+      <label>Jenis<select id="fileCenterType"><option>PDF</option><option>Modul</option><option>Dokumen</option><option>Link</option></select></label>
+      <label>URL Google Drive / File <input id="fileCenterUrl" type="url" placeholder="https://drive.google.com/..."></label>
+    </div>
+    <div class="file-center-actions"><button class="mini-btn" id="fileCenterCancel" type="button">Batal</button><button class="btn btn-primary" id="fileCenterSave" type="button">Simpan File</button></div>
+  </div>
+</div>
+
+
+<div class="modal student-barcode-modal" id="studentBarcodeModal" aria-hidden="true">
+  <div class="student-barcode-box">
+    <button class="modal-close" id="studentBarcodeClose" type="button" aria-label="Tutup">×</button>
+    <div class="student-barcode-head">
+      <span class="eyebrow">XI TKJ 1 • STUDENT ID</span>
+      <h2>Barcode Absensi</h2>
+      <p>Tunjukkan barcode ini kepada admin saat melakukan absensi. Barcode berisi NISN akun kamu.</p>
+    </div>
+    <div class="student-barcode-card">
+      <div class="student-barcode-top">
+        <span class="student-barcode-status"><i></i> BARCODE AKTIF</span>
+        <span id="studentBarcodeDate"></span>
+      </div>
+      <div class="student-barcode-image-wrap">
+        <img id="studentBarcodeImage" src="" alt="Barcode NISN siswa">
+      </div>
+      <div class="student-barcode-name" id="studentBarcodeName">Siswa</div>
+      <div class="student-barcode-nisn"><span>NISN</span><b id="studentBarcodeNisn">-</b></div>
+      <div class="student-barcode-note"><span>✓</span><small>Gunakan barcode ini untuk scan absensi oleh admin. Jangan bagikan ke orang lain.</small></div>
+    </div>
+    <div class="student-barcode-actions">
+      <button class="mini-btn" id="studentBarcodeClose2" type="button">Tutup</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal admin-barcode-modal" id="adminBarcodeModal" aria-hidden="true">
+  <div class="admin-barcode-box">
+    <button class="modal-close" id="adminBarcodeClose" type="button" aria-label="Tutup scanner">×</button>
+    <div class="admin-barcode-head">
+      <div>
+        <span class="eyebrow">ADMIN CONTROL • ATTENDANCE</span>
+        <h2>Scan Barcode Siswa</h2>
+        <p>Scan barcode siswa untuk langsung memberi status <b>Hadir (H)</b> pada absensi hari ini.</p>
+      </div>
+      <span class="admin-scanner-live"><i></i> ADMIN ONLY</span>
+    </div>
+    <div class="admin-scanner-layout">
+      <div class="admin-scanner-camera">
+        <div class="scanner-frame">
+          <video id="adminBarcodeVideo" playsinline muted></video>
+          <div class="scanner-placeholder" id="adminBarcodePlaceholder"><span>▣</span><b>Scanner siap</b><small>Tekan tombol mulai kamera</small></div>
+          <div class="scanner-corners"></div>
+          <div class="scanner-line"></div>
+        </div>
+        <div class="admin-scanner-status" id="adminBarcodeStatus">Kamera belum aktif.</div>
+        <div class="admin-scanner-actions">
+          <button class="btn btn-primary" id="adminBarcodeStart" type="button">▣ Mulai Scanner</button>
+          <button class="mini-btn" id="adminBarcodeStop" type="button">Berhenti</button>
+        </div>
+        <input id="adminBarcodeFile" type="file" accept="image/*" hidden>
+        <button class="scanner-upload-btn" id="adminBarcodeUpload" type="button">Pilih gambar barcode</button>
+      </div>
+      <div class="admin-scanner-result" id="adminBarcodeResult">
+        <span class="eyebrow">SCAN RESULT</span>
+        <div class="scanner-result-icon">✓</div>
+        <h3 id="adminBarcodeResultName">Belum ada scan</h3>
+        <p id="adminBarcodeResultMeta">Hasil scan akan tampil di sini.</p>
+        <div class="scanner-result-status" id="adminBarcodeResultStatus">Menunggu barcode…</div>
+      </div>
+    </div>
+    <div class="admin-scanner-note"><span>SECURE</span> Scanner ini hanya dapat dibuka dari sesi Administrator. Setiap scan hanya mencatat satu siswa sebagai Hadir untuk tanggal hari ini.</div>
+  </div>
+</div>
+
+<div class="music-panel" id="musicPanel" aria-hidden="true">
+  <div class="music-panel-head"><div><span class="eyebrow">XI TKJ 1 MUSIC</span><h3>Music Player</h3><p>Semua pengunjung bisa mendengarkan lagu. Login hanya diperlukan untuk menambah atau menghapus lagu.</p></div><button class="music-close" id="musicClose" aria-label="Tutup">×</button></div>
+  <div class="music-drop"><div class="music-drop-icon">♫</div><div><b>Music lokal</b><small>Lagu ditambahkan manual ke folder <code>assets/music/</code>. Semua pengunjung bisa langsung memutarnya.</small></div></div>
+  <div class="music-list" id="musicList"><div class="music-empty">Daftar lagu masih kosong.</div></div>
+  <audio id="musicAudio" controls preload="metadata"></audio>
+</div>
+
+<div class="tool-modal" id="toolModal"><div class="tool-modal-box"><button class="modal-close" id="toolClose">×</button><div id="toolModalContent"></div></div></div>
+
+<div class="toast" id="toast"></div>
+
+<div class="modal task-input-modal" id="taskInputModal" aria-hidden="true">
+  <div class="task-input-box">
+    <span class="eyebrow" id="taskInputEyebrow">CONTROL PANEL • TUGAS</span>
+    <h2 id="taskInputTitle">Nama Tugas?</h2>
+    <p id="taskInputHint">Masukkan nama tugas yang akan diberikan.</p>
+    <input id="taskInputField" type="text" autocomplete="off" placeholder="Nama tugas...">
+    <textarea id="taskTextareaField" hidden placeholder="Tulis isi tugas di sini..."></textarea>
+    <div class="task-input-actions"><button class="mini-btn" id="taskInputCancel">Batal</button><button class="btn btn-primary" id="taskInputOk">Oke</button></div>
+  </div>
+</div>
+
+
+<div class="global-search-overlay" id="globalSearchOverlay" aria-hidden="true">
+  <div class="global-search-box">
+    <div class="global-search-head"><div><span class="eyebrow">XI TKJ 1 SEARCH</span><h2>Cari apa saja</h2></div><button class="modal-close" id="globalSearchClose">×</button></div>
+    <div class="global-search-input"><span>⌕</span><input id="globalSearchInput" autocomplete="off" placeholder="Cari siswa, tugas, materi, tools, event..."><kbd>ESC</kbd></div>
+    <div class="search-results" id="globalSearchResults"><div class="search-empty">Mulai mengetik untuk mencari di seluruh website.</div></div>
+  </div>
+</div>
+
+<footer>
+<div class="footer-brand"><div class="brand-logo">XI</div><div><strong>XI TKJ 1</strong><span>Class Website</span></div></div>
+<p>© <span id="year"></span> XI TKJ 1 • Digital Class Website</p>
+<button id="backTop">↑</button>
+</footer>
+
+<div class="modal" id="infoModal"><div class="modal-box"><button class="modal-close" id="modalClose">×</button><div class="modal-icon">XI</div><h2>XI TKJ 1</h2><p>Website kelas digital untuk menyimpan informasi, jadwal, data siswa, kegiatan, dan kenangan keluarga besar XI TKJ 1.</p><button class="btn modal-ok" id="modalOk">Siap!</button></div></div>
+
+
+<script src="music-list.js"></script>
+<script src="drive-config.js"></script>
+<script src="script.js"></script>
+</body>
+</html>

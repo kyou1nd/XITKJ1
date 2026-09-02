@@ -2008,3 +2008,86 @@ body.dark .navbar{background:linear-gradient(135deg,rgba(12,18,40,.92),rgba(16,2
   .account-pill{flex:0 0 40px;box-shadow:0 7px 20px rgba(64,85,255,.13)}
   .top-avatar-wrap{box-shadow:0 5px 14px rgba(64,85,255,.28)}
 }
+
+
+/* =========================================================
+   XI TKJ 1 — ACCOUNT + MOBILE OVERLAP FIX (FINAL)
+   Account is independent from Drive attendance: Code.gs handles
+   attendance uploads/status; profile/session data stays local.
+   ========================================================= */
+html.account-modal-open,body.account-modal-open{overflow:hidden!important}
+.account-modal{z-index:14000!important;padding:18px!important;align-items:center!important;justify-content:center!important}
+.account-modal.show{display:flex!important}
+.account-modal-box{position:relative!important;width:min(1120px,96vw)!important;height:min(860px,calc(100dvh - 36px))!important;max-height:calc(100dvh - 36px)!important;min-height:0!important;padding:0!important;overflow:hidden!important;border-radius:30px!important;background:var(--bg)!important;color:var(--text)!important}
+.account-modal-box>.modal-close{z-index:50!important;position:absolute!important;top:14px!important;right:14px!important;width:38px!important;height:38px!important;border-radius:12px!important;background:rgba(8,12,25,.46)!important;color:#fff!important;border:1px solid rgba(255,255,255,.12)!important;backdrop-filter:blur(10px)!important}
+#accountGuestView.login-shell{width:100%!important;height:100%!important;min-height:0!important;margin:0!important;overflow:hidden!important}
+#accountGuestView .login-showcase,#accountGuestView .login-panel{min-width:0!important}
+#accountProfileView{height:100%!important;min-height:0!important;overflow:hidden!important;background:var(--bg)!important}
+.account-profile-scroll{height:100%!important;min-height:0!important;overflow-y:auto!important;overflow-x:hidden!important;overscroll-behavior:contain!important;padding-bottom:20px!important;scrollbar-width:thin}
+.account-profile-scroll::-webkit-scrollbar{width:7px}
+.account-profile-scroll::-webkit-scrollbar-thumb{background:rgba(120,130,170,.35);border-radius:99px}
+.account-profile-scroll .profile-cover{border-radius:0!important}
+.account-profile-scroll .profile-actions{padding-bottom:10px}
+.account-profile-scroll .profile-editor{margin-bottom:0}
+.profile-toast{z-index:60!important}
+.profile-confirm-modal{z-index:15000!important}
+.crop-modal{z-index:16000!important}
+.student-profile-modal{z-index:15500!important}
+
+/* Desktop login: two equal panes, no content can escape the card. */
+@media(min-width:801px){
+  #accountGuestView.login-shell{display:block!important;position:relative!important}
+  #accountGuestView .login-showcase,#accountGuestView .login-panel{position:absolute!important;top:0!important;bottom:0!important;height:100%!important;width:50%!important;min-height:0!important;overflow:auto!important}
+  #accountGuestView .login-showcase{left:0!important;right:auto!important}
+  #accountGuestView .login-panel{left:50%!important;right:auto!important}
+}
+
+/* Mobile: stack the login instead of using the old 200% sliding canvas.
+   This is the main fix for the screenshot where the account/profile area
+   appeared behind or below a clipped login card. */
+@media(max-width:800px){
+ .account-modal{padding:0!important;align-items:stretch!important}
+ .account-modal-box{width:100vw!important;height:100dvh!important;max-height:none!important;border-radius:0!important;border:0!important}
+ #accountGuestView.login-shell{display:flex!important;flex-direction:column!important;width:100%!important;height:100%!important;min-height:100%!important;overflow-y:auto!important;overflow-x:hidden!important}
+ #accountGuestView .login-showcase,#accountGuestView .login-panel{position:relative!important;left:auto!important;right:auto!important;top:auto!important;bottom:auto!important;width:100%!important;height:auto!important;min-height:0!important;transform:none!important;overflow:visible!important}
+ #accountGuestView .login-showcase{flex:0 0 auto!important;padding:30px 22px 24px!important}
+ #accountGuestView .login-panel{flex:1 0 auto!important;padding:26px 22px 28px!important}
+ #accountGuestView .login-showcase-copy{margin:30px 0 18px!important}
+ #accountGuestView .login-showcase-copy h2{font-size:clamp(30px,9vw,42px)!important}
+ #accountGuestView .login-showcase-points{display:grid!important;gap:8px!important}
+ #accountGuestView .login-showcase-points span{font-size:9px!important}
+ #accountGuestView .login-panel-head{gap:10px!important}
+ #accountGuestView .login-panel-head h2{font-size:27px!important}
+ #accountGuestView .auth-choice{grid-template-columns:1fr 1fr!important;margin:20px 0!important}
+ #accountGuestView .auth-choice-btn{min-height:72px!important}
+ #accountGuestView .login-security-note{display:block!important;margin:0 0 14px!important}
+ #accountGuestView .modal-login-view{padding:0!important}
+ #accountGuestView .login-foot{margin-top:22px!important;padding-bottom:4px!important}
+ #accountProfileView .profile-cover{min-height:230px!important;padding:26px 20px 22px!important}
+ #accountProfileView .profile-cover-content{height:auto!important;min-height:165px!important;padding:0!important;align-items:flex-end!important}
+ #accountProfileView .profile-cover-content h2{font-size:25px!important;max-width:calc(100vw - 160px)!important;overflow-wrap:anywhere!important}
+ #accountProfileView .profile-avatar-wrap{width:94px!important;height:94px!important;flex-basis:94px!important;padding:5px!important}
+ #accountProfileView .profile-avatar-wrap img,#accountProfileView .profile-avatar-wrap>div{width:84px!important;height:84px!important;border-radius:24px!important}
+ #accountProfileView .profile-feature-grid{grid-template-columns:1fr 1fr!important;padding-left:20px!important;padding-right:20px!important;margin-top:14px!important}
+ #accountProfileView .profile-info-grid{grid-template-columns:1fr 1fr!important;padding-left:20px!important;padding-right:20px!important}
+ #accountProfileView .profile-editor{margin-left:20px!important;margin-right:20px!important;padding:0 0 4px!important}
+ #accountProfileView .profile-actions.profile-actions-bottom{padding-left:20px!important;padding-right:20px!important;display:grid!important;grid-template-columns:1fr 1fr!important}
+ #accountProfileView .profile-actions .mini-btn{width:100%!important;min-height:42px!important}
+}
+@media(max-width:480px){
+ #accountGuestView .login-showcase{padding:24px 18px 20px!important}
+ #accountGuestView .login-showcase-copy{margin:24px 0 12px!important}
+ #accountGuestView .login-showcase-copy p{font-size:9px!important;line-height:1.55!important}
+ #accountGuestView .login-showcase-points{display:none!important}
+ #accountGuestView .login-panel{padding:22px 18px 24px!important}
+ #accountGuestView .auth-choice{gap:7px!important}
+ #accountGuestView .auth-choice-btn{padding:11px!important;min-height:68px!important}
+ #accountGuestView .auth-choice-btn b{font-size:9px!important}
+ #accountGuestView .auth-choice-btn small{font-size:7px!important}
+ #accountProfileView .profile-feature-grid,#accountProfileView .profile-info-grid{grid-template-columns:1fr!important}
+ #accountProfileView .profile-actions.profile-actions-bottom{grid-template-columns:1fr!important}
+ #accountProfileView .profile-cover-content{min-height:150px!important}
+ #accountProfileView .profile-cover-content h2{font-size:22px!important;max-width:calc(100vw - 140px)!important}
+ #accountProfileView .profile-avatar-wrap{width:82px!important;height:82px!important;flex-basis:82px!important}
+ #accountProfileView .profile-avatar-wrap img,#accountProfileView .profile-avatar-wrap>div{width:72px!important;height:72px!important}
+}

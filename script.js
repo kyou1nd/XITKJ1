@@ -559,8 +559,21 @@ window.exportClassBackup=exportClassBackup;
  const adminMenu=document.getElementById('adminControlLink');
  function syncAdminMenu(){const u=getSession();if(adminMenu)adminMenu.hidden=!(u&&u.role==='admin');if(typeof syncFaceAttendanceMenu==='function')syncFaceAttendanceMenu();}
  function initials(n){return n.split(/\s+/).filter(Boolean).slice(0,2).map(x=>x[0]).join('').toUpperCase()||'XI'}
- function openAccount(){const u=getSession();if(u){renderAccount()}else{renderAccount()}modal?.classList.add('show');modal?.setAttribute('aria-hidden','false');}
- function closeAccount(){modal?.classList.remove('show');modal?.setAttribute('aria-hidden','true')}
+ function openAccount(){
+  renderAccount();
+  if(!modal)return;
+  modal.classList.add('show');
+  modal.setAttribute('aria-hidden','false');
+  document.documentElement.classList.add('account-modal-open');
+  document.body.classList.add('account-modal-open');
+ }
+ function closeAccount(){
+  if(!modal)return;
+  modal.classList.remove('show');
+  modal.setAttribute('aria-hidden','true');
+  document.documentElement.classList.remove('account-modal-open');
+  document.body.classList.remove('account-modal-open');
+ }
  function updateMobileAccount(u){const label=document.getElementById('mobileAccountLabel');const link=document.getElementById('mobileAccountLink');const img=document.getElementById('mobileAccountAvatar'),fallback=document.getElementById('mobileAccountAvatarFallback');if(label)label.textContent=u?(u.name):'Account / Login';if(link)link.title=u?('Akun: '+u.name):'Account / Login';if(!u){if(img)img.hidden=true;if(fallback){fallback.hidden=false;fallback.textContent='A'}return}const photos=getPhotos();if(photos[u.key]){if(img){img.hidden=false;img.src=photos[u.key]}if(fallback)fallback.hidden=true}else{if(img)img.hidden=true;if(fallback){fallback.hidden=false;fallback.textContent=initials(u.name)}}}
  function getProfiles(){try{return JSON.parse(localStorage.getItem(profileKey)||'{}')}catch{return {}}}
  function getProfile(u){const p=getProfiles();const key=u?.role==='admin'?'admin':u?.nisn;const defaults=u?.role==='admin'?{displayName:u?.name||'Admin XI TKJ 1',username:u?.username||'admin',bio:'Administrator website XI TKJ 1.',interests:'Pengelolaan website, data kelas, dan sistem informasi',skills:'Administrasi website, manajemen data, dan maintenance',achievement:'Mengelola sistem kelas',goal:'Menjaga website tetap rapi dan berjalan baik',favoriteSubject:'Administrasi Sistem',motto:'Kelola dengan rapi, layani dengan baik',status:'Aktif'}:{displayName:u?.name||'',username:u?.first||'',bio:'Suka mencoba hal baru dan membangun proyek digital sederhana.',interests:'Desain UI, jaringan, dan eksplorasi teknologi',skills:'Troubleshooting, konfigurasi jaringan, dan dasar coding',achievement:'Belum ada data',goal:'Mengembangkan kemampuan TKJ',favoriteSubject:'Teknik Komputer & Jaringan',motto:'',status:'Aktif'};return Object.assign(defaults,p[key]||{})}
@@ -597,7 +610,11 @@ function renderAccount(){
  window.addEventListener('xi-force-account-refresh',renderAccount);
 function syncAccountBio(){const u=getSession();if(!u||u.role!=='student')return;const prof=getProfile(u);const bioEl=document.getElementById('accountBio'),input=document.getElementById('accountBioInput');if(bioEl)bioEl.textContent=prof.bio||'Belum ada bio.';if(input)input.value=prof.bio||'';}
  function guestTop(){syncAdminMenu();updateMobileAccount(null);if(topPill){topPill.querySelector('b').textContent='Account';topPill.title='Account / Login';const topImg=document.getElementById('topAvatarImg'),topFallback=document.getElementById('topAvatarFallback');if(topImg)topImg.hidden=true;if(topFallback){topFallback.hidden=false;topFallback.textContent='AC'}}}
- document.querySelectorAll('[data-open-account]').forEach(a=>a.addEventListener('click',e=>{e.preventDefault();mobileMenu?.classList.remove('show');openAccount()}));topPill?.addEventListener('click',openAccount);document.getElementById('accountModalClose')?.addEventListener('click',closeAccount);modal?.addEventListener('click',e=>{if(e.target===modal)closeAccount()});
+ document.querySelectorAll('[data-open-account]').forEach(a=>a.addEventListener('click',e=>{e.preventDefault();e.stopPropagation();mobileMenu?.classList.remove('show');openAccount()}));
+ topPill?.addEventListener('click',e=>{e.preventDefault();e.stopPropagation();openAccount()});
+ document.getElementById('accountModalClose')?.addEventListener('click',e=>{e.preventDefault();closeAccount()});
+ modal?.addEventListener('click',e=>{if(e.target===modal)closeAccount()});
+ document.addEventListener('keydown',e=>{if(e.key==='Escape'&&modal?.classList.contains('show'))closeAccount()});
  document.querySelectorAll('[data-auth-modal-view]').forEach(b=>b.addEventListener('click',()=>{
    const shell=document.getElementById('accountGuestView');
    const mode=b.dataset.authModalView==='admin'?'admin':'student';
@@ -1203,47 +1220,51 @@ async function submitFaceAttendance(){
  toast('Absensi foto + lokasi berhasil dikirim');
 }
 function uploadFaceToDrive(record){
- return new Promise((resolve,reject)=>{
+ return new Promise(async (resolve,reject)=>{
   try{
    if(!DRIVE_UPLOAD_URL)return reject(new Error('URL Apps Script Web App kosong'));
-   const iframe=document.createElement('iframe');
-   iframe.name='faceDriveFrame_'+Date.now();
-   iframe.style.display='none';
-   document.body.appendChild(iframe);
-   const form=document.createElement('form');
-   form.method='POST'; form.action=DRIVE_UPLOAD_URL; form.target=iframe.name;
-   form.enctype='application/x-www-form-urlencoded'; form.acceptCharset='UTF-8';
-   form.style.display='none';
    const imageData=String(record.image||'').split(',')[1]||'';
+   if(!imageData)return reject(new Error('Data foto kosong'));
+   const params=new URLSearchParams();
    const fields={
-    action:'uploadFaceAttendance',date:record.date,time:record.time,
-    nisn:record.nisn,name:record.name,kelas:'XI TKJ 1',mimeType:'image/jpeg',
-    imageData:imageData,latitude:record.latitude,longitude:record.longitude,
-    accuracy:record.accuracy,mapsUrl:record.mapsUrl,
+    action:'uploadFaceAttendance',
+    date:record.date,
+    time:record.time,
+    nisn:record.nisn,
+    name:record.name,
+    kelas:'XI TKJ 1',
+    mimeType:'image/jpeg',
+    imageData:imageData,
+    latitude:record.latitude,
+    longitude:record.longitude,
+    accuracy:record.accuracy,
+    mapsUrl:record.mapsUrl,
     locationText:record.locationText||record.address||''
    };
-   Object.entries(fields).forEach(([k,v])=>{
-    const input=document.createElement('textarea');input.name=k;input.value=String(v??'');input.style.display='none';form.appendChild(input)
-   });
-   document.body.appendChild(form);
-   let settled=false;
-   const finish=(ok,err)=>{if(settled)return;settled=true;clearTimeout(timer);form.remove();iframe.remove();ok?resolve():reject(err)};
-   const timer=setTimeout(()=>finish(false,new Error('Upload foto timeout.')),30000);
-   iframe.addEventListener('load',async()=>{
-    // Cross-origin iframe tidak boleh dibaca. Konfirmasi penyimpanan lewat endpoint status Drive.
-    let tries=0;
-    const verify=async()=>{
-      tries++;
-      try{
-       const status=await getAttendanceStatusJsonp(record.date,record.nisn);
-       if(status?.faceDone){finish(true);return}
-      }catch(_){ }
-      if(tries<6){setTimeout(verify,1200);return}
-      finish(false,new Error('Foto belum terkonfirmasi masuk Google Drive.'));
-    };
-    setTimeout(verify,900);
-   },{once:true});
-   form.submit();
+   Object.entries(fields).forEach(([k,v])=>params.append(k,String(v??'')));
+
+   // POST langsung ke Apps Script. Response tidak dibaca karena CORS/no-cors;
+   // penyimpanan dikonfirmasi melalui endpoint JSONP attendanceStatus.
+   await fetch(DRIVE_UPLOAD_URL,{method:'POST',mode:'no-cors',redirect:'follow',body:params,cache:'no-store'});
+
+   let tries=0;
+   const verify=async()=>{
+    tries++;
+    try{
+     const status=await getAttendanceStatusJsonp(record.date,record.nisn);
+     if(status?.faceDone){
+      resolve(status.record||{});
+      return;
+     }
+     if(status?.barcodeDone){
+      reject(new Error('Absensi hari ini sudah tercatat melalui barcode.'));
+      return;
+     }
+    }catch(_){ }
+    if(tries<10){setTimeout(verify,1200);return}
+    reject(new Error('Foto belum terkonfirmasi masuk Google Drive. Coba lagi.'));
+   };
+   setTimeout(verify,900);
   }catch(e){reject(e)}
  });
 }
@@ -1634,18 +1655,3 @@ document.getElementById('facePhotoViewerImage')?.addEventListener('click',e=>{
  };
  update();setInterval(update,1000);
 })();
-
-/* ACCOUNT FIX: satu handler fallback, selalu refresh session sebelum membuka profil. */
-document.addEventListener('click',e=>{
- const target=e.target.closest?.('#accountShortcut,[data-open-account],#mobileAccountLink');
- if(!target)return;
- const modal=document.getElementById('accountModal');
- if(!modal)return;
- e.preventDefault();
- e.stopPropagation();
- window.setTimeout(()=>{
-   try{window.dispatchEvent(new CustomEvent('xi-force-account-refresh'))}catch(_){ }
-   modal.classList.add('show');
-   modal.setAttribute('aria-hidden','false');
- },0);
-});

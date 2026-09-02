@@ -1,11 +1,14 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
+  <link rel="preload" href="./assets/fonts/Halo-Dek.ttf" as="font" type="font/ttf" crossorigin>
+  <link rel="preload" href="./assets/fonts/Billy-Ohio.ttf" as="font" type="font/ttf" crossorigin>
+  <link rel="preload" href="./assets/fonts/SpotifyMix-Bold.ttf" as="font" type="font/ttf" crossorigin>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="theme-color" content="#4055ff">
 <title>XI TKJ 1 — Class Website</title>
-<link rel="stylesheet" href="style.css?v=account-drive-final-3">
+<link rel="stylesheet" href="style.css?v=custom-fonts-premium-1">
 <meta name="description" content="XI TKJ 1 digital class website untuk informasi, tugas, materi, jadwal, dan akun siswa.">
 
 <link rel="icon" href="assets/kyou-logo.svg">
@@ -17,8 +20,8 @@
   .hero-card.hero-class-photo{width:100%!important;height:auto!important;min-height:0!important;aspect-ratio:16/9!important;display:grid!important;place-items:center!important}
   .hero-class-photo-bg{width:100%!important;height:100%!important;object-fit:cover!important;object-position:center center!important}
   .hero-class-photo .hero-content{position:absolute!important;inset:0!important;z-index:10!important;display:flex!important;align-items:center!important;justify-content:center!important;padding:18px!important}
-  .hero-class-photo .typewriter-title{display:block!important;visibility:visible!important;opacity:1!important;color:#fff!important;font-size:clamp(46px,16vw,76px)!important;line-height:1!important;text-shadow:0 3px 18px rgba(0,0,0,.85)!important}
-  .hero-class-photo .welcome{display:block!important;position:absolute!important;top:50%!important;transform:translateY(-125%)!important;color:#fff!important}
+  .hero-class-photo .typewriter-title{display:block!important;visibility:visible!important;opacity:1!important;color:#fff!important;font-size:clamp(38px,13vw,58px)!important;line-height:1!important;text-shadow:0 3px 18px rgba(0,0,0,.85)!important}
+  .hero-class-photo .welcome{display:block!important;position:absolute!important;top:31%!important;transform:translateY(-100%)!important;color:#fff!important}
   .hero-class-photo .hero-description,.hero-class-photo .hero-buttons,.hero-class-photo .hero-live-strip,.hero-class-photo .badge{display:none!important}
 }
 </style>
@@ -41,6 +44,12 @@
 <a href="#dashboard-pro" data-open-account="1">Account</a>
 </nav>
 <div class="nav-right">
+<a class="social-nav-button social-tiktok" href="https://www.tiktok.com/@tkjoneeeee?_r=1&_t=ZS-99OwtuFhhw4" target="_blank" rel="noopener noreferrer" title="TikTok XI TKJ 1" aria-label="TikTok XI TKJ 1">
+  <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15.7 3c.4 2.2 1.7 3.6 3.9 3.9v3.1c-1.4 0-2.7-.4-3.8-1.1v6.2c0 3.6-2.5 5.9-6 5.9-3.1 0-5.7-2.4-5.7-5.5 0-3.3 2.6-5.6 5.8-5.6.3 0 .7 0 1 .1v3.2c-.3-.1-.6-.2-1-.2-1.4 0-2.5 1-2.5 2.4 0 1.3 1 2.4 2.5 2.4 1.6 0 2.6-1 2.6-2.8V3h3.2Z"/></svg>
+</a>
+<a class="social-nav-button social-instagram" href="https://www.instagram.com/xi.netshaone?igsi=dXE0YWIzMWw4bHRt" target="_blank" rel="noopener noreferrer" title="Instagram XI TKJ 1" aria-label="Instagram XI TKJ 1">
+  <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3.2" y="3.2" width="17.6" height="17.6" rx="5"/><circle cx="12" cy="12" r="4.1"/><circle cx="17.5" cy="6.7" r="1.15"/></svg>
+</a>
 <button class="nav-search-btn" id="globalSearchButton" title="Cari di website">⌕</button>
 <button class="notification-button" id="notificationButton" title="Notifikasi">◉<span id="notificationCount">0</span></button>
 <button class="account-pill" id="accountShortcut" title="Account"><span class="top-avatar-wrap"><img id="topAvatarImg" alt="" hidden><span id="topAvatarFallback">AC</span></span><b>Account</b></button>
@@ -116,10 +125,11 @@
 <a href="#tasks" class="btn btn-glass">Lihat Tugas</a>
 <button class="btn btn-glass" id="infoButton">Tentang Website</button>
 </div>
-<div class="hero-live-strip"><span><i></i> Website aktif</span><span>36 anggota</span><span>TKJ • Academic • Class Hub</span></div>
 </div>
 
 </div>
+
+<div class="hero-live-strip"><span><i></i> Website aktif</span><span>36 anggota</span><span>TKJ • Academic • Class Hub</span></div>
 
 <div class="stats-grid">
 <div class="stat-card"><div class="stat-icon">👨‍🎓</div><div><strong data-count="36">0</strong><span>Siswa</span></div></div>
@@ -499,7 +509,7 @@
       <canvas id="faceCameraCanvas" hidden></canvas>
       <div class="face-camera-placeholder" id="faceCameraPlaceholder"><span class="camera-placeholder-icon">⌾</span><b>Kamera siap digunakan</b><small>Tekan Buka Kamera untuk mulai</small></div>
       <div class="face-camera-overlay" aria-hidden="true">
-        <span class="camera-badge"><i></i> KAMERA DEPAN</span><div class="face-guide"></div>
+        <span class="camera-badge"><i></i> KAMERA DEPAN</span><div class="face-guide"><span></span></div><div class="camera-hint">Posisikan wajah di dalam bingkai</div>
       </div>
     </div>
     <div class="face-camera-status" id="faceCameraStatus"><span class="status-dot"></span><span class="status-text">Tekan “Buka Kamera” untuk mulai.</span></div>
@@ -596,6 +606,11 @@
         <div class="admin-scanner-actions">
           <button class="btn btn-primary" id="adminBarcodeStart" type="button">▣ Mulai Scanner</button>
           <button class="mini-btn" id="adminBarcodeStop" type="button">Berhenti</button>
+          <button class="mini-btn scanner-torch-btn" id="adminBarcodeTorch" type="button" hidden>☼ Senter</button>
+        </div>
+        <div class="scanner-manual-row">
+          <input id="adminBarcodeManualInput" inputmode="numeric" autocomplete="off" maxlength="20" placeholder="Masukkan NISN jika barcode sulit terbaca">
+          <button class="mini-btn" id="adminBarcodeManualSubmit" type="button">Hadir</button>
         </div>
         <input id="adminBarcodeFile" type="file" accept="image/*" hidden>
         <button class="scanner-upload-btn" id="adminBarcodeUpload" type="button">Pilih gambar barcode</button>
@@ -654,6 +669,6 @@
 
 <script src="music-list.js"></script>
 <script src="drive-config.js"></script>
-<script src="script.js?v=account-drive-final-3"></script>
+<script src="script.js?v=custom-fonts-premium-1"></script>
 </body>
 </html>

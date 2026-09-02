@@ -2198,3 +2198,964 @@ footer{margin-top:40px;border-top:1px solid var(--border);background:linear-grad
 #facePreviewWrap #facePreview{
   max-width:100%;
 }
+
+/* =========================================================
+   XI TKJ 1 — PREMIUM VISUAL UPGRADE
+   ========================================================= */
+
+:root{
+  --font-ui:'DM Sans',Inter,system-ui,-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+  --font-display:'Plus Jakarta Sans',var(--font-ui);
+  --shadow-soft:0 12px 40px rgba(20,31,75,.08);
+  --shadow-card:0 18px 55px rgba(20,31,75,.10);
+  --shadow-hover:0 24px 70px rgba(35,50,125,.16);
+  --line:rgba(91,105,160,.15);
+}
+
+*{box-sizing:border-box}
+html{font-family:var(--font-ui);font-size:16px}
+body{font-family:var(--font-ui);letter-spacing:-.01em;line-height:1.6;color:var(--text,#17213d);overflow-x:hidden}
+h1,h2,h3,h4,h5,h6,.brand-text,strong,.section-heading h2,.typewriter-title{font-family:var(--font-display);letter-spacing:-.035em}
+button,input,select,textarea{font:inherit}
+::selection{background:rgba(70,87,255,.18)}
+
+/* Ambient background */
+.background{position:fixed;inset:0;pointer-events:none;z-index:-2;overflow:hidden}
+.background:before{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(255,255,255,.18),transparent 25%,rgba(70,85,170,.025))}
+.orb{filter:blur(12px);opacity:.45}
+
+/* Navigation */
+.navbar{height:70px!important;max-width:1400px;margin:12px auto 0!important;padding:0 15px 0 12px!important;border:1px solid rgba(115,128,181,.18)!important;border-radius:22px!important;background:rgba(250,251,255,.78)!important;backdrop-filter:blur(24px) saturate(150%);-webkit-backdrop-filter:blur(24px) saturate(150%);box-shadow:0 18px 60px rgba(24,34,78,.10)!important}
+.brand{gap:11px!important;text-decoration:none}
+.brand-logo{width:44px!important;height:44px!important;border-radius:14px!important;display:grid!important;place-items:center;font-family:var(--font-display);font-weight:800;box-shadow:0 8px 24px rgba(64,85,255,.22)}
+.brand-text{line-height:1.05!important}.brand-text strong{font-size:14px!important}.brand-text small{font-size:9px!important;letter-spacing:.16em!important;margin-top:4px;opacity:.6}
+.nav-links{gap:3px!important}.nav-links a{font-weight:700!important;font-size:12px!important;padding:9px 11px!important;border-radius:12px!important;color:var(--muted,#66708f)!important}.nav-links a:hover{background:rgba(64,85,255,.08);color:var(--primary,#4055ff)!important}
+.nav-right{gap:7px!important}.nav-search-btn,.notification-button,.theme-button,.menu-button{border:1px solid var(--line)!important;background:rgba(255,255,255,.72)!important;box-shadow:none!important}
+.account-pill{height:44px!important;padding:0 12px 0 7px!important;border-radius:14px!important;border:1px solid rgba(64,85,255,.18)!important;background:linear-gradient(135deg,rgba(255,255,255,.96),rgba(240,243,255,.86))!important;box-shadow:0 8px 24px rgba(64,85,255,.10)!important}
+.account-pill:hover{box-shadow:0 12px 30px rgba(64,85,255,.17)!important}
+.top-avatar-wrap{width:32px!important;height:32px!important;border-radius:10px!important;overflow:hidden!important}.top-avatar-wrap img{width:100%;height:100%;object-fit:cover}
+
+/* Sections */
+main{max-width:1400px;margin:0 auto}
+.section{padding-top:92px;padding-bottom:92px}
+.section-heading{display:flex;align-items:end;justify-content:space-between;gap:24px;margin-bottom:30px!important}
+.section-heading p{font-size:10px!important;font-weight:800!important;color:var(--primary,#4055ff)!important;letter-spacing:.22em!important;margin-bottom:7px!important}
+.section-heading h2{font-size:clamp(32px,4vw,48px)!important;line-height:1.05!important;margin:0!important}
+.section-heading h2 span{color:var(--primary,#4055ff)}
+
+/* Hero */
+.hero.section{padding-top:42px}
+.hero-card.hero-class-photo{border:1px solid rgba(255,255,255,.22)!important;border-radius:32px!important;box-shadow:0 35px 90px rgba(20,28,70,.22)!important;overflow:hidden!important}
+.hero-class-photo-bg{filter:saturate(.95) contrast(1.03);transform:scale(1.015);transition:transform 1.2s ease,filter .6s ease}
+.hero-card:hover .hero-class-photo-bg{transform:scale(1.035);filter:saturate(1.05) contrast(1.04)}
+.hero-photo-overlay{background:linear-gradient(90deg,rgba(5,9,27,.82) 0%,rgba(7,12,34,.54) 45%,rgba(7,12,34,.22) 100%),linear-gradient(0deg,rgba(3,6,18,.55),transparent 55%)!important}
+.hero-content{max-width:900px!important}
+.hero-content .badge{border:1px solid rgba(255,255,255,.18)!important;background:rgba(255,255,255,.10)!important;backdrop-filter:blur(14px);box-shadow:0 8px 25px rgba(0,0,0,.12);font-weight:700}
+.welcome{font-family:var(--font-display)!important;font-weight:800!important;letter-spacing:.28em!important;font-size:12px!important}
+.typewriter-title{font-size:clamp(58px,9vw,112px)!important;font-weight:800!important;line-height:.95!important;text-shadow:0 12px 50px rgba(0,0,0,.32)!important}
+.hero-description{max-width:680px!important;font-size:15px!important;line-height:1.75!important;color:rgba(255,255,255,.82)!important}
+.hero-buttons{gap:10px!important}.btn{border-radius:14px!important;font-weight:800!important;min-height:46px;box-shadow:0 10px 30px rgba(0,0,0,.10)}
+.btn-primary{box-shadow:0 12px 30px rgba(64,85,255,.32)!important}.btn-glass{border:1px solid rgba(255,255,255,.18)!important;background:rgba(255,255,255,.09)!important;backdrop-filter:blur(12px)}
+.hero-live-strip{border-top:1px solid rgba(255,255,255,.13)!important;color:rgba(255,255,255,.68)!important;padding-top:16px!important}
+
+/* Stats */
+.stats-grid{gap:14px!important;margin-top:16px!important}
+.stat-card{border:1px solid var(--line)!important;background:rgba(255,255,255,.74)!important;backdrop-filter:blur(18px);border-radius:20px!important;padding:20px!important;box-shadow:var(--shadow-soft)!important}
+.stat-card:hover{transform:translateY(-4px);box-shadow:var(--shadow-card)!important;border-color:rgba(64,85,255,.22)!important}
+.stat-icon{width:45px!important;height:45px!important;border-radius:14px!important;background:rgba(64,85,255,.08)!important;display:grid;place-items:center}
+.stat-card strong{font-size:27px!important}.stat-card span{font-size:11px!important;font-weight:700!important;color:var(--muted,#707a98)}
+
+/* Universal cards */
+.about-main,.mini-card,.teacher-card,.student-card,.piket-day,.schedule-card,.knowledge-card,.tool-card,.task-card,.dash-panel,.database-card,.file-card,.notification-info,.finance-main,.finance-list,.event-feature,.event-list,.linkhub-card,.class-quote-card{border:1px solid var(--line)!important;box-shadow:var(--shadow-soft)!important;border-radius:22px!important;background:rgba(255,255,255,.74)!important;backdrop-filter:blur(16px)}
+.student-card,.knowledge-card,.tool-card,.task-card,.teacher-card,.mini-card,.linkhub-card{overflow:hidden}
+.student-card:hover,.knowledge-card:hover,.tool-card:hover,.task-card:hover,.mini-card:hover,.teacher-card:hover,.piket-day:hover,.linkhub-card:hover{box-shadow:var(--shadow-hover)!important;border-color:rgba(64,85,255,.22)!important}
+
+/* Dashboard */
+.dashboard-shell{border:1px solid var(--line)!important;border-radius:28px!important;box-shadow:var(--shadow-card)!important;overflow:hidden;background:rgba(255,255,255,.72)!important;backdrop-filter:blur(18px)}
+.dashboard-main{background:transparent!important}
+.premium-hero{border-radius:22px!important;box-shadow:0 18px 55px rgba(36,49,115,.13)!important}
+.dash-action{border:1px solid rgba(255,255,255,.15)!important;border-radius:12px!important;font-weight:700!important;transition:.25s ease}.dash-action:hover{transform:translateY(-2px)}
+.dash-stat{border:1px solid var(--line)!important;border-radius:18px!important;background:rgba(255,255,255,.78)!important;box-shadow:none!important}
+
+/* Search / filters */
+input,select,textarea{border-radius:13px!important;border:1px solid rgba(105,119,171,.20)!important;background:rgba(255,255,255,.84)!important;outline:none!important;transition:border-color .2s ease,box-shadow .2s ease,background .2s ease!important}
+input:focus,select:focus,textarea:focus{border-color:rgba(64,85,255,.48)!important;box-shadow:0 0 0 4px rgba(64,85,255,.09)!important;background:#fff!important}
+
+/* Tables / schedule */
+.schedule-item{border:1px solid rgba(100,115,170,.12)!important;border-radius:16px!important;background:rgba(255,255,255,.62)!important;margin-bottom:8px!important;transition:.25s ease!important}.schedule-item:hover{transform:translateX(4px);border-color:rgba(64,85,255,.22)!important;box-shadow:0 10px 28px rgba(30,45,100,.07)}
+.schedule-time{font-family:var(--font-display)!important;font-weight:800!important;color:var(--primary,#4055ff)!important}
+
+/* Buttons */
+button,.btn,.mini-btn{cursor:pointer;-webkit-tap-highlight-color:transparent}
+.mini-btn{border-radius:12px!important;font-weight:800!important;border:1px solid var(--line)!important}
+
+/* Account modal premium */
+.account-modal{background:rgba(5,9,25,.68)!important;backdrop-filter:blur(14px)!important}
+.account-modal-box{width:min(980px,calc(100vw - 28px))!important;max-height:min(850px,calc(100vh - 28px))!important;border:1px solid rgba(255,255,255,.18)!important;border-radius:28px!important;box-shadow:0 35px 110px rgba(0,0,0,.35)!important;overflow:hidden!important;background:var(--bg,#f7f8fc)!important}
+#accountGuestView .login-panel,#accountGuestView .login-showcase{border-radius:0!important}
+#accountProfileView .account-profile-scroll{background:linear-gradient(180deg,#f8f9fd,#f4f6fc)!important}
+#accountProfileView .profile-cover{border-radius:0!important;min-height:220px!important;padding:34px 38px!important;background:radial-gradient(circle at 85% 15%,rgba(113,125,255,.34),transparent 27%),linear-gradient(135deg,#0d1535,#121a42 52%,#172456)!important}
+#accountProfileView .profile-cover-content h2{font-size:clamp(28px,4vw,44px)!important;font-weight:800!important}
+#accountProfileView .profile-avatar-wrap{border:5px solid rgba(255,255,255,.22)!important;box-shadow:0 15px 40px rgba(0,0,0,.25)!important}
+#accountProfileView .profile-feature-grid article,#accountProfileView .profile-info-grid>div{border:1px solid rgba(105,119,171,.15)!important;background:rgba(255,255,255,.72)!important;border-radius:17px!important;box-shadow:none!important}
+#accountProfileView .profile-actions.profile-actions-bottom{padding:22px 38px 34px!important}
+
+/* Music */
+.music-button{border-radius:14px!important;font-weight:800!important}.music-panel{border:1px solid var(--line)!important;border-radius:22px!important;box-shadow:0 25px 80px rgba(15,25,70,.18)!important;backdrop-filter:blur(24px)}
+.music-row{border-radius:14px!important}.music-row:hover{background:rgba(64,85,255,.06)!important}.music-row.playing{background:rgba(64,85,255,.09)!important}
+
+/* Mobile navigation/menu */
+.mobile-menu{border:1px solid rgba(100,115,175,.18)!important;border-radius:24px!important;box-shadow:0 28px 90px rgba(10,17,50,.22)!important;background:rgba(248,249,253,.94)!important;backdrop-filter:blur(25px)}
+.menu-list a,.menu-feature,.mobile-account-card,.admin-menu-card{border:1px solid rgba(105,119,171,.12)!important;border-radius:15px!important;background:rgba(255,255,255,.68)!important;transition:.2s ease}.menu-list a:hover,.menu-feature:hover,.mobile-account-card:hover{transform:translateX(3px);border-color:rgba(64,85,255,.20)!important}
+
+/* Footer */
+footer{padding-top:55px!important;padding-bottom:35px!important;border-top:1px solid var(--line)!important}
+footer a{transition:.2s ease}footer a:hover{color:var(--primary,#4055ff)!important}
+
+/* Scrollbars */
+*{scrollbar-width:thin;scrollbar-color:rgba(80,96,160,.30) transparent}
+*::-webkit-scrollbar{width:8px;height:8px}*::-webkit-scrollbar-track{background:transparent}*::-webkit-scrollbar-thumb{background:rgba(80,96,160,.25);border-radius:99px}
+
+/* Reduced motion */
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{scroll-behavior:auto!important;animation-duration:.01ms!important;transition-duration:.01ms!important}}
+
+@media(max-width:900px){
+ .section{padding-top:72px;padding-bottom:72px}
+ .navbar{height:62px!important}
+ .nav-links{display:none!important}
+ .hero.section{padding-top:24px}
+ .hero-class-photo{min-height:0!important}
+ .stats-grid{grid-template-columns:repeat(2,1fr)!important}
+}
+@media(max-width:600px){
+ body{font-size:14px}
+ .navbar{width:calc(100% - 16px)!important;margin:8px auto 0!important;border-radius:18px!important}
+ .brand-logo{width:38px!important;height:38px!important;border-radius:12px!important}.brand-text strong{font-size:12px!important}.brand-text small{font-size:8px!important}
+ .nav-right{gap:4px!important}.theme-button,.menu-button,.nav-search-btn,.notification-button{width:35px!important;height:35px!important}.account-pill{width:36px!important;height:36px!important;padding:0!important;border-radius:11px!important}
+ .hero-card.hero-class-photo{border-radius:22px!important}.hero-content{padding:20px!important}.typewriter-title{font-size:clamp(48px,15vw,76px)!important}.welcome{font-size:9px!important}.hero-description{font-size:12px!important;line-height:1.6!important}.hero-live-strip{font-size:9px!important}
+ .stats-grid{gap:9px!important}.stat-card{padding:14px!important;border-radius:16px!important}.stat-icon{width:38px!important;height:38px!important}.stat-card strong{font-size:22px!important}
+ .section{padding-top:58px;padding-bottom:58px}
+ .section-heading{align-items:flex-start;flex-direction:column;gap:12px}.section-heading h2{font-size:31px!important}
+ .account-modal-box{width:calc(100vw - 16px)!important;max-height:calc(100vh - 16px)!important;border-radius:22px!important}
+ #accountProfileView .profile-cover{padding:25px 18px!important;min-height:190px!important}
+ #accountProfileView .profile-actions.profile-actions-bottom{padding:18px 14px 26px!important}
+}
+
+
+/* === XI TKJ 1 — CUSTOM FONT & VISUAL POLISH === */
+@font-face{font-family:'Halo Dek';src:url('./assets/fonts/Halo-Dek.ttf') format('truetype');font-display:swap;font-weight:400;font-style:normal}
+@font-face{font-family:'Billy Ohio';src:url('./assets/fonts/Billy-Ohio.ttf') format('truetype');font-display:swap;font-weight:400;font-style:normal}
+@font-face{font-family:'Spotify Mix';src:url('./assets/fonts/SpotifyMix-Bold.ttf') format('truetype');font-display:swap;font-weight:700;font-style:normal}
+:root{--font-ui:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;--font-display:'Spotify Mix',var(--font-ui)}
+body{font-family:var(--font-ui);text-rendering:optimizeLegibility}
+.brand-text,.hero h1,.hero-title,.typewriter-title,.typewriter,.typing-title,[class*="typewriter"]{font-family:'Halo Dek',var(--font-display)!important;letter-spacing:.01em}
+.clock,.time,.digital-clock,#clock,#currentTime,[class*="clock"],[class*="time"]{font-family:'Billy Ohio',var(--font-ui)!important;letter-spacing:.03em}
+.music-title,.music-name,.song-title,.track-title,.player-title,.music-heading,[class*="music"] h1,[class*="music"] h2,[class*="music"] h3{font-family:'Spotify Mix',var(--font-display);letter-spacing:-.02em}
+h1,h2,h3,h4,h5,h6,.section-heading h2{font-family:'Spotify Mix',var(--font-display);letter-spacing:-.035em}
+button,.nav-link,.account-pill,.badge,.chip,.stat-label,.section-kicker,.form-label{font-family:var(--font-ui)}
+/* premium depth without changing existing layout */
+.card,.feature-card,.dashboard-card,.music-card,.schedule-card,.stat-card,.panel,.account-card{box-shadow:0 16px 50px rgba(24,35,80,.09);transition:transform .22s ease,box-shadow .22s ease,border-color .22s ease}
+.card:hover,.feature-card:hover,.dashboard-card:hover,.music-card:hover,.schedule-card:hover,.stat-card:hover,.panel:hover{transform:translateY(-3px);box-shadow:0 24px 65px rgba(24,35,80,.14)}
+button{transition:transform .18s ease,box-shadow .18s ease,filter .18s ease}
+button:hover{transform:translateY(-1px)}
+button:active{transform:translateY(0) scale(.98)}
+::selection{background:rgba(76,96,210,.18)}
+@media(max-width:700px){.brand-text{font-size:clamp(1.8rem,9vw,3rem)}.clock,.time,#clock,#currentTime{font-size:clamp(2rem,12vw,4rem)}}
+
+
+/* =========================================================
+   XI TKJ 1 — FINAL RESPONSIVE + THEME BUGFIX
+   ========================================================= */
+
+/* Custom fonts are local; never depend on external font loading. */
+@font-face{font-family:'Halo Dek';src:url('./assets/fonts/Halo-Dek.ttf') format('truetype');font-display:swap;font-weight:400;font-style:normal}
+@font-face{font-family:'Billy Ohio';src:url('./assets/fonts/Billy-Ohio.ttf') format('truetype');font-display:swap;font-weight:400;font-style:normal}
+@font-face{font-family:'Spotify Mix';src:url('./assets/fonts/SpotifyMix-Bold.ttf') format('truetype');font-display:swap;font-weight:700;font-style:normal}
+
+:root{
+  --surface-0:#f7f8fc;
+  --surface-1:rgba(255,255,255,.82);
+  --surface-2:rgba(255,255,255,.68);
+  --soft-border:rgba(93,108,164,.16);
+  --ui-ease:cubic-bezier(.22,.61,.36,1);
+}
+
+body{min-width:0;overflow-x:hidden}
+img,video,canvas,svg{max-width:100%}
+button,input,select,textarea{font:inherit}
+
+/* Light theme */
+body:not(.dark){
+  --bg:#f5f7ff;
+  --card:rgba(255,255,255,.84);
+  --panel:rgba(255,255,255,.76);
+  --text:#171d34;
+  --muted:#707995;
+  --border:rgba(65,78,130,.14);
+  --line:rgba(75,91,150,.13);
+}
+
+/* Dark theme — overrides old light-only premium surfaces. */
+body.dark{
+  --bg:#070b17;
+  --card:rgba(17,24,47,.88);
+  --panel:rgba(14,20,40,.86);
+  --text:#f3f6ff;
+  --muted:#929bb6;
+  --border:rgba(159,171,218,.13);
+  --line:rgba(159,171,218,.12);
+  --surface-1:rgba(18,26,52,.88);
+  --surface-2:rgba(14,21,43,.76);
+  background:
+    radial-gradient(circle at 8% 10%,rgba(70,88,255,.13),transparent 27%),
+    radial-gradient(circle at 92% 52%,rgba(124,61,255,.10),transparent 25%),
+    #070b17!important;
+  color:var(--text)!important;
+}
+
+body.dark .background{opacity:.72}
+body.dark .orb{opacity:.12}
+body.dark .section-heading h2,body.dark .about-main h3,body.dark .mini-card h4,
+body.dark .teacher-card h3,body.dark .student-card h3,body.dark .schedule-subject,
+body.dark .panel-head h3,body.dark .dash-stat b,body.dark .modern-stat b,
+body.dark .database-card h3,body.dark .event-feature h3{color:var(--text)!important}
+
+/* Kill the old white card backgrounds when dark mode is active. */
+body.dark .stat-card,
+body.dark .about-main,body.dark .mini-card,body.dark .teacher-card,
+body.dark .student-card,body.dark .piket-day,body.dark .schedule-card,
+body.dark .knowledge-card,body.dark .tool-card,body.dark .task-card,
+body.dark .dash-panel,body.dark .database-card,body.dark .file-card,
+body.dark .notification-info,body.dark .finance-main,body.dark .finance-list,
+body.dark .event-feature,body.dark .event-list,body.dark .linkhub-card,
+body.dark .class-quote-card,
+body.dark .schedule-item,
+body.dark .search-box,
+body.dark #studentFilter,
+body.dark input,body.dark select,body.dark textarea,
+body.dark .mobile-menu,
+body.dark .menu-list a,body.dark .menu-feature,body.dark .mobile-account-card,
+body.dark .admin-menu-card{
+  background:linear-gradient(145deg,rgba(20,28,55,.90),rgba(10,15,32,.82))!important;
+  color:var(--text)!important;
+  border-color:var(--border)!important;
+  box-shadow:0 18px 55px rgba(0,0,0,.18)!important;
+}
+body.dark .stat-card span,body.dark .mini-card p,body.dark .teacher-card p,
+body.dark .student-card p,body.dark .task-card p,body.dark .knowledge-card p,
+body.dark .database-card p,body.dark .linkhub-card small,body.dark .section-heading p,
+body.dark .panel-head span,body.dark .dash-stat span,body.dark .system-list span,
+body.dark .system-list b,body.dark .task-meta{color:var(--muted)!important}
+body.dark input::placeholder,body.dark textarea::placeholder{color:#77819d!important}
+body.dark input:focus,body.dark select:focus,body.dark textarea:focus{background:#10182f!important;color:#fff!important}
+body.dark .dash-hero,.body.dark .premium-hero{color:#fff!important}
+body.dark .schedule-room,body.dark .day-button{background:rgba(82,98,255,.12)!important;color:#aab5ff!important;border-color:rgba(100,115,255,.18)!important}
+body.dark .day-button.active{background:var(--primary)!important;color:#fff!important}
+body.dark .mobile-dash-main{border-color:#070b17!important}
+
+/* Navigation theme consistency */
+body.dark .navbar{
+  background:linear-gradient(135deg,rgba(13,19,40,.94),rgba(18,25,51,.84))!important;
+  border-color:rgba(160,174,225,.13)!important;
+}
+body.dark .nav-links a{color:#a2abc4!important}
+body.dark .nav-links a:hover,body.dark .nav-links a.active{color:#fff!important;background:rgba(86,101,255,.14)!important}
+body.dark .nav-search-btn,body.dark .notification-button,body.dark .theme-button,body.dark .menu-button,
+body.dark .account-pill,body.dark .music-button{background:rgba(20,28,55,.76)!important;color:#eef2ff!important;border-color:rgba(160,174,225,.14)!important}
+
+/* Hero: keep image dark enough in both themes, without bleaching content. */
+.hero-card.hero-class-photo{isolation:isolate}
+.hero-class-photo-bg{z-index:-2}
+.hero-photo-overlay{z-index:-1}
+
+/* Responsive section widths and grids */
+.section{width:min(1280px,calc(100% - 32px));max-width:1280px}
+.section-heading{min-width:0}
+.event-layout,.finance-layout,.notes-layout,.about-grid,.announcement-grid{min-width:0}
+.event-layout>*,.finance-layout>* ,.notes-layout>*{min-width:0}
+
+@media(max-width:900px){
+  .section{width:min(100% - 24px,760px);padding-top:72px;padding-bottom:72px}
+  .hero.section{padding-top:24px}
+  .hero-card.hero-class-photo{min-height:500px!important}
+  .hero-content{width:100%!important;max-width:760px!important}
+  .event-layout,.finance-layout,.notes-layout{grid-template-columns:1fr!important}
+  .about-grid,.announcement-grid{grid-template-columns:1fr!important}
+  .teacher-grid{grid-template-columns:1fr!important}
+  .students-grid{grid-template-columns:repeat(2,minmax(0,1fr))!important}
+  .task-grid,.knowledge-grid{grid-template-columns:repeat(2,minmax(0,1fr))!important}
+  .tools-grid,#tools .tools-grid{grid-template-columns:repeat(2,minmax(0,1fr))!important}
+  .linkhub-grid,.quick-grid{grid-template-columns:repeat(2,minmax(0,1fr))!important}
+  .admin-layout{grid-template-columns:1fr!important}
+  .admin-cards{grid-template-columns:repeat(2,minmax(0,1fr))!important}
+  .dashboard-two-col{grid-template-columns:1fr!important}
+}
+
+@media(max-width:620px){
+  html{font-size:15px}
+  .section{width:calc(100% - 20px);padding-top:54px;padding-bottom:54px}
+  .section-heading{margin-bottom:18px!important;gap:8px!important}
+  .section-heading h2{font-size:clamp(27px,8vw,38px)!important}
+  .section-heading p{font-size:8px!important;letter-spacing:.18em!important}
+
+  /* Navbar stays compact and never overflows the viewport. */
+  .navbar{width:calc(100% - 12px)!important;max-width:none!important;height:58px!important;margin:7px 6px 0!important;padding:0 7px!important;border-radius:17px!important}
+  .brand{gap:7px!important;min-width:0!important;flex:1 1 auto!important}
+  .brand-logo{width:36px!important;height:36px!important;flex:0 0 36px!important}
+  .brand-text{min-width:0!important}
+  .brand-text strong{font-size:11px!important;max-width:74px!important}
+  .brand-text small{font-size:6px!important;white-space:nowrap}
+  .nav-right{gap:3px!important;flex:0 0 auto!important}
+  .nav-search-btn,.notification-button,.theme-button,.menu-button{width:34px!important;height:34px!important;border-radius:10px!important}
+  .music-button,.account-pill{width:35px!important;height:35px!important;min-width:35px!important;border-radius:11px!important;padding:0!important}
+  .music-button .music-label,.account-pill b{display:none!important}
+  .top-avatar-wrap{width:27px!important;height:27px!important;border-radius:8px!important}
+
+  /* Hero */
+  .hero-card.hero-class-photo{min-height:465px!important;border-radius:21px!important}
+  .hero-content{padding:25px 19px!important}
+  .welcome{font-size:8px!important;letter-spacing:.22em!important}
+  .typewriter-title{font-size:clamp(45px,15vw,72px)!important;line-height:.9!important;max-width:100%!important;overflow-wrap:normal!important}
+  .hero-description{font-size:11px!important;line-height:1.55!important;max-width:100%!important}
+  .hero-buttons{display:grid!important;grid-template-columns:1fr!important;gap:7px!important;max-width:240px}
+  .hero-buttons .btn{min-height:42px!important}
+  .hero-live-strip{flex-wrap:wrap!important;gap:5px!important;font-size:8px!important}
+
+  /* Four stat cards: 2 x 2 on phone, never squashed. */
+  .stats-grid{grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:8px!important}
+  .stat-card{min-width:0!important;padding:12px!important;border-radius:15px!important;gap:9px!important}
+  .stat-icon{width:34px!important;height:34px!important;flex:0 0 34px!important;border-radius:10px!important}
+  .stat-card strong{font-size:20px!important}
+  .stat-card span{font-size:8px!important}
+
+  /* All major content grids collapse cleanly. */
+  .about-grid,.announcement-grid,.event-layout,.finance-layout,.notes-layout,
+  .task-grid,.knowledge-grid,.tools-grid,#tools .tools-grid,
+  .teacher-grid,.linkhub-grid,.quick-grid{grid-template-columns:1fr!important;gap:10px!important}
+  .students-grid{grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:8px!important}
+  .admin-cards{grid-template-columns:1fr!important}
+
+  .about-main{padding:23px!important}
+  .about-main h3{font-size:27px!important}
+  .mini-card{padding:20px!important}
+  .class-quote-card{padding:22px!important}
+  .event-feature,.event-list,.finance-main,.finance-list{min-height:0!important}
+  .countdown-row{grid-template-columns:repeat(4,minmax(0,1fr))!important;gap:5px!important}
+  .countdown-row>div{min-width:0!important;padding:10px 4px!important}
+  .countdown-row b{font-size:17px!important}
+
+  /* Dashboard */
+  .pro-dashboard{padding-top:24px!important}
+  .dashboard-shell{border-radius:20px!important}
+  .dashboard-main{padding:12px 10px 70px!important}
+  .dash-mobile-title{display:flex!important;align-items:center!important;justify-content:space-between!important;gap:10px!important}
+  .dash-mobile-title h3{font-size:18px!important}
+  .dash-mobile-title .live-clock{font-size:14px!important;white-space:nowrap}
+  .dash-hero.premium-hero{min-height:300px!important;padding:18px!important;border-radius:19px!important}
+  .premium-hero h3{font-size:22px!important;line-height:1.1!important}
+  .premium-hero p{font-size:9px!important;line-height:1.6!important}
+  .hero-clock{left:18px!important;right:18px!important;bottom:15px!important;padding:10px!important}
+  .hero-clock strong{font-size:17px!important}
+  .dash-stat-grid{grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:7px!important}
+  .modern-stat{min-width:0!important;padding:10px!important}
+  .modern-stat b{font-size:18px!important}
+  .dashboard-two-col{grid-template-columns:1fr!important;gap:8px!important}
+  .dash-panel{padding:14px!important;border-radius:16px!important}
+  .activity-item{grid-template-columns:28px 1fr auto!important;gap:7px!important}
+  .activity-item>span{width:28px!important;height:28px!important}
+  .quick-dashboard-grid{grid-template-columns:1fr 1fr!important}
+
+  /* Schedules: stack instead of forcing 3 columns. */
+  .schedule-item{grid-template-columns:1fr auto!important;gap:7px!important;padding:15px!important}
+  .schedule-time{grid-column:1/-1!important}
+  .schedule-room{grid-column:2!important;grid-row:2!important;width:max-content!important}
+
+  /* Inputs/toolbars */
+  .student-toolbar,.feature-toolbar{flex-direction:column!important;align-items:stretch!important}
+  .student-toolbar>* ,.feature-toolbar>*{width:100%!important;min-width:0!important}
+  .search-box{width:100%!important}
+
+  /* Avoid enormous blank areas on phone. */
+  .section[style*="min-height"],section[style*="min-height"]{min-height:0!important}
+  .dash-empty-state{min-height:260px!important}
+  .cta-card{min-height:210px!important;padding:28px 21px!important}
+
+  /* Keep mobile menu readable in both themes. */
+  .mobile-menu{left:8px!important;right:8px!important;top:70px!important;max-height:calc(100dvh - 82px)!important;overflow:auto!important}
+}
+
+@media(max-width:390px){
+  .nav-search-btn{display:none!important}
+  .brand-text strong{max-width:62px!important}
+  .stats-grid{gap:7px!important}
+  .stat-card{padding:10px!important}
+  .stat-icon{width:31px!important;height:31px!important;flex-basis:31px!important}
+  .stat-card strong{font-size:18px!important}
+  .typewriter-title{font-size:clamp(40px,14vw,60px)!important}
+  .section-heading h2{font-size:28px!important}
+}
+
+/* Custom type assignments requested by the user. */
+.typewriter-title,.hero h1,.hero-title,[class*="typewriter"]{font-family:'Halo Dek',cursive!important;font-weight:400!important;letter-spacing:.01em!important}
+#liveClock,#dashboardTime,.live-clock,.clock,.digital-clock,#clock,#currentTime{font-family:'Billy Ohio',cursive!important;font-weight:400!important;letter-spacing:.04em!important}
+.music-title,.music-name,.song-title,.track-title,.player-title,.music-heading,[class*="music"] h1,[class*="music"] h2,[class*="music"] h3{font-family:'Spotify Mix',var(--font-ui)!important}
+
+/* Fix an accidental selector typo from the earlier premium block. */
+body.dark .premium-hero{color:#fff!important}
+
+/* Never let hover transforms make mobile cards overflow horizontally. */
+@media(max-width:620px){
+  .card:hover,.feature-card:hover,.dashboard-card:hover,.music-card:hover,.schedule-card:hover,
+  .stat-card:hover,.panel:hover,.student-card:hover,.knowledge-card:hover,.tool-card:hover,
+  .task-card:hover,.mini-card:hover,.teacher-card:hover,.piket-day:hover,.linkhub-card:hover,
+  .schedule-item:hover{transform:none!important}
+}
+
+/* =========================================================
+   FINAL MOBILE RESPONSIVE FIX — XI TKJ 1
+   Fixes: horizontal overflow, hero scale, dashboard overlap,
+   section spacing, cards and About/Link grids on phones.
+   ========================================================= */
+html,body{width:100%;max-width:100%;overflow-x:hidden}
+*,*::before,*::after{box-sizing:border-box}
+img,svg,video,iframe{max-width:100%}
+
+@media (max-width:620px){
+  /* Never allow a child/grid item to create a wider page. */
+  .section,
+  .section>* ,
+  .dashboard-shell,
+  .dashboard-main,
+  .dashboard-two-col,
+  .about-grid,
+  .about-grid>* ,
+  .announcement-grid,
+  .announcement-grid>* ,
+  .event-layout,
+  .event-layout>* ,
+  .finance-layout,
+  .finance-layout>* ,
+  .notes-layout,
+  .notes-layout>* ,
+  .linkhub-grid,
+  .quick-grid,
+  .task-grid,
+  .knowledge-grid,
+  .tools-grid,
+  .teacher-grid{min-width:0;max-width:100%}
+
+  /* Tighter spacing between the top statistics and dashboard. */
+  #dashboard-pro{padding-top:30px!important;padding-bottom:42px!important}
+  #dashboard-pro .section-heading{margin-bottom:15px!important}
+
+  /* Hero: keep the class photo compact and the title centered. */
+  .hero.section{padding-top:18px!important;padding-bottom:24px!important}
+  .hero-card.hero-class-photo{
+    width:100%!important;
+    aspect-ratio:16/9!important;
+    min-height:0!important;
+    height:auto!important;
+    border-radius:20px!important;
+  }
+  .hero-class-photo .hero-content{
+    position:absolute!important;
+    inset:0!important;
+    width:100%!important;
+    padding:12px!important;
+    display:flex!important;
+    align-items:center!important;
+    justify-content:center!important;
+  }
+  .hero-class-photo .typewriter-title{
+    width:100%!important;
+    max-width:100%!important;
+    text-align:center!important;
+    white-space:nowrap!important;
+    font-size:clamp(38px,13vw,58px)!important;
+    line-height:.95!important;
+    letter-spacing:0!important;
+  }
+  .hero-class-photo .welcome{
+    top:50%!important;
+    transform:translateY(-135%)!important;
+    font-size:7px!important;
+  }
+
+  /* Stats: exactly 2 x 2 on phones. */
+  .stats-grid{grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:8px!important}
+  .stat-card{width:100%!important;min-width:0!important;padding:12px!important}
+
+  /* Dashboard heading must stay inside the viewport. */
+  #dashboard-pro .section-heading>div{min-width:0!important}
+  #dashboard-pro .section-heading h2{font-size:clamp(27px,8vw,36px)!important;white-space:nowrap}
+
+  /* Dashboard hero: give actions their own space so the clock never covers them. */
+  #dashboard-pro .dash-hero.premium-hero{
+    min-height:350px!important;
+    height:auto!important;
+    padding:18px!important;
+    overflow:hidden!important;
+  }
+  #dashboard-pro .premium-hero>div:first-child{
+    position:relative!important;
+    z-index:2!important;
+    min-width:0!important;
+    padding-bottom:78px!important;
+  }
+  #dashboard-pro .premium-hero h3{
+    font-size:23px!important;
+    line-height:1.12!important;
+    max-width:100%!important;
+  }
+  #dashboard-pro .premium-hero p{
+    font-size:10px!important;
+    line-height:1.55!important;
+    max-width:100%!important;
+  }
+  #dashboard-pro .hero-mini-actions{
+    display:flex!important;
+    flex-wrap:wrap!important;
+    gap:7px!important;
+    max-width:100%!important;
+  }
+  #dashboard-pro .hero-mini-actions .dash-action{
+    min-height:38px!important;
+    padding:8px 11px!important;
+    font-size:9px!important;
+    white-space:nowrap!important;
+  }
+  #dashboard-pro .hero-clock{
+    left:18px!important;
+    right:18px!important;
+    bottom:13px!important;
+    z-index:3!important;
+    min-height:54px!important;
+    padding:9px 11px!important;
+    display:grid!important;
+    grid-template-columns:auto 1fr auto!important;
+    gap:7px!important;
+  }
+  #dashboard-pro .hero-clock strong{font-size:19px!important;white-space:nowrap!important}
+  #dashboard-pro .hero-clock span{font-size:7px!important}
+  #dashboard-pro .hero-clock small{font-size:6px!important;white-space:nowrap!important}
+
+  /* Dashboard cards and panels: no fixed-width children. */
+  #dashboard-pro .dash-stat-grid{grid-template-columns:repeat(2,minmax(0,1fr))!important}
+  #dashboard-pro .dash-stat{min-width:0!important;width:100%!important}
+  #dashboard-pro .dash-panel{width:100%!important;min-width:0!important;overflow:hidden!important}
+  #dashboard-pro .activity-item{min-width:0!important}
+  #dashboard-pro .activity-item>div{min-width:0!important}
+  #dashboard-pro .activity-item b,
+  #dashboard-pro .activity-item small{overflow-wrap:anywhere!important}
+
+  /* About/link sections: one clean column instead of clipped/two-column layouts. */
+  .about-grid,
+  .announcement-grid,
+  .event-layout,
+  .finance-layout,
+  .notes-layout,
+  .linkhub-grid,
+  .quick-grid,
+  .task-grid,
+  .knowledge-grid,
+  .tools-grid,
+  #tools .tools-grid,
+  .teacher-grid{grid-template-columns:minmax(0,1fr)!important}
+  .about-main,.mini-card,.linkhub-card,.quick-card{width:100%!important;min-width:0!important}
+  .mini-card{flex:0 0 auto!important}
+
+  /* Prevent long labels/links from pushing cards sideways. */
+  .linkhub-card div,.quick-card div,.mini-card>div{min-width:0!important}
+  .linkhub-card b,.linkhub-card small,.quick-card b,.quick-card small,
+  .mini-card p,.mini-card h4{overflow-wrap:anywhere!important}
+
+  /* Toolbars/inputs fit the phone exactly. */
+  .feature-toolbar,.student-toolbar{width:100%!important;min-width:0!important}
+  .feature-toolbar>* ,.student-toolbar>*{min-width:0!important;max-width:100%!important}
+}
+
+@media (max-width:390px){
+  .hero-class-photo .typewriter-title{font-size:clamp(35px,12.5vw,51px)!important}
+  #dashboard-pro .dash-hero.premium-hero{min-height:365px!important}
+  #dashboard-pro .premium-hero h3{font-size:21px!important}
+  #dashboard-pro .hero-mini-actions .dash-action{font-size:8px!important;padding:7px 9px!important}
+  #dashboard-pro .hero-clock{grid-template-columns:1fr 1.35fr!important}
+  #dashboard-pro .hero-clock small{display:none!important}
+}
+
+/* =========================================================
+   FINAL RESPONSIVE / VISUAL FIX — XI TKJ 1
+   ========================================================= */
+/* The class photo should stay visible; text remains readable without
+   putting a heavy black veil over the whole image. */
+.hero-card.hero-class-photo .hero-photo-overlay{
+  background:linear-gradient(90deg,rgba(5,9,27,.34) 0%,rgba(7,12,34,.16) 48%,rgba(7,12,34,.08) 100%),
+             linear-gradient(0deg,rgba(3,6,18,.20),transparent 58%)!important;
+}
+.hero-card.hero-class-photo .typewriter-title{
+  font-size:clamp(52px,7vw,92px)!important;
+  text-shadow:0 5px 24px rgba(0,0,0,.52)!important;
+  max-width:100%;
+}
+
+/* Phone/tablet: scale the decorative title with the viewport instead of
+   letting the desktop size carry over. */
+@media(max-width:900px){
+  .hero-card.hero-class-photo .typewriter-title{
+    font-size:clamp(38px,11vw,66px)!important;
+  }
+  .hero-card.hero-class-photo .hero-photo-overlay{
+    background:linear-gradient(90deg,rgba(5,9,27,.28),rgba(7,12,34,.10) 55%,rgba(7,12,34,.06)),
+               linear-gradient(0deg,rgba(3,6,18,.16),transparent 60%)!important;
+  }
+}
+
+@media(max-width:620px){
+  .hero-card.hero-class-photo .typewriter-title{
+    font-size:clamp(31px,11vw,52px)!important;
+    line-height:.95!important;
+    letter-spacing:0!important;
+    white-space:nowrap!important;
+  }
+  .hero-card.hero-class-photo .hero-content{padding:12px!important}
+
+  /* Dashboard clock: compact on phones, desktop sizing stays untouched. */
+  #dashboard-pro .dash-mobile-title .live-clock{
+    font-family:'Billy Ohio',cursive!important;
+    font-size:13px!important;
+    line-height:1!important;
+    letter-spacing:.02em!important;
+    white-space:nowrap!important;
+    flex:0 0 auto!important;
+  }
+  #dashboard-pro .hero-clock{
+    min-width:0!important;
+    width:auto!important;
+    max-width:calc(100% - 28px)!important;
+    padding:8px 10px!important;
+    border-radius:15px!important;
+    grid-template-columns:auto 1fr auto!important;
+  }
+  #dashboard-pro .hero-clock strong{
+    font-size:17px!important;
+    line-height:1!important;
+  }
+  #dashboard-pro .hero-clock span{font-size:6px!important}
+  #dashboard-pro .hero-clock small{font-size:6px!important}
+
+  /* Keep the first hero image visible on small screens too. */
+  .hero-card.hero-class-photo .hero-photo-overlay{
+    background:linear-gradient(90deg,rgba(5,9,27,.24),rgba(7,12,34,.08) 55%,rgba(7,12,34,.04)),
+               linear-gradient(0deg,rgba(3,6,18,.13),transparent 62%)!important;
+  }
+}
+
+/* The light VISION card must not inherit white text from the dark/ACCENT card.
+   The previous universal !important background also accidentally removed the
+   blue background of the MISSION card, making its text look invisible. */
+.class-quote-card:not(.accent){
+  color:var(--text,#17203a)!important;
+  background:rgba(255,255,255,.82)!important;
+}
+.class-quote-card:not(.accent) h4,
+.class-quote-card:not(.accent) p,
+.class-quote-card:not(.accent) b{color:inherit!important}
+.class-quote-card.accent{
+  color:#fff!important;
+  border-color:transparent!important;
+  background:linear-gradient(135deg,#4055ff,#6e48ff)!important;
+}
+.class-quote-card.accent h4{color:#fff!important}
+.class-quote-card.accent b,.class-quote-card.accent p{color:rgba(255,255,255,.68)!important}
+body.dark .class-quote-card:not(.accent){
+  color:#f5f7ff!important;
+  background:linear-gradient(145deg,rgba(20,28,55,.90),rgba(10,15,32,.82))!important;
+}
+
+
+/* =========================================================
+   XI TKJ 1 — SOCIAL NAV + MOBILE MENU / HERO FIX
+   ========================================================= */
+.social-nav-button{
+  width:44px;height:44px;flex:0 0 44px;
+  display:grid;place-items:center;
+  border-radius:14px;
+  border:1px solid var(--line);
+  background:rgba(255,255,255,.72);
+  color:var(--text);
+  text-decoration:none;
+  transition:transform .18s ease,background .18s ease,border-color .18s ease,box-shadow .18s ease;
+  box-sizing:border-box;
+}
+.social-nav-button svg{width:20px;height:20px;display:block;fill:currentColor;stroke:currentColor;stroke-width:1.2}
+.social-instagram svg rect{fill:none}
+.social-instagram svg circle{fill:none}
+.social-nav-button:hover{transform:translateY(-1px);background:rgba(76,92,255,.10);border-color:rgba(76,92,255,.20);box-shadow:0 8px 22px rgba(45,60,150,.10)}
+body.dark .social-nav-button{background:rgba(20,28,55,.76);color:#eef2ff;border-color:rgba(160,174,225,.14)}
+body.dark .social-nav-button:hover{background:rgba(86,101,255,.14)}
+
+/* The three-dot button is a real compact control on tablet/mobile. */
+@media(max-width:900px){
+  .menu-dots{display:flex!important;position:relative!important;z-index:20!important;pointer-events:auto!important;touch-action:manipulation!important}
+  .social-nav-button{display:grid!important}
+  .nav-right{flex-wrap:nowrap!important;min-width:0!important}
+}
+
+/* Keep the desktop clock exactly as designed, but scale it before it can
+   inherit the desktop typography on narrower screens. */
+@media(max-width:900px){
+  #dashboard-pro .hero-clock{min-width:150px!important;width:auto!important;padding:14px 16px!important}
+  #dashboard-pro .hero-clock strong{font-size:25px!important;letter-spacing:.8px!important}
+}
+@media(max-width:620px){
+  #dashboard-pro .dash-hero.premium-hero{min-height:310px!important;padding:20px!important;align-items:flex-start!important}
+  #dashboard-pro .hero-clock{position:absolute!important;left:20px!important;right:20px!important;bottom:18px!important;width:auto!important;min-width:0!important;padding:12px 14px!important;border-radius:18px!important}
+  #dashboard-pro .hero-clock strong{font-size:clamp(22px,8vw,30px)!important;line-height:1!important}
+  #dashboard-pro .hero-clock small{font-size:8px!important}
+
+  /* Social icons + controls stay inside the phone viewport. */
+  .social-nav-button{width:34px!important;height:34px!important;flex:0 0 34px!important;border-radius:10px!important}
+  .social-nav-button svg{width:17px!important;height:17px!important}
+  .nav-search-btn,.notification-button,.theme-button,.menu-button{width:34px!important;height:34px!important}
+  .music-button,.account-pill{width:35px!important;height:35px!important;min-width:35px!important}
+  .nav-right{gap:3px!important}
+
+  /* Move WELCOME TO above the animated title so it never gets covered. */
+  .hero-card.hero-class-photo .welcome{top:31%!important;transform:translateY(-100%)!important;z-index:12!important;margin:0!important}
+  .hero-card.hero-class-photo .typewriter-title{position:relative!important;z-index:11!important;margin-top:18px!important}
+}
+@media(max-width:380px){
+  .social-nav-button{width:29px!important;height:29px!important;flex-basis:29px!important;border-radius:9px!important}
+  .social-nav-button svg{width:15px!important;height:15px!important}
+  .nav-search-btn,.notification-button,.theme-button,.menu-button{width:29px!important;height:29px!important;border-radius:9px!important}
+  .music-button,.account-pill{width:30px!important;height:30px!important;min-width:30px!important}
+  .top-avatar-wrap{width:23px!important;height:23px!important}
+  .nav-right{gap:2px!important}
+  .brand-logo{width:34px!important;height:34px!important;flex-basis:34px!important}
+  .brand-text strong{font-size:10px!important}
+  .hero-card.hero-class-photo .welcome{top:29%!important}
+}
+
+/* Photo overlay: visible photo, while retaining enough contrast for white title. */
+.hero-card.hero-class-photo .hero-photo-overlay{
+  background:linear-gradient(90deg,rgba(4,8,18,.24),rgba(4,8,18,.08) 55%,rgba(4,8,18,.18))!important;
+}
+@media(max-width:700px){
+  .hero-card.hero-class-photo .hero-photo-overlay{
+    background:linear-gradient(180deg,rgba(4,8,18,.14),rgba(4,8,18,.28))!important;
+  }
+}
+
+
+/* =========================================================
+   XI TKJ 1 — HERO LAYOUT + SOCIAL POSITION + ATTENDANCE V2
+   ========================================================= */
+/* The class-status strip is now outside the hero photo. */
+.hero > .hero-live-strip{
+  width:min(760px,calc(100% - 28px));
+  margin:14px auto 0;
+  min-height:42px;
+  padding:9px 14px!important;
+  display:flex!important;
+  align-items:center;
+  justify-content:center;
+  gap:7px;
+  flex-wrap:wrap;
+  border:1px solid rgba(105,120,190,.18)!important;
+  border-top:1px solid rgba(105,120,190,.18)!important;
+  border-radius:15px;
+  background:rgba(13,20,42,.54)!important;
+  color:rgba(235,240,255,.72)!important;
+  backdrop-filter:blur(16px) saturate(135%);
+  box-shadow:0 10px 28px rgba(20,30,80,.10);
+}
+.hero > .hero-live-strip span{display:inline-flex;align-items:center;gap:5px;padding:6px 9px;border-radius:999px;background:rgba(255,255,255,.045);border:1px solid rgba(255,255,255,.055);font-size:9px!important;line-height:1.1}
+.hero > .hero-live-strip i{width:6px;height:6px;border-radius:50%;background:#4ee0a2;box-shadow:0 0 0 4px rgba(78,224,162,.08)}
+.stats-grid{margin-top:14px!important}
+.hero-card.hero-class-photo .hero-live-strip{display:none!important}
+
+/* Socials belong in the navbar gap, before search — not after Account. */
+.nav-right{position:relative;z-index:1002;display:flex;align-items:center;flex-wrap:nowrap!important;min-width:0}
+.social-nav-button{order:-1!important;width:40px;height:40px;flex:0 0 40px;border-radius:12px}
+.social-nav-button svg{width:18px;height:18px}
+.menu-dots{position:relative!important;z-index:30!important;display:flex!important;align-items:center;justify-content:center;pointer-events:auto!important;touch-action:manipulation!important;cursor:pointer!important}
+.navbar{position:sticky!important;z-index:2200!important}
+.mobile-menu{z-index:2400!important}
+@media(max-width:900px){
+  .nav-right{gap:5px!important}
+  .social-nav-button{width:38px!important;height:38px!important;flex-basis:38px!important;border-radius:11px!important}
+  .social-nav-button svg{width:18px!important;height:18px!important}
+  .menu-dots{display:flex!important}
+  .hero > .hero-live-strip{width:calc(100% - 22px);margin-top:11px}
+  .stats-grid{margin-top:13px!important}
+}
+@media(max-width:620px){
+  .nav-right{gap:3px!important}
+  .social-nav-button{width:34px!important;height:34px!important;flex-basis:34px!important;border-radius:10px!important}
+  .social-nav-button svg{width:17px!important;height:17px!important}
+  .hero > .hero-live-strip{width:calc(100% - 18px);min-height:38px;margin-top:9px;padding:7px 8px!important;gap:4px}
+  .hero > .hero-live-strip span{font-size:7px!important;padding:5px 7px}
+  .stats-grid{margin-top:10px!important}
+}
+@media(max-width:380px){
+  .social-nav-button{width:29px!important;height:29px!important;flex-basis:29px!important;border-radius:9px!important}
+  .social-nav-button svg{width:15px!important;height:15px!important}
+}
+
+/* BARCODE V2 — clearer camera stage, status, and manual fallback. */
+.admin-scanner-layout{align-items:stretch!important}
+.admin-scanner-camera{min-width:0}
+.scanner-frame{position:relative;overflow:hidden;border-radius:24px!important;border:1px solid rgba(100,120,220,.22)!important;background:#050814;box-shadow:0 22px 60px rgba(15,25,75,.18)}
+.scanner-frame video{width:100%;height:100%;min-height:310px;object-fit:cover;display:block;background:#050814}
+.scanner-corners{z-index:3!important;inset:11%!important;border-color:rgba(255,255,255,.82)!important;border-width:2px!important;filter:drop-shadow(0 2px 8px rgba(0,0,0,.35))}
+.scanner-line{z-index:4!important;height:2px!important;background:linear-gradient(90deg,transparent,#6ee7b7,transparent)!important;box-shadow:0 0 16px rgba(110,231,183,.55)!important;animation:barcodeScanLine 2.1s ease-in-out infinite!important}
+@keyframes barcodeScanLine{0%,100%{top:18%;opacity:.15}50%{top:82%;opacity:1}}
+.scanner-placeholder{z-index:5!important;background:radial-gradient(circle at 50% 42%,rgba(70,88,255,.15),rgba(4,8,22,.97) 68%)!important}
+.scanner-placeholder span{width:58px!important;height:58px!important;display:grid!important;place-items:center!important;border-radius:18px!important;background:rgba(83,101,255,.13)!important;border:1px solid rgba(115,130,255,.22)!important;box-shadow:0 14px 35px rgba(40,55,150,.18)!important}
+.admin-scanner-status{min-height:40px!important;margin-top:10px!important;padding:10px 12px!important;border-radius:13px!important;border:1px solid var(--border)!important;background:var(--card)!important;font-size:9px!important}
+.admin-scanner-status[data-state="success"]{border-color:rgba(63,211,151,.25)!important;color:#53dca6!important;background:rgba(63,211,151,.06)!important}
+.admin-scanner-status[data-state="error"]{border-color:rgba(255,90,120,.25)!important;color:#ff7c98!important;background:rgba(255,90,120,.06)!important}
+.scanner-manual-row{display:grid;grid-template-columns:1fr auto;gap:7px;margin-top:8px}
+.scanner-manual-row input{width:100%;min-width:0;height:38px;padding:0 11px;border:1px solid var(--border);border-radius:11px;background:var(--card);color:var(--text);outline:none;font-size:9px}
+.scanner-manual-row input:focus{border-color:rgba(80,96,255,.55);box-shadow:0 0 0 3px rgba(80,96,255,.08)}
+.scanner-torch-btn[hidden]{display:none!important}
+.admin-barcode-modal .admin-barcode-box{width:min(980px,96vw)!important;max-height:94vh!important;border-radius:28px!important}
+.admin-scanner-result{position:relative;overflow:hidden;border-radius:24px!important;background:linear-gradient(160deg,rgba(72,88,255,.10),rgba(255,255,255,.025))!important;border:1px solid rgba(105,120,220,.17)!important}
+.admin-scanner-result:before{content:"SCAN • VERIFY • HADIR";position:absolute;right:18px;top:18px;font-size:7px;font-weight:900;letter-spacing:.14em;color:rgba(135,150,255,.58)}
+.scanner-result-icon{width:66px!important;height:66px!important;border-radius:21px!important;background:linear-gradient(135deg,#4b61ff,#8251ff)!important;box-shadow:0 18px 42px rgba(72,88,255,.22)!important}
+.scanner-result-status{border-radius:12px!important;padding:11px 12px!important}
+@media(max-width:700px){
+  .scanner-frame video{min-height:270px}
+  .admin-barcode-modal .admin-barcode-box{width:100vw!important;max-height:100vh!important;height:100vh!important;border-radius:0!important}
+  .scanner-manual-row{grid-template-columns:1fr 78px}
+}
+
+/* FACE V2 — cleaner live camera framing + capture feedback. */
+.face-camera{border-radius:26px!important;border-color:rgba(105,120,220,.22)!important;box-shadow:0 22px 55px rgba(15,25,70,.20)!important}
+.face-camera video{filter:saturate(1.03) contrast(1.02);}
+.face-camera-overlay{z-index:2!important;padding:14px!important;align-items:flex-start!important;justify-content:flex-start!important}
+.face-camera-overlay .camera-badge{position:static!important;display:inline-flex;align-items:center;gap:5px;background:rgba(5,9,22,.62)!important;border-color:rgba(255,255,255,.16)!important;box-shadow:0 8px 24px rgba(0,0,0,.18)}
+.face-camera-overlay .camera-badge i{width:6px;height:6px;background:#55e2a8;box-shadow:0 0 10px rgba(85,226,168,.7);opacity:1}
+.face-guide{position:absolute!important;left:50%!important;top:50%!important;transform:translate(-50%,-46%)!important;width:min(240px,48%)!important;height:min(300px,72%)!important;aspect-ratio:auto!important;border:1.5px solid rgba(255,255,255,.72)!important;border-radius:46% 46% 42% 42% / 43% 43% 49% 49%!important;box-shadow:0 0 0 1px rgba(0,0,0,.14),0 0 0 999px rgba(0,0,0,.045)!important}
+.face-guide:before,.face-guide:after,.face-guide span:before,.face-guide span:after{width:30px!important;height:30px!important;border-width:2px!important}
+.camera-hint{left:50%;transform:translateX(-50%);bottom:14px!important;white-space:nowrap;padding:7px 11px;border-radius:999px!important;background:rgba(5,9,22,.66)!important;border:1px solid rgba(255,255,255,.12);box-shadow:0 8px 22px rgba(0,0,0,.16);font-size:8px!important}
+.face-camera-status{min-height:34px!important;padding:8px 10px!important;border-radius:12px;background:var(--card);border:1px solid var(--border);margin-top:10px!important}
+.face-control{border-radius:15px!important;min-height:50px!important}
+.face-control.primary{box-shadow:0 12px 28px rgba(64,85,255,.20)!important}
+.face-preview-wrap{border-radius:18px!important;background:linear-gradient(135deg,rgba(64,85,255,.06),rgba(255,255,255,.02))!important;border-color:rgba(100,120,220,.17)!important}
+.face-preview-check{box-shadow:0 5px 15px rgba(69,211,154,.16)}
+@media(max-width:700px){
+  .face-camera{aspect-ratio:3/4;max-height:54vh;margin-top:15px}
+  .face-guide{width:min(210px,58%)!important;height:min(270px,70%)!important}
+  .camera-hint{bottom:11px!important}
+}
+@media(max-width:420px){.face-guide{width:56%!important;height:64%!important}.camera-hint{font-size:7px!important}}
+
+/* =========================================================
+   FINAL V3 — LIGHT/DARK THEME READABILITY + PROFILE DARK FIX
+   ========================================================= */
+/* The status text that sits BELOW the hero must stay readable in both themes. */
+body:not(.dark) .hero > .hero-live-strip{
+  background:rgba(255,255,255,.88)!important;
+  color:#26304d!important;
+  border-color:rgba(65,78,130,.16)!important;
+  box-shadow:0 12px 32px rgba(35,50,100,.08)!important;
+  backdrop-filter:blur(16px) saturate(125%);
+}
+body:not(.dark) .hero > .hero-live-strip span{
+  background:rgba(64,85,255,.055)!important;
+  color:#38425f!important;
+  border-color:rgba(65,78,130,.10)!important;
+}
+body:not(.dark) .hero > .hero-live-strip i{background:#31c98a;box-shadow:0 0 0 4px rgba(49,201,138,.10)}
+
+body.dark .hero > .hero-live-strip{
+  background:linear-gradient(135deg,rgba(19,28,57,.92),rgba(10,16,34,.88))!important;
+  color:#dfe6ff!important;
+  border-color:rgba(155,170,225,.16)!important;
+  box-shadow:0 16px 42px rgba(0,0,0,.24)!important;
+}
+body.dark .hero > .hero-live-strip span{
+  background:rgba(255,255,255,.055)!important;
+  color:#dfe6ff!important;
+  border-color:rgba(155,170,225,.10)!important;
+}
+
+/* DARK MODE PROFILE — remove the old hard-coded white/light surfaces. */
+body.dark #accountProfileView .account-profile-scroll{
+  background:linear-gradient(180deg,#070b17 0%,#0a1022 100%)!important;
+  color:#f3f6ff!important;
+}
+body.dark #accountProfileView .profile-cover{
+  background:
+    radial-gradient(circle at 86% 14%,rgba(100,115,255,.30),transparent 27%),
+    radial-gradient(circle at 10% 100%,rgba(0,190,255,.09),transparent 30%),
+    linear-gradient(135deg,#10183c,#090e20 72%)!important;
+  color:#fff!important;
+  border-color:rgba(155,170,225,.14)!important;
+}
+body.dark #accountProfileView .profile-cover-content h2,
+body.dark #accountProfileView .profile-cover-content p,
+body.dark #accountProfileView .profile-cover-content .eyebrow{color:inherit!important}
+body.dark #accountProfileView .profile-cover-content p{color:#9ba6c5!important}
+body.dark #accountProfileView .profile-feature-grid article,
+body.dark #accountProfileView .profile-info-grid>div{
+  background:linear-gradient(145deg,rgba(20,28,55,.92),rgba(10,15,32,.86))!important;
+  color:#f3f6ff!important;
+  border-color:rgba(155,170,225,.13)!important;
+  box-shadow:0 14px 38px rgba(0,0,0,.18)!important;
+}
+body.dark #accountProfileView .profile-feature-grid b,
+body.dark #accountProfileView .profile-info-grid b{color:#f3f6ff!important}
+body.dark #accountProfileView .profile-feature-grid small,
+body.dark #accountProfileView .profile-info-grid small{color:#8f9ab8!important}
+body.dark #accountProfileView .profile-feature-icon{background:rgba(82,98,255,.14)!important;color:#aeb8ff!important}
+body.dark #accountProfileView .profile-editor{
+  background:linear-gradient(145deg,rgba(27,35,63,.96),rgba(14,20,40,.92))!important;
+  border-color:rgba(155,170,225,.14)!important;
+  color:#f3f6ff!important;
+  box-shadow:0 18px 48px rgba(0,0,0,.20)!important;
+}
+body.dark #accountProfileView .profile-editor-heading h3,
+body.dark #accountProfileView .profile-editor-heading .eyebrow{color:#f3f6ff!important}
+body.dark #accountProfileView .profile-editor-heading>small{color:#929bb6!important}
+body.dark #accountProfileView .profile-edit-grid label{color:#dce3f7!important}
+body.dark #accountProfileView .profile-edit-grid input,
+body.dark #accountProfileView .profile-edit-grid textarea,
+body.dark #accountProfileView .profile-edit-grid select{
+  background:#0b1227!important;
+  color:#f3f6ff!important;
+  border-color:rgba(155,170,225,.15)!important;
+}
+body.dark #accountProfileView .profile-edit-grid input::placeholder,
+body.dark #accountProfileView .profile-edit-grid textarea::placeholder{color:#6f7a98!important}
+body.dark #accountProfileView .profile-actions.profile-actions-bottom .mini-btn{
+  background:rgba(20,28,55,.88)!important;
+  color:#eef2ff!important;
+  border-color:rgba(155,170,225,.14)!important;
+}
+body.dark #accountProfileView .profile-actions.profile-actions-bottom .mini-btn:first-child{
+  background:linear-gradient(135deg,#4055ff,#6e48ff)!important;
+  color:#fff!important;
+  border-color:transparent!important;
+}
+body.dark #accountProfileView .profile-actions.profile-actions-bottom .mini-btn.danger{
+  background:rgba(239,92,114,.08)!important;
+  color:#ff8da3!important;
+  border-color:rgba(239,92,114,.20)!important;
+}
+body.dark #accountProfileView .profile-avatar-wrap{background:#0b1227!important;border-color:rgba(155,170,225,.12)!important}
+
+/* Keep profile close button visible against both themes. */
+body.dark .account-modal-box>.modal-close{background:rgba(8,12,25,.72)!important;color:#fff!important}
+
+/* Mobile: don't let the status strip crowd the four stat cards. */
+@media(max-width:700px){
+  .hero > .hero-live-strip{margin-top:10px!important;margin-bottom:0!important}
+  .hero > .stats-grid{margin-top:12px!important}
+}
+@media(max-width:480px){
+  .hero > .hero-live-strip{min-height:36px!important}
+  .hero > .hero-live-strip span{font-size:7px!important}
+  .hero > .stats-grid{margin-top:10px!important}
+}

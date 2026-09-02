@@ -1463,7 +1463,7 @@ document.getElementById('facePhotoViewerImage')?.addEventListener('click',e=>{
 
 /* ===== BARCODE ABSENSI SISWA / ADMIN SCANNER ===== */
 (()=>{
-  let stream=null, scanning=false, timer=null, detector=null;
+  let stream=null, scannerTrack=null, scanning=false, timer=null, detector=null, lastDetected='', lastDetectedAt=0, torchOn=false;
 
   const getCurrentUser=()=>{try{return JSON.parse(sessionStorage.getItem('xi-account-session')||'null')}catch{return null}};
   const localKey=()=>typeof localDateKey==='function'?localDateKey():new Date().toISOString().slice(0,10);
@@ -1540,7 +1540,10 @@ document.getElementById('facePhotoViewerImage')?.addEventListener('click',e=>{
       const results=await detector.detect(video);
       if(results&&results.length){
         const raw=results[0].rawValue||'';
-        if(raw){await handleDetected(raw);return}
+        if(raw){
+          const now=Date.now();
+          if(raw!==lastDetected || now-lastDetectedAt>3000){lastDetected=raw;lastDetectedAt=now;await handleDetected(raw);return}
+        }
       }
     }catch(_){}
     timer=setTimeout(scanLoop,220);
@@ -1562,6 +1565,10 @@ document.getElementById('facePhotoViewerImage')?.addEventListener('click',e=>{
       const formats=wanted.filter(x=>supported.includes(x));
       detector=new BarcodeDetector({formats:formats.length?formats:['qr_code']});
       stream=await navigator.mediaDevices.getUserMedia({video:{facingMode:{ideal:'environment'},width:{ideal:1920},height:{ideal:1080}},audio:false});
+      scannerTrack=stream.getVideoTracks?.()[0]||null;
+      torchOn=false;
+      const torchBtn=document.getElementById('adminBarcodeTorch');
+      if(torchBtn)torchBtn.hidden=!(scannerTrack?.getCapabilities?.().torch);
       video.srcObject=stream;
       await video.play();
       scanning=true;
@@ -1579,6 +1586,8 @@ document.getElementById('facePhotoViewerImage')?.addEventListener('click',e=>{
     scanning=false;
     if(timer){clearTimeout(timer);timer=null}
     if(stream){stream.getTracks().forEach(t=>t.stop());stream=null}
+    scannerTrack=null; torchOn=false;
+    const torchBtn=document.getElementById('adminBarcodeTorch');if(torchBtn)torchBtn.hidden=true;
     const video=document.getElementById('adminBarcodeVideo');
     if(video)video.srcObject=null;
     const ph=document.getElementById('adminBarcodePlaceholder');
@@ -1647,6 +1656,21 @@ document.getElementById('facePhotoViewerImage')?.addEventListener('click',e=>{
   document.getElementById('adminBarcodeStart')?.addEventListener('click',startScanner);
   document.getElementById('adminBarcodeStop')?.addEventListener('click',stopScanner);
   document.getElementById('adminBarcodeUpload')?.addEventListener('click',()=>document.getElementById('adminBarcodeFile')?.click());
+  document.getElementById('adminBarcodeTorch')?.addEventListener('click',async()=>{
+    if(!scannerTrack?.applyConstraints)return;
+    const caps=scannerTrack.getCapabilities?.()||{};
+    if(!caps.torch)return;
+    torchOn=!torchOn;
+    try{await scannerTrack.applyConstraints({advanced:[{torch:torchOn}]});document.getElementById('adminBarcodeTorch').textContent=torchOn?'☀ Senter ON':'☼ Senter';}
+    catch(_){torchOn=!torchOn;toast('Senter kamera tidak tersedia di perangkat ini.')}
+  });
+  document.getElementById('adminBarcodeManualSubmit')?.addEventListener('click',()=>{
+    const input=document.getElementById('adminBarcodeManualInput');
+    const value=String(input?.value||'').trim().replace(/\s+/g,'');
+    if(!value){toast('Masukkan NISN terlebih dahulu.');input?.focus();return;}
+    handleDetected(value);if(input)input.value='';
+  });
+  document.getElementById('adminBarcodeManualInput')?.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();document.getElementById('adminBarcodeManualSubmit')?.click()}});
   document.getElementById('adminBarcodeFile')?.addEventListener('change',e=>{const f=e.target.files?.[0];if(f)decodeBarcodeImage(f);e.target.value=''});
   document.getElementById('adminBarcodeClose')?.addEventListener('click',closeAdminBarcodeScanner);
   document.getElementById('adminBarcodeModal')?.addEventListener('click',e=>{if(e.target.id==='adminBarcodeModal')closeAdminBarcodeScanner()});

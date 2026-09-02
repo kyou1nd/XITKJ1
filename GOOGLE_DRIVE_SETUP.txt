@@ -1,11 +1,22 @@
-XI TKJ 1 — GOOGLE DRIVE ONLY
+XI TKJ 1 — GOOGLE DRIVE ABSENSI
 
-Apps Script Web App yang dipakai website:
-https://script.google.com/macros/s/AKfycbyhsfuF-ISWf3IUY8I5CJgW0SbqRb136HfHSafU9gHs8yClcPsBujHuDhr4ojvCE5TkkQ/exec
-
-Google Drive folder:
+Folder Drive:
 https://drive.google.com/drive/folders/1Flcbrukb1Ln2x-uhDhUyWUc0eHp8EZoQ
 
-Absensi tidak menggunakan Google Spreadsheet.
-- Foto muka -> file JPG di Drive + watermark nama, lokasi, koordinat, tanggal, waktu.
-- Barcode -> file SVG/gambar teks di Drive.
+Web App URL di drive-config.js harus memakai URL deployment yang berakhiran /exec.
+
+Deploy Apps Script:
+1. Buka Apps Script.
+2. Ganti seluruh Code.gs dengan Code.gs dari folder google-apps-script pada paket ini.
+3. Deploy > New deployment > Web app.
+4. Execute as: Me.
+5. Who has access: Anyone.
+6. Copy URL /exec ke drive-config.js.
+7. Jika mengubah Code.gs, lakukan Deploy > Manage deployments > Edit > New version.
+
+Penyimpanan:
+- Foto muka -> JPG di Google Drive + metadata lokasi, koordinat, tanggal, waktu.
+- Barcode -> bukti SVG di Google Drive.
+- Tidak memakai Google Spreadsheet.
+
+Frontend sudah memakai kompresi foto agar upload lebih stabil dan baru mengunci absensi lokal setelah Drive terkonfirmasi.

@@ -884,7 +884,7 @@ function saveFaceAttendanceLocal(dateKey,data){
 function faceSession(){
  try{return JSON.parse(sessionStorage.getItem('xi-account-session')||'null')}catch{return null}
 }
-function compressFaceImage(dataUrl,maxSide=2200,quality=.82){
+function compressFaceImage(dataUrl,maxSide=1400,quality=.78){
  return new Promise((resolve,reject)=>{
   const img=new Image();
   img.onload=()=>{
@@ -1187,13 +1187,15 @@ async function submitFaceAttendance(){
  let record={nisn:u.nisn,name:u.name,date:dateKey,time:now.toLocaleTimeString('id-ID',{hour:'2-digit',minute:'2-digit'}),image:faceCapturedData,source:DRIVE_UPLOAD_URL?'local+drive':'local',latitude:loc.latitude,longitude:loc.longitude,accuracy:loc.accuracy,mapsUrl:mapsUrl,locationText:locationText,address:locationText};
  setFaceStatus('Menempelkan lokasi, tanggal, dan waktu ke foto...','ready');
  try{record.image=await addAttendanceWatermark(faceCapturedData,record);faceCapturedData=record.image;showFacePreview(record.image,record.date+' • '+record.time+' • Lokasi ditempel di foto');}catch(e){return toast('Watermark foto gagal dibuat. Coba ambil foto lagi.')}
- data[u.nisn]=record;saveFaceAttendanceLocal(dateKey,data);
- // Absensi foto langsung disimpan ke Google Drive.
+ // Kirim ke Google Drive dulu. Data lokal baru dikunci setelah Drive terkonfirmasi.
+ // Ini mencegah bug: upload gagal tetapi browser menganggap siswa sudah absen.
  try{
-   await uploadFaceToDrive(record);
-   setFaceStatus('Absensi foto berhasil disimpan ke Google Drive.','success');
+   const driveResult=await uploadFaceToDrive(record);
+   data[u.nisn]=Object.assign(record,driveResult||{});
+   saveFaceAttendanceLocal(dateKey,data);
+   setFaceStatus('Absensi foto berhasil disimpan di Google Drive.','success');
  }catch(err){
-   setFaceStatus('Foto tersimpan di perangkat, tetapi Drive gagal menerima data.','error');
+   setFaceStatus('Upload ke Google Drive gagal. Foto belum dikunci sebagai absensi.','error');
    return toast('Gagal menyimpan absensi ke Google Drive: '+(err?.message||'server tidak merespons.'));
  }
  document.getElementById('faceSubmitActions').hidden=true;document.getElementById('faceCameraCapture').disabled=true;
@@ -1633,7 +1635,7 @@ document.getElementById('facePhotoViewerImage')?.addEventListener('click',e=>{
  update();setInterval(update,1000);
 })();
 
-/* Account button hardening: never navigate away to #dashboard-pro. */
+/* ACCOUNT FIX: satu handler fallback, selalu refresh session sebelum membuka profil. */
 document.addEventListener('click',e=>{
  const target=e.target.closest?.('#accountShortcut,[data-open-account],#mobileAccountLink');
  if(!target)return;
@@ -1641,9 +1643,9 @@ document.addEventListener('click',e=>{
  if(!modal)return;
  e.preventDefault();
  e.stopPropagation();
- modal.classList.add('show');
- modal.setAttribute('aria-hidden','false');
  window.setTimeout(()=>{
-   try{window.dispatchEvent(new CustomEvent('xi-force-account-refresh'))}catch(_){}
+   try{window.dispatchEvent(new CustomEvent('xi-force-account-refresh'))}catch(_){ }
+   modal.classList.add('show');
+   modal.setAttribute('aria-hidden','false');
  },0);
-},true);
+});

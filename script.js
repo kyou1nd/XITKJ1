@@ -552,8 +552,22 @@ window.exportClassBackup=exportClassBackup;
  const modal=document.getElementById('accountModal'), guest=document.getElementById('accountGuestView'), profile=document.getElementById('accountProfileView');
  const topPill=document.getElementById('accountShortcut');
  const sessionKey='xi-account-session', passKey='xi-account-passwords', photoKey='xi-account-photos', profileKey='xi-account-profiles';
- const getSession=()=>{try{return JSON.parse(sessionStorage.getItem(sessionKey)||'null')}catch{return null}};
- const setSession=u=>{sessionStorage.setItem(sessionKey,JSON.stringify(u));syncAdminMenu();if(typeof syncFaceAttendanceMenu==='function')syncFaceAttendanceMenu();window.dispatchEvent(new CustomEvent('xi-session-changed'))};
+ // Session dibuat tahan reload supaya tombol Account selalu membuka PROFILE setelah login.
+ const getSession=()=>{
+   try{
+     const live=sessionStorage.getItem(sessionKey);
+     if(live){const u=JSON.parse(live); if(u){return u}}
+     const saved=localStorage.getItem(sessionKey);
+     if(saved){const u=JSON.parse(saved); if(u){sessionStorage.setItem(sessionKey,JSON.stringify(u));return u}}
+   }catch(_){}
+   return null;
+ };
+ const setSession=u=>{
+   const value=JSON.stringify(u);
+   sessionStorage.setItem(sessionKey,value);
+   localStorage.setItem(sessionKey,value);
+   syncAdminMenu();if(typeof syncFaceAttendanceMenu==='function')syncFaceAttendanceMenu();window.dispatchEvent(new CustomEvent('xi-session-changed'));
+ };
  const getPasswords=()=>JSON.parse(localStorage.getItem(passKey)||'{}');
  const getPhotos=()=>JSON.parse(localStorage.getItem(photoKey)||'{}');
  const adminMenu=document.getElementById('adminControlLink');
@@ -635,7 +649,7 @@ function syncAccountBio(){const u=getSession();if(!u||u.role!=='student')return;
  }));
  document.getElementById('studentLoginForm')?.addEventListener('submit',e=>{e.preventDefault();const nisn=document.getElementById('studentUsername').value.trim();const pw=document.getElementById('studentPassword').value;const err=document.getElementById('studentLoginError');const u=ACCOUNTS.find(x=>x.nisn===nisn);const stored=getPasswords();if(!u){err.textContent='NISN tidak ditemukan di data XI TKJ 1.';return}if((stored[u.nisn]||u.defaultPassword)!==pw){err.textContent='Password salah.';return}err.textContent='';setSession({role:'student',key:u.nisn,name:u.name,nisn:u.nisn,first:u.first});document.getElementById('studentLoginForm').reset();renderAccount();closeAccount();welcomeToast('Welcome Di Website XI TKJ 1 '+u.name)});
  document.getElementById('adminLoginForm')?.addEventListener('submit',e=>{e.preventDefault();const un=document.getElementById('adminUsername').value.trim(),pw=document.getElementById('adminPassword').value,err=document.getElementById('adminLoginError');if(un!==ADMIN.username||pw!==ADMIN.password){err.textContent='Username atau password admin salah.';return}err.textContent='';setSession({role:'admin',key:'admin',name:ADMIN.name});document.getElementById('adminLoginForm').reset();renderAccount();closeAccount();welcomeToast('Welcome Di Website XI TKJ 1 '+ADMIN.name)});
- document.getElementById('accountLogout')?.addEventListener('click',()=>{sessionStorage.removeItem(sessionKey);syncAdminMenu();if(typeof syncFaceAttendanceMenu==='function')syncFaceAttendanceMenu();window.dispatchEvent(new CustomEvent('xi-session-changed'));renderAccount();guestTop();closeAccount();closeAdminPortal();toast('Sesi ditutup.')});document.getElementById('adminLogout')?.addEventListener('click',()=>{sessionStorage.removeItem(sessionKey);syncAdminMenu();if(typeof syncFaceAttendanceMenu==='function')syncFaceAttendanceMenu();window.dispatchEvent(new CustomEvent('xi-session-changed'));closeAdminPortal();renderAccount();guestTop();toast('Sesi admin ditutup.')});
+ document.getElementById('accountLogout')?.addEventListener('click',()=>{sessionStorage.removeItem(sessionKey);localStorage.removeItem(sessionKey);syncAdminMenu();if(typeof syncFaceAttendanceMenu==='function')syncFaceAttendanceMenu();window.dispatchEvent(new CustomEvent('xi-session-changed'));renderAccount();guestTop();closeAccount();closeAdminPortal();toast('Sesi ditutup.')});document.getElementById('adminLogout')?.addEventListener('click',()=>{sessionStorage.removeItem(sessionKey);localStorage.removeItem(sessionKey);syncAdminMenu();if(typeof syncFaceAttendanceMenu==='function')syncFaceAttendanceMenu();window.dispatchEvent(new CustomEvent('xi-session-changed'));closeAdminPortal();renderAccount();guestTop();toast('Sesi admin ditutup.')});
  document.getElementById('saveAccountProfile')?.addEventListener('click',()=>{const u=getSession();if(!u)return toast('Silakan login terlebih dahulu.');openProfileConfirm()});
  function openProfileConfirm(){const m=document.getElementById('profileConfirmModal');if(m){m.classList.add('show');m.setAttribute('aria-hidden','false')}}
  function closeProfileConfirm(){const m=document.getElementById('profileConfirmModal');if(m){m.classList.remove('show');m.setAttribute('aria-hidden','true')}}
@@ -948,67 +962,57 @@ function addAttendanceWatermark(dataUrl,record){
   img.onload=()=>{
    try{
     const c=document.createElement('canvas');
-    c.width=img.naturalWidth||img.width;
-    c.height=img.naturalHeight||img.height;
-    const ctx=c.getContext('2d');
-    ctx.drawImage(img,0,0,c.width,c.height);
+    c.width=img.naturalWidth||img.width;c.height=img.naturalHeight||img.height;
+    const ctx=c.getContext('2d');ctx.drawImage(img,0,0,c.width,c.height);
 
-    const pad=Math.max(18,Math.round(c.width*.018));
-    const titleFs=Math.max(20,Math.round(c.width*.028));
-    const bodyFs=Math.max(15,Math.round(c.width*.020));
-    const smallFs=Math.max(13,Math.round(c.width*.017));
-    const maxW=Math.min(c.width*.82,Math.max(280,c.width-pad*2));
-    const name=String(record.name||'Siswa');
-    const location=String(record.locationText||record.address||'Lokasi tidak tersedia');
-    const coords='Koordinat: '+String(record.latitude??'-')+', '+String(record.longitude??'-');
+    // Watermark dibuat kecil dan selalu menempel di kanan bawah seperti contoh foto.
+    const scale=Math.max(.75,Math.min(1.4,c.width/1080));
+    const pad=Math.round(16*scale);
+    const titleSize=Math.max(13,Math.round(16*scale));
+    const bodySize=Math.max(11,Math.round(14*scale));
+    const smallSize=Math.max(9,Math.round(11*scale));
+    const maxW=Math.min(Math.round(c.width*.48),520);
+    const location=String(record.locationText||record.address||'Lokasi tidak tersedia').trim();
     const dateLine=formatAttendanceWatermarkDate(record.date,record.time);
+    const name=String(record.name||'Siswa').trim();
 
-    function wrap(text,font){
-      ctx.font=font;
-      const words=String(text||'').trim().split(/\\s+/).filter(Boolean),lines=[];
-      let line='';
-      for(const word of words){
-       const test=line?line+' '+word:word;
-       if(ctx.measureText(test).width<=maxW-pad*2||!line) line=test;
-       else {lines.push(line);line=word}
-      }
-      if(line)lines.push(line);
-      return lines.slice(0,3);
+    function fit(text,font,maxWidth){
+      ctx.font=font;let value=text;
+      if(ctx.measureText(value).width<=maxWidth)return value;
+      while(value.length>8&&ctx.measureText(value+'…').width>maxWidth)value=value.slice(0,-1);
+      return value+'…';
     }
 
-    const titleFont='800 '+titleFs+'px Arial, sans-serif';
-    const bodyFont='650 '+bodyFs+'px Arial, sans-serif';
-    const smallFont='600 '+smallFs+'px Arial, sans-serif';
-    const locationLines=wrap(location,bodyFont);
-    const coordLines=wrap(coords,smallFont);
-    const rows=[
-      {text:'ABSEN FOTO MUKA',font:titleFont,h:titleFs*1.25},
-      {text:name,font:bodyFont,h:bodyFs*1.25},
-      ...locationLines.map(x=>({text:x,font:bodyFont,h:bodyFs*1.18})),
-      ...coordLines.map(x=>({text:x,font:smallFont,h:smallFs*1.18})),
-      {text:dateLine,font:smallFont,h:smallFs*1.22}
+    const titleFont='700 '+titleSize+'px Arial,sans-serif';
+    const bodyFont='600 '+bodySize+'px Arial,sans-serif';
+    const smallFont='500 '+smallSize+'px Arial,sans-serif';
+    const lines=[
+      {text:fit(location,bodyFont,maxW-pad*2),font:bodyFont,h:bodySize*1.35,alpha:.96},
+      {text:fit(dateLine,smallFont,maxW-pad*2),font:smallFont,h:smallSize*1.45,alpha:.88},
+      {text:fit('XI TKJ 1 • '+name,smallFont,maxW-pad*2),font:smallFont,h:smallSize*1.35,alpha:.72}
     ];
-    const boxH=pad*2+rows.reduce((a,r)=>a+r.h,0)+10;
-    let widest=0;
-    rows.forEach(r=>{ctx.font=r.font;widest=Math.max(widest,ctx.measureText(r.text).width)});
-    const boxW=Math.min(c.width-pad*2,Math.max(320,widest+pad*2));
-    const x=c.width-boxW-pad, y=c.height-boxH-pad;
+    let widest=0;lines.forEach(r=>{ctx.font=r.font;widest=Math.max(widest,ctx.measureText(r.text).width)});
+    const boxW=Math.min(c.width-pad*2,Math.max(230*scale,widest+pad*2));
+    const boxH=pad*2+lines.reduce((sum,r)=>sum+r.h,0);
+    const x=c.width-pad-boxW;const y=c.height-pad-boxH;
+    const radius=Math.max(8,Math.round(10*scale));
 
-    ctx.fillStyle='rgba(7,12,28,.78)';
+    ctx.save();
+    ctx.fillStyle='rgba(0,0,0,.50)';
     ctx.beginPath();
-    ctx.roundRect(x,y,boxW,boxH,Math.max(12,Math.round(titleFs*.35)));
+    if(typeof ctx.roundRect==='function')ctx.roundRect(x,y,boxW,boxH,radius);
+    else ctx.rect(x,y,boxW,boxH);
     ctx.fill();
-    ctx.strokeStyle='rgba(255,255,255,.22)';ctx.lineWidth=1.5;ctx.stroke();
+    ctx.fillStyle='rgba(255,255,255,.22)';
+    ctx.fillRect(x,y,Math.min(3,scale*3),boxH);
 
     let ty=y+pad;
-    rows.forEach((r,i)=>{
-      ctx.font=r.font;
-      ctx.fillStyle=i===0?'#ffffff':(i===rows.length-1?'rgba(255,255,255,.84)':'#f4f7ff');
-      ctx.shadowColor='rgba(0,0,0,.45)';ctx.shadowBlur=4;ctx.shadowOffsetY=1;
-      ctx.fillText(r.text,x+pad,ty);
-      ctx.shadowColor='transparent';
-      ty+=r.h;
+    lines.forEach((r,i)=>{
+      ctx.font=r.font;ctx.fillStyle='rgba(255,255,255,'+r.alpha+')';
+      ctx.shadowColor='rgba(0,0,0,.45)';ctx.shadowBlur=3;ctx.shadowOffsetY=1;
+      ctx.fillText(r.text,x+pad,ty);ty+=r.h;
     });
+    ctx.restore();
     resolve(c.toDataURL('image/jpeg',.88));
    }catch(e){reject(e)}
   };
@@ -1016,6 +1020,7 @@ function addAttendanceWatermark(dataUrl,record){
   img.src=dataUrl;
  });
 }
+
 function showFaceAttendanceThanks(record={}){
  stopFaceCamera();
  const box=document.querySelector('#faceAttendanceModal .face-attendance-box');
@@ -1213,61 +1218,80 @@ async function submitFaceAttendance(){
    setFaceStatus('Absensi foto berhasil disimpan di Google Drive.','success');
  }catch(err){
    setFaceStatus('Upload ke Google Drive gagal. Foto belum dikunci sebagai absensi.','error');
-   return toast('Gagal menyimpan absensi ke Google Drive: '+(err?.message||'server tidak merespons.'));
+   return toast('Gagal menyimpan absensi: '+(err?.message||'server tidak merespons.')+'');
  }
  document.getElementById('faceSubmitActions').hidden=true;document.getElementById('faceCameraCapture').disabled=true;
  showFaceAttendanceThanks(record);
  toast('Absensi foto + lokasi berhasil dikirim');
 }
+function postDriveForm_(params){
+ return new Promise((resolve,reject)=>{
+  const iframe=document.createElement('iframe');
+  const name='xiDriveUpload_'+Date.now()+'_'+Math.floor(Math.random()*100000);
+  iframe.name=name;iframe.style.cssText='position:fixed;left:-9999px;top:-9999px;width:1px;height:1px;border:0;opacity:0';
+  document.body.appendChild(iframe);
+  const form=document.createElement('form');
+  form.method='POST';form.action=DRIVE_UPLOAD_URL;form.target=name;form.acceptCharset='UTF-8';form.enctype='application/x-www-form-urlencoded';
+  form.style.display='none';
+  Object.entries(params).forEach(([k,v])=>{const input=document.createElement('input');input.type='hidden';input.name=k;input.value=String(v??'');form.appendChild(input)});
+  document.body.appendChild(form);
+  let done=false;
+  const finish=(err)=>{if(done)return;done=true;clearTimeout(timer);setTimeout(()=>{iframe.remove();form.remove()},300);err?reject(err):resolve(true)};
+  const timer=setTimeout(()=>finish(new Error('Server upload timeout')),15000);
+  iframe.onload=()=>{setTimeout(()=>finish(),250)};
+  try{form.submit()}catch(e){finish(e)}
+ });
+}
+
+async function verifyFaceUpload_(record,tries=14){
+ for(let i=0;i<tries;i++){
+  try{
+   const status=await getAttendanceStatusJsonp(record.date,record.nisn);
+   if(status?.faceDone)return status.record||{};
+   if(status?.barcodeDone)throw new Error('Absensi hari ini sudah tercatat melalui barcode.');
+  }catch(e){
+   if(e?.message&&/barcode/i.test(e.message))throw e;
+  }
+  await new Promise(r=>setTimeout(r,900));
+ }
+ throw new Error('Foto belum terkonfirmasi masuk Google Drive. Pastikan Apps Script sudah di-deploy versi terbaru sebagai Web App.');
+}
+
 function uploadFaceToDrive(record){
- return new Promise(async (resolve,reject)=>{
+ return new Promise(async(resolve,reject)=>{
   try{
    if(!DRIVE_UPLOAD_URL)return reject(new Error('URL Apps Script Web App kosong'));
    const imageData=String(record.image||'').split(',')[1]||'';
    if(!imageData)return reject(new Error('Data foto kosong'));
-   const params=new URLSearchParams();
-   const fields={
-    action:'uploadFaceAttendance',
-    date:record.date,
-    time:record.time,
-    nisn:record.nisn,
-    name:record.name,
-    kelas:'XI TKJ 1',
-    mimeType:'image/jpeg',
-    imageData:imageData,
-    latitude:record.latitude,
-    longitude:record.longitude,
-    accuracy:record.accuracy,
-    mapsUrl:record.mapsUrl,
-    locationText:record.locationText||record.address||''
+   const params={
+    action:'saveFace',date:record.date,time:record.time,nisn:record.nisn,name:record.name,kelas:'XI TKJ 1',
+    mimeType:'image/jpeg',imageData,latitude:record.latitude,longitude:record.longitude,accuracy:record.accuracy,
+    mapsUrl:record.mapsUrl,locationText:record.locationText||record.address||''
    };
-   Object.entries(fields).forEach(([k,v])=>params.append(k,String(v??'')));
 
-   // POST langsung ke Apps Script. Response tidak dibaca karena CORS/no-cors;
-   // penyimpanan dikonfirmasi melalui endpoint JSONP attendanceStatus.
-   await fetch(DRIVE_UPLOAD_URL,{method:'POST',mode:'no-cors',redirect:'follow',body:params,cache:'no-store'});
+   // Coba fetch sederhana terlebih dahulu. Jika browser memblokir redirect/cross-origin,
+   // langsung gunakan form POST sebagai fallback. Code.gs menerima keduanya.
+   let firstAttempt=false;
+   try{
+    await fetch(DRIVE_UPLOAD_URL,{method:'POST',mode:'no-cors',redirect:'follow',headers:{'Content-Type':'application/x-www-form-urlencoded;charset=UTF-8'},body:new URLSearchParams(params),cache:'no-store'});
+    firstAttempt=true;
+   }catch(_){}
 
-   let tries=0;
-   const verify=async()=>{
-    tries++;
+   try{
+    const verified=await verifyFaceUpload_(record,firstAttempt?5:2);
+    resolve(verified);return;
+   }catch(firstError){
+    // Upload ulang lewat native form POST. Backend punya duplicate guard sehingga aman.
+    try{await postDriveForm_(params)}catch(_){}
     try{
-     const status=await getAttendanceStatusJsonp(record.date,record.nisn);
-     if(status?.faceDone){
-      resolve(status.record||{});
-      return;
-     }
-     if(status?.barcodeDone){
-      reject(new Error('Absensi hari ini sudah tercatat melalui barcode.'));
-      return;
-     }
-    }catch(_){ }
-    if(tries<10){setTimeout(verify,1200);return}
-    reject(new Error('Foto belum terkonfirmasi masuk Google Drive. Coba lagi.'));
-   };
-   setTimeout(verify,900);
+     const verified=await verifyFaceUpload_(record,14);
+     resolve(verified);return;
+    }catch(finalError){reject(finalError)}
+   }
   }catch(e){reject(e)}
  });
 }
+
 function driveJsonp(dateKey){
  return new Promise((resolve,reject)=>{
   if(!DRIVE_UPLOAD_URL)return reject(new Error('Drive URL kosong'));

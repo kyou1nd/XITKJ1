@@ -2091,3 +2091,68 @@ html.account-modal-open,body.account-modal-open{overflow:hidden!important}
  #accountProfileView .profile-avatar-wrap{width:82px!important;height:82px!important;flex-basis:82px!important}
  #accountProfileView .profile-avatar-wrap img,#accountProfileView .profile-avatar-wrap>div{width:72px!important;height:72px!important}
 }
+
+/* =========================================================
+   XI TKJ 1 — POLISH PASS / ACCOUNT + ATTENDANCE FINAL
+   ========================================================= */
+:root{--ui-radius:24px;--ui-ease:cubic-bezier(.22,.8,.22,1)}
+html{scroll-behavior:smooth}
+body{background:radial-gradient(circle at 10% 8%,rgba(72,88,255,.06),transparent 28%),radial-gradient(circle at 90% 45%,rgba(0,190,255,.045),transparent 26%),var(--bg);}
+.navbar{border-color:rgba(120,135,190,.16);box-shadow:0 16px 55px rgba(28,40,95,.11);transition:transform .35s var(--ui-ease),box-shadow .35s ease,background .35s ease}
+.navbar:hover{box-shadow:0 20px 65px rgba(28,40,95,.15)}
+.nav-links a,.account-pill,.theme-button,.menu-button,.music-button,.nav-search-btn,.notification-button{transition:transform .25s var(--ui-ease),background .25s ease,color .25s ease,border-color .25s ease}
+.nav-links a:hover,.account-pill:hover,.theme-button:hover,.menu-button:hover,.music-button:hover,.nav-search-btn:hover,.notification-button:hover{transform:translateY(-2px)}
+.account-pill{max-width:190px;overflow:hidden}.account-pill b{max-width:105px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.section{position:relative}.section-heading{margin-bottom:26px}.section-heading h2{letter-spacing:-.045em}.section-heading p{letter-spacing:.18em}
+.about-main,.mini-card,.teacher-card,.student-card,.piket-day,.schedule-card,.knowledge-card,.tool-card,.task-card,.dash-panel,.database-card,.file-card,.notification-info,.finance-main,.finance-list,.event-feature,.event-list,.linkhub-card,.class-quote-card{transition:transform .35s var(--ui-ease),box-shadow .35s ease,border-color .3s ease}
+.student-card:hover,.knowledge-card:hover,.tool-card:hover,.task-card:hover,.mini-card:hover,.teacher-card:hover,.piket-day:hover,.linkhub-card:hover{transform:translateY(-5px)}
+.btn,.mini-btn{transition:transform .25s var(--ui-ease),box-shadow .25s ease,border-color .25s ease,background .25s ease}
+.btn:hover,.mini-btn:hover{transform:translateY(-2px)}
+footer{margin-top:40px;border-top:1px solid var(--border);background:linear-gradient(180deg,transparent,rgba(70,85,170,.035));}
+
+/* Account: one clean layer, no profile underneath the login. */
+.account-modal{isolation:isolate!important}
+.account-modal-box{isolation:isolate!important;display:block!important}
+#accountGuestView[hidden],#accountProfileView[hidden]{display:none!important}
+#accountGuestView{position:relative!important;z-index:1!important}
+#accountProfileView{position:relative!important;z-index:2!important}
+.account-profile-scroll{background:linear-gradient(180deg,var(--bg),rgba(80,95,180,.025));}
+.account-profile-scroll .profile-cover{position:relative;overflow:hidden;background:radial-gradient(circle at 90% 15%,rgba(90,100,255,.28),transparent 28%),radial-gradient(circle at 10% 100%,rgba(0,190,255,.10),transparent 30%),linear-gradient(135deg,#10183c,#090e20 70%);color:#fff}
+.account-profile-scroll .profile-cover:after{content:"";position:absolute;inset:auto 0 0;height:1px;background:linear-gradient(90deg,transparent,rgba(255,255,255,.24),transparent)}
+.account-profile-scroll .profile-cover-content{position:relative;z-index:2}
+.account-profile-scroll .profile-feature-grid{margin-top:0}
+.account-profile-scroll .profile-feature-grid article,.account-profile-scroll .profile-info-grid>div{transition:transform .25s var(--ui-ease),border-color .25s ease,box-shadow .25s ease}
+.account-profile-scroll .profile-feature-grid article:hover,.account-profile-scroll .profile-info-grid>div:hover{transform:translateY(-2px);border-color:rgba(90,105,255,.25);box-shadow:0 12px 30px rgba(35,50,110,.08)}
+.profile-actions.profile-actions-bottom{position:sticky;bottom:0;z-index:5;background:linear-gradient(180deg,transparent,var(--bg) 24%);padding-top:28px!important}
+
+/* Compact watermark preview inside the attendance camera too. */
+#facePreviewWrap{position:relative}
+#facePreview{display:block;width:100%;height:auto;max-height:58vh;object-fit:contain;background:#050711}
+
+/* Attendance status + photo cards */
+.attendance-unified-item.has-photo{position:relative;overflow:hidden}
+.attendance-unified-item.has-photo:before{content:"";position:absolute;left:0;top:0;bottom:0;width:3px;background:linear-gradient(180deg,#5d70ff,#8b5cf6);opacity:.8}
+
+/* Mobile polish */
+@media(max-width:800px){
+ .navbar{width:calc(100% - 18px);margin-top:9px;border-radius:18px;padding:0 11px}
+ .brand-logo{width:39px;height:39px;border-radius:12px}.brand-text strong{font-size:12px}
+ .nav-right{gap:5px}.account-pill{padding:0 8px!important;min-width:42px}.account-pill b{display:none}.top-avatar-wrap{margin:0!important}
+ .section{padding-left:0;padding-right:0}
+ .section-heading{padding:0 2px}.section-heading h2{font-size:clamp(27px,8vw,38px)}
+ .hero-card,.class-showcase,.dashboard-shell,.admin-portal-box{border-radius:22px}
+ .account-profile-scroll .profile-cover{padding:28px 18px 22px!important}
+ .account-profile-scroll .profile-cover-content{gap:12px!important}
+ .account-profile-scroll .profile-cover-content h2{line-height:1.05!important}
+ .account-profile-scroll .profile-feature-grid{gap:8px!important}
+ .account-profile-scroll .profile-info-grid{gap:8px!important}
+}
+@media(max-width:480px){
+ .navbar{height:58px}.brand-logo{width:35px;height:35px}.brand-text strong{font-size:11px}
+ .theme-button,.menu-button,.nav-search-btn,.notification-button{width:36px;height:36px}
+ .account-pill{width:36px;height:36px;min-height:36px}
+ .section{padding-top:58px;padding-bottom:58px}
+ .hero-card{border-radius:20px}
+ .account-modal-box>.modal-close{top:10px!important;right:10px!important;width:34px!important;height:34px!important;border-radius:11px!important}
+ .profile-actions.profile-actions-bottom{grid-template-columns:1fr!important}
+}

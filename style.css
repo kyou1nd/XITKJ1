@@ -2156,3 +2156,45 @@ footer{margin-top:40px;border-top:1px solid var(--border);background:linear-grad
  .account-modal-box>.modal-close{top:10px!important;right:10px!important;width:34px!important;height:34px!important;border-radius:11px!important}
  .profile-actions.profile-actions-bottom{grid-template-columns:1fr!important}
 }
+
+
+/* =========================================================
+   FINAL FIX — PROFILE ACTIONS MUST SCROLL WITH PROFILE
+   ========================================================= */
+#accountProfileView .account-profile-scroll{
+  position:relative!important;
+  display:block!important;
+  overflow-y:auto!important;
+  overflow-x:hidden!important;
+  height:100%!important;
+  min-height:0!important;
+  padding-bottom:28px!important;
+}
+#accountProfileView .profile-actions.profile-actions-bottom{
+  position:static!important;
+  bottom:auto!important;
+  z-index:auto!important;
+  width:auto!important;
+  margin:0!important;
+  background:transparent!important;
+  background-image:none!important;
+  padding:18px 38px 30px!important;
+}
+#accountProfileView .profile-actions.profile-actions-bottom .mini-btn{
+  position:static!important;
+}
+@media(max-width:800px){
+  #accountProfileView .profile-actions.profile-actions-bottom{
+    padding:18px 20px 30px!important;
+  }
+}
+@media(max-width:480px){
+  #accountProfileView .profile-actions.profile-actions-bottom{
+    padding:18px 14px 30px!important;
+  }
+}
+
+/* FINAL ATTENDANCE WATERMARK — compact lower-right overlay */
+#facePreviewWrap #facePreview{
+  max-width:100%;
+}

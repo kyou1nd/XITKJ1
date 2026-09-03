@@ -362,7 +362,6 @@ function updateClock(){const now=new Date();const time=now.toLocaleTimeString('i
 function getSiteConfig(){try{return JSON.parse(localStorage.getItem('xi-site-config')||'{}')}catch{return {}}}
 function saveSiteConfig(x){localStorage.setItem('xi-site-config',JSON.stringify(x))}
 function money(n){return 'Rp '+Number(n||0).toLocaleString('id-ID')}
-function getClassTuesdayDates(year,month){const out=[];const d=new Date(year,month,1);while(d.getMonth()===month){if(d.getDay()===2)out.push(new Date(d));d.setDate(d.getDate()+1)}return out}
 function applyMaintenance(){const b=document.getElementById('maintenanceBanner');if(b)b.classList.toggle('show',localStorage.getItem('xi-maintenance-mode')==='1')}
 function applySiteConfig(){
  const cfg=getSiteConfig();
@@ -378,7 +377,7 @@ function getPasswordsForAdmin(nisn){try{const p=JSON.parse(localStorage.getItem(
 function adminSaveAccount(nisn,row){const accounts=window.__CLASS_ACCOUNTS||[];const account=accounts.find(x=>x.nisn===nisn);if(!account)return;const profiles=JSON.parse(localStorage.getItem('xi-account-profiles')||'{}');const current=Object.assign({displayName:account.name,username:account.first,bio:'Suka mencoba hal baru dan membangun proyek digital sederhana.',interests:'Desain UI, jaringan, dan eksplorasi teknologi',skills:'Troubleshooting, konfigurasi jaringan, dan dasar coding',motto:''},profiles[nisn]||{});current.displayName=row.querySelector('[data-account-name]')?.value.trim()||account.name;current.username=row.querySelector('[data-account-username]')?.value.trim()||account.first;profiles[nisn]=current;localStorage.setItem('xi-account-profiles',JSON.stringify(profiles));const passwords=JSON.parse(localStorage.getItem('xi-account-passwords')||'{}');const pw=row.querySelector('[data-account-password]')?.value.trim();if(pw)passwords[nisn]=pw;localStorage.setItem('xi-account-passwords',JSON.stringify(passwords));const u=getSessionSafe();if(u?.nisn===nisn){const next=Object.assign({},u,{name:current.displayName,first:current.username});sessionStorage.setItem('xi-account-session',JSON.stringify(next));}renderStudents();toast('Account berhasil diperbarui');}
 function getSessionSafe(){try{return JSON.parse(sessionStorage.getItem('xi-account-session')||'null')}catch{return null}}
 function adminRender(tab='overview'){
- const c=document.getElementById('adminContent');if(!c)return;const tasks=loadTasks(),cfg=getSiteConfig();let storedCash={};try{storedCash=JSON.parse(localStorage.getItem('xi-class-finance-v3')||'{}')}catch{}const cash=Object.assign({balance:0,income:0,expense:0,note:'Data kas kelas'},cfg.cash||{},storedCash||{});
+ const c=document.getElementById('adminContent');if(!c)return;const tasks=loadTasks(),cfg=getSiteConfig(),cash=cfg.cash||{balance:850000,income:300000,expense:150000};
  if(tab==='overview')c.innerHTML=`<div class="admin-cards"><div class="admin-mini"><small>Siswa</small><b>${window.__CLASS_ACCOUNTS?.length||36}</b><span>anggota kelas</span></div><div class="admin-mini"><small>Tugas aktif</small><b>${tasks.filter(t=>t.status!=='done').length}</b><span>perlu dipantau</span></div><div class="admin-mini"><small>Saldo kas</small><b>${money(cash.balance)}</b><span>tersimpan lokal</span></div></div><h3 style="margin-top:25px">Kontrol Website</h3><p class="admin-help">Semua perubahan di panel ini disimpan di browser perangkat. Tidak membutuhkan server, bracket, API, atau manifest.</p><div class="task-actions"><button class="btn btn-primary" onclick="adminRender('website')">Atur Website</button><button class="mini-btn" onclick="adminRender('finance')">Atur Kas</button><button class="mini-btn" onclick="adminRender('schedule')">Atur Jadwal</button><button class="mini-btn" onclick="exportClassBackup()">Export backup</button></div>`;
  else if(tab==='website')c.innerHTML=`<h3>Pengaturan Tampilan Website</h3><p class="admin-help">Ubah teks utama yang tampil di halaman depan.</p><div class="admin-form-stack"><label>Teks welcome<input id="cfgWelcome" value="${escapeHTML(cfg.welcome||'WELCOME TO')}"></label><label>Judul utama<input id="cfgTitle" value="${escapeHTML(cfg.heroTitle||'XI TKJ 1')}"></label><label>Deskripsi<textarea id="cfgDesc">${escapeHTML(cfg.heroDescription||'Website digital resmi untuk jadwal, piket, siswa, guru, pengumuman, tugas, dan informasi XI TKJ 1.')}</textarea></label></div><div class="admin-save-row"><button class="btn btn-primary" id="saveWebsiteCfg">Simpan perubahan</button></div>`;
  else if(tab==='attendance'){
@@ -401,24 +400,7 @@ function adminRender(tab='overview'){
   c.querySelector('#faceRefreshDrive')?.addEventListener('click',()=>refreshUnifiedAttendance(dateKey,true));
   refreshUnifiedAttendance(dateKey,false);
  }
- else if(tab==='finance'){
-  const accounts=window.__CLASS_ACCOUNTS||[], now=new Date(), tuesdays=getClassTuesdayDates(now.getFullYear(),now.getMonth()), currentTuesday=tuesdays.filter(x=>x<=now).pop();
-  const monthLabel=new Intl.DateTimeFormat('id-ID',{month:'long',year:'numeric'}).format(now);
-  const monthly=Array.isArray(cash.monthly)?cash.monthly:[];
-  const currentMonth=monthly.find(m=>String(m.month).toLowerCase()===monthLabel.toLowerCase())||{month:monthLabel,income:0,expense:0};
-  c.innerHTML=`<div class="admin-finance-head"><div><span class="eyebrow">CLASS FINANCE • XI TKJ 1</span><h3>Keuangan <em>Kelas</em></h3><p class="admin-help">Kelola saldo, pemasukan, pengeluaran, grafik bulanan, dan status iuran setiap siswa. Iuran rutin Rp 2.000 setiap hari Selasa.</p></div><div class="admin-finance-badge"><b>Rp 2.000</b><small>SETIAP SELASA</small></div></div>
-  <div class="admin-finance-stats"><article><small>SALDO KAS</small><b>${money(cash.balance)}</b><span>Saldo berjalan</span></article><article><small>PEMASUKAN</small><b>${money(cash.income)}</b><span>Total pemasukan</span></article><article><small>PENGELUARAN</small><b>${money(cash.expense)}</b><span>Total pengeluaran</span></article><article><small>SELASA BERJALAN</small><b>${currentTuesday?new Intl.DateTimeFormat('id-ID',{day:'2-digit',month:'short'}).format(currentTuesday):'—'}</b><span>${tuesdays.filter(x=>x<=now).length} kewajiban bulan ini</span></article></div>
-  <section class="admin-finance-editor"><div class="admin-card-head premium"><div><span>RINGKASAN KAS</span><h4>Atur data keuangan</h4></div><span class="admin-finance-month">${escapeHTML(monthLabel)}</span></div><div class="admin-form-grid"><label>Saldo kas<input type="number" id="cashBal" value="${Number(cash.balance||0)}"></label><label>Total pemasukan<input type="number" id="cashInc" value="${Number(cash.income||0)}"></label><label>Total pengeluaran<input type="number" id="cashExp" value="${Number(cash.expense||0)}"></label><label>Catatan kas<input id="cashNote" value="${escapeHTML(cash.note||'Data kas kelas')}"></label></div><div class="admin-save-row"><button class="btn btn-primary" id="saveFinanceCfg">Simpan Keuangan</button></div></section>
-  <section class="admin-finance-monthly"><div class="admin-card-head premium"><div><span>MONTHLY CASH FLOW</span><h4>Grafik bulan berjalan</h4></div><div><b>${money(currentMonth.income)}</b> masuk · <b>${money(currentMonth.expense)}</b> keluar</div></div><div class="admin-finance-bars"><div><span>Pemasukan</span><i style="width:${Math.min(100,Math.max(0,Number(currentMonth.income||0)/(Math.max(1,Number(currentMonth.income||0),Number(currentMonth.expense||0)))*100))}%"></i></div><div><span>Pengeluaran</span><i style="width:${Math.min(100,Math.max(0,Number(currentMonth.expense||0)/(Math.max(1,Number(currentMonth.income||0),Number(currentMonth.expense||0)))*100))}%"></i></div></div></section>
-  <section class="admin-finance-payments"><div class="admin-card-head premium"><div><span>PAYMENT ROSTER</span><h4>Status iuran siswa</h4><small>Setiap Selasa = Rp 2.000. Admin dapat mencatat pembayaran untuk tanggal hari ini.</small></div><strong>${accounts.length} siswa</strong></div><div class="admin-payment-list">${accounts.map(x=>{let d={};try{d=JSON.parse(localStorage.getItem('xi-cash-payments-'+x.nisn)||'{}')}catch{};const key=currentTuesday?localDateKey(currentTuesday):'',paid=!!(key&&d[key]);return `<article class="admin-payment-row ${paid?'paid':''}"><div class="admin-payment-avatar">${escapeHTML((x.first||x.name||'S').slice(0,1).toUpperCase())}</div><div class="admin-account-main"><b>${escapeHTML(x.name)}</b><small>${paid?'SUDAH BAYAR':'BELUM BAYAR'} ${key?'• Selasa '+new Intl.DateTimeFormat('id-ID',{day:'2-digit',month:'short'}).format(currentTuesday):''}</small></div><button class="mini-btn ${paid?'':'danger'}" type="button" data-mark-cash="${escapeHTML(x.nisn)}">${paid?'✓ Sudah bayar':'Catat Rp 2.000'}</button></article>`}).join('')||'<div class="empty-state">Data siswa belum tersedia.</div>'}</div></section>`;
- }
- else if(tab==='voting'){const ideas=window.loadClassIdeasAdmin?window.loadClassIdeasAdmin():[];c.innerHTML=`<div class="admin-head-row"><div><span class="eyebrow">CLASS VOTING</span><h3>Vooting Class</h3><p class="admin-help">Hanya Administrator yang dapat menambahkan atau menghapus usulan. Siswa hanya dapat memberikan vote.</p></div><button class="btn btn-primary" id="adminAddIdea">＋ Tambah Usulan</button></div><div class="admin-voting-list">${ideas.length?ideas.map(x=>`<article class="admin-voting-row"><div><b>${escapeHTML(x.title)}</b><small>${escapeHTML(x.author||'Admin')} • ${escapeHTML(x.date||'')} • ${Number(x.votes||0)} vote</small><p>${escapeHTML(x.desc||'')}</p></div><button class="mini-btn danger" data-delete-idea="${escapeHTML(x.id)}">Hapus</button></article>`).join(''):'<div class="empty-state">Belum ada usulan. Tambahkan usulan pertama dari Admin.</div>'}</div>`;document.getElementById('adminAddIdea')?.addEventListener('click',adminAddClassIdea);c.querySelectorAll('[data-delete-idea]').forEach(b=>b.addEventListener('click',()=>{window.deleteClassIdea?.(b.dataset.deleteIdea);adminRender('voting')}));}
- else if(tab==='song-requests'){
-  c.innerHTML=`<div class="admin-head-row"><div><span class="eyebrow">MUSIC HUB</span><h3>Request Lagu</h3><p class="admin-help">Request dari siswa disimpan sebagai gambar di Google Drive. Tekan refresh untuk mengambil data terbaru.</p></div><button class="mini-btn" id="refreshSongRequests">↻ Refresh</button></div><div id="songRequestAdminList" class="admin-voting-list"><div class="empty-state">Memuat request...</div></div>`;
-  const renderReq=(data)=>{const list=document.getElementById('songRequestAdminList');const rows=data?.requests||[];if(!rows.length){list.innerHTML='<div class="empty-state">Belum ada request lagu.</div>';return}list.innerHTML=rows.map(r=>`<article class="admin-voting-row"><div><b>${escapeHTML(r.title||'Tanpa judul')}</b><small>${escapeHTML(r.artist||'')} • ${escapeHTML(r.name||'Siswa')} • ${escapeHTML(r.date||'')} ${escapeHTML(r.time||'')}</small><p>NISN: ${escapeHTML(r.nisn||'-')}</p></div><a class="mini-btn" href="${escapeHTML(r.url||'#')}" target="_blank" rel="noopener">Buka Drive</a></article>`).join('')};
-  const loadReq=()=>{if(!DRIVE_UPLOAD_URL){renderReq({requests:[]});return}const cb='xiSongRequests_'+Date.now();window[cb]=d=>{delete window[cb];renderReq(d)};const sc=document.createElement('script');sc.src=DRIVE_UPLOAD_URL+(DRIVE_UPLOAD_URL.includes('?')?'&':'?')+'action=listSongRequests&callback='+cb;sc.onerror=()=>{delete window[cb];renderReq({requests:[]})};document.body.appendChild(sc)};
-  document.getElementById('refreshSongRequests')?.addEventListener('click',loadReq);loadReq();
- }
+ else if(tab==='finance')c.innerHTML=`<h3>Kelola Keuangan Kelas</h3><p class="admin-help">Iuran rutin siswa adalah Rp 2.000 setiap hari Selasa. Admin dapat mengatur ringkasan dan transaksi.</p><p class="admin-help">Atur saldo, total pemasukan, dan total pengeluaran. Nilai disimpan lokal.</p><div class="admin-form-grid"><label>Saldo kas<input type="number" id="cashBal" value="${Number(cash.balance||0)}"></label><label>Total pemasukan<input type="number" id="cashInc" value="${Number(cash.income||0)}"></label><label>Total pengeluaran<input type="number" id="cashExp" value="${Number(cash.expense||0)}"></label><label>Catatan kas<input id="cashNote" value="${escapeHTML(cash.note||'Data kas kelas')}"></label></div><div class="admin-save-row"><button class="btn btn-primary" id="saveFinanceCfg">Simpan kas</button></div><h4 style="margin-top:25px">Status pembayaran siswa bulan ini</h4><p class="admin-help">Iuran rutin Rp 2.000 setiap Selasa. Klik tombol untuk mencatat pembayaran siswa.</p><div class="admin-account-list">${(window.__CLASS_ACCOUNTS||[]).map(x=>{let d={};try{d=JSON.parse(localStorage.getItem('xi-cash-payments-'+x.nisn)||'{}')}catch{};const now=new Date(),td=getTuesdayDates(now.getFullYear(),now.getMonth()).filter(x=>x<=now).pop(),key=td?td.toISOString().slice(0,10):'',paid=!!(key&&d[key]);return `<article class="admin-account-row"><div class="admin-account-main"><b>${escapeHTML(x.name)}</b><small>NISN: ${escapeHTML(x.nisn)} • ${paid?'SUDAH BAYAR':'BELUM BAYAR'}</small></div><button class="mini-btn ${paid?'':'danger'}" type="button" data-mark-cash="${escapeHTML(x.nisn)}">${paid?'Sudah bayar':'Catat Rp 2.000'}</button></article>`}).join('')}</div>`;
  else if(tab==='schedule')c.innerHTML=`<h3>Kelola Jadwal Pelajaran</h3><p class="admin-help">Format satu baris: waktu | mata pelajaran | guru | ruang. Gunakan satu blok per hari.</p><div class="admin-form-stack">${['senin','selasa','rabu','kamis','jumat'].map(day=>`<label>${day[0].toUpperCase()+day.slice(1)}<textarea id="sch_${day}">${escapeHTML((getSchedules()[day]||[]).map(x=>x.join(' | ')).join('\n'))}</textarea></label>`).join('')}</div><div class="admin-save-row"><button class="btn btn-primary" id="saveScheduleCfg">Simpan jadwal</button></div>`;
  else if(tab==='piket')c.innerHTML=`<h3>Kelola Piket</h3><p class="admin-help">Masukkan nama siswa dipisahkan koma.</p><div class="admin-form-grid">${['Senin','Selasa','Rabu','Kamis','Jumat'].map(day=>`<label>${day}<input id="pik_${day}" value="${escapeHTML((getPiketData()[day]||[]).join(', '))}"></label>`).join('')}</div><div class="admin-save-row"><button class="btn btn-primary" id="savePiketCfg">Simpan piket</button></div>`;
  else if(tab==='announcements')c.innerHTML=`<h3>Kelola Pengumuman</h3><p class="admin-help">Isi JSON sederhana. Setiap item memiliki day, month, label, title, desc.</p><textarea id="annCfg" style="width:100%;min-height:260px;box-sizing:border-box">${escapeHTML(JSON.stringify(cfg.announcements||[{day:'10',month:'AGU',label:'INFO KELAS',title:'Selamat datang di website XI TKJ 1!',desc:'Semua informasi kelas akan ditampilkan melalui website ini.'}],null,2))}</textarea><div class="admin-save-row"><button class="btn btn-primary" id="saveAnnCfg">Simpan pengumuman</button></div>`;
@@ -441,8 +423,8 @@ function savePiketData(x){localStorage.setItem('xi-piket',JSON.stringify(x))}
 function bindAdminConfigButtons(){
  const adminContent=document.getElementById('adminContent');
  document.getElementById('saveWebsiteCfg')?.addEventListener('click',()=>{const cfg=getSiteConfig();cfg.welcome=document.getElementById('cfgWelcome').value;cfg.heroTitle=document.getElementById('cfgTitle').value;cfg.heroDescription=document.getElementById('cfgDesc').value;saveSiteConfig(cfg);applyMaintenance();applySiteConfig();toast('Website diperbarui')});
- document.getElementById('saveFinanceCfg')?.addEventListener('click',()=>{const cfg=getSiteConfig(),next={balance:+document.getElementById('cashBal').value||0,income:+document.getElementById('cashInc').value||0,expense:+document.getElementById('cashExp').value||0,note:document.getElementById('cashNote').value};cfg.cash=next;saveSiteConfig(cfg);let fin={};try{fin=JSON.parse(localStorage.getItem('xi-class-finance-v3')||'{}')}catch{};fin=Object.assign({monthly:[],transactions:[]},fin,next);localStorage.setItem('xi-class-finance-v3',JSON.stringify(fin));applySiteConfig();['cashBalance','cashIncome','cashExpense'].forEach((id,i)=>{const el=document.getElementById(id);if(el)el.textContent=money([next.balance,next.income,next.expense][i])});toast('Keuangan kelas berhasil disimpan'); exportFinanceSnapshotToDrive().then(()=>toast('Snapshot keuangan juga dikirim ke Google Drive.')).catch(()=>{}); adminRender('finance')});
- adminContent?.querySelectorAll('[data-mark-cash]').forEach(btn=>btn.addEventListener('click',()=>{const nisn=btn.dataset.markCash,d=new Date(),key=d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'),storage='xi-cash-payments-'+nisn;let x={};try{x=JSON.parse(localStorage.getItem(storage)||'{}')}catch{};if(x[key])return toast('Pembayaran hari ini sudah dicatat.');x[key]=true;localStorage.setItem(storage,JSON.stringify(x));let fin={};try{fin=JSON.parse(localStorage.getItem('xi-class-finance-v3')||'{}')}catch{};fin=Object.assign({balance:0,income:0,expense:0,monthly:[],transactions:[]},fin);fin.balance=Number(fin.balance||0)+2000;fin.income=Number(fin.income||0)+2000;const label=new Intl.DateTimeFormat('id-ID',{month:'long',year:'numeric'}).format(d);let m=(fin.monthly||[]).find(v=>String(v.month).toLowerCase()===label.toLowerCase());if(m)m.income=Number(m.income||0)+2000;else(fin.monthly||[]).push({month:label,income:2000,expense:0});fin.transactions=[{title:'Iuran '+(window.__CLASS_ACCOUNTS||[]).find(a=>a.nisn===nisn)?.name||'Siswa',amount:2000,type:'in',date:key},...(fin.transactions||[])].slice(0,100);localStorage.setItem('xi-class-finance-v3',JSON.stringify(fin));adminRender('finance');exportFinanceSnapshotToDrive().catch(()=>{});toast('Pembayaran Rp 2.000 dicatat.')}));
+ document.getElementById('saveFinanceCfg')?.addEventListener('click',()=>{const cfg=getSiteConfig();cfg.cash={balance:+document.getElementById('cashBal').value||0,income:+document.getElementById('cashInc').value||0,expense:+document.getElementById('cashExp').value||0,note:document.getElementById('cashNote').value};saveSiteConfig(cfg);applySiteConfig();toast('Kas diperbarui')});
+ adminContent?.querySelectorAll('[data-mark-cash]').forEach(btn=>btn.addEventListener('click',()=>{const nisn=btn.dataset.markCash;const d=new Date(),key=d.toISOString().slice(0,10),storage='xi-cash-payments-'+nisn;let x={};try{x=JSON.parse(localStorage.getItem(storage)||'{}')}catch{};x[key]=true;localStorage.setItem(storage,JSON.stringify(x));adminRender('finance');toast('Pembayaran Rp 2.000 dicatat.')}));
  document.getElementById('saveScheduleCfg')?.addEventListener('click',()=>{const out={};['senin','selasa','rabu','kamis','jumat'].forEach(day=>{out[day]=document.getElementById('sch_'+day).value.split('\n').map(x=>x.split('|').map(y=>y.trim())).filter(x=>x[0])});saveSchedules(out);renderSchedule(document.querySelector('.day-button.active')?.dataset.day||'senin');toast('Jadwal diperbarui')});
  document.getElementById('savePiketCfg')?.addEventListener('click',()=>{const out={};['Senin','Selasa','Rabu','Kamis','Jumat'].forEach(day=>out[day]=document.getElementById('pik_'+day).value.split(',').map(x=>x.trim()).filter(Boolean));savePiketData(out);Object.keys(piketData).forEach(k=>delete piketData[k]);Object.assign(piketData,out);renderPiket();toast('Piket diperbarui')});
  document.getElementById('saveAnnCfg')?.addEventListener('click',()=>{try{const cfg=getSiteConfig();cfg.announcements=JSON.parse(document.getElementById('annCfg').value);saveSiteConfig(cfg);applySiteConfig();toast('Pengumuman diperbarui')}catch{toast('Format pengumuman tidak valid')}});
@@ -620,28 +602,24 @@ window.exportClassBackup=exportClassBackup;
 function getLocalSongs(){return Array.isArray(window.LOCAL_MUSIC)?window.LOCAL_MUSIC:[]}
 function songById(id){const songs=getLocalSongs();return songs[Number(id)]||null}
 function renderSongSelect(){
- const sel=document.getElementById('favoriteSongSelect'),title=document.getElementById('favoritePickerTitle'),artist=document.getElementById('favoritePickerArtist'),cover=document.getElementById('favoritePickerCover'),play=document.getElementById('profileSelectedPlay');
+ const sel=document.getElementById('favoriteSongSelect'), trigger=document.getElementById('openFavoritePicker'), title=document.getElementById('favoritePickerTitle'), artist=document.getElementById('favoritePickerArtist');
  if(!sel)return;
- const songs=getLocalSongs();
- if(sel.value!=='' && !songs[Number(sel.value)]) sel.value='';
- const s=songs[Number(sel.value)];
- if(title)title.textContent=s?(s.name||'Lagu favorit'):'Belum memilih lagu';
- if(artist)artist.textContent=s?(s.artist||'Musik lokal'):'Pilih salah satu lagu di atas';
- if(cover){if(s?.cover){cover.src=s.cover;cover.hidden=false;}else{cover.removeAttribute('src');cover.hidden=true;}}
- const coverIcon=document.querySelector('#profileSelectedSong .profile-selected-icon');if(coverIcon)coverIcon.style.display=s?.cover?'none':'grid';
- if(play){play.disabled=!s;play.onclick=s?()=>window.playLocalSong(Number(sel.value)):null;}
- renderFavoriteInline(document.getElementById('favoriteInlineSearch')?.value||'');
+ const current=sel.value;
+ if(current!=='' && !getLocalSongs()[Number(current)]) sel.value='';
+ const s=getLocalSongs()[Number(sel.value)];
+ if(title)title.textContent=s?(s.name||'Lagu favorit'):'Pilih lagu favorit';
+ if(artist)artist.textContent=s?(s.artist||'Musik lokal'):'Belum ada lagu dipilih';
+ if(trigger)trigger.classList.toggle('has-selection',!!s);
 }
-function renderFavoriteInline(q=''){
- const list=document.getElementById('favoriteInlineList'); if(!list)return;
+function renderFavoritePicker(q=''){
+ const list=document.getElementById('favoritePickerList'); if(!list)return;
  const term=(q||'').trim().toLowerCase();
- const active=String(document.getElementById('favoriteSongSelect')?.value||'');
- const songs=getLocalSongs().map((s,i)=>({s,i})).filter(x=>!term||`${x.s.name||''} ${x.s.artist||''}`.toLowerCase().includes(term));
- list.innerHTML=songs.length?songs.map(({s,i})=>`<button type="button" class="favorite-inline-song ${String(i)===active?'selected':''}" data-song-id="${i}"><span class="favorite-inline-cover">${s.cover?`<img src="${escapeHTML(s.cover)}" alt="">`:'♫'}</span><span class="favorite-inline-copy"><b>${escapeHTML(s.name||('Lagu '+(i+1)))}</b><small>${escapeHTML(s.artist||'Musik lokal')}</small></span><span class="favorite-inline-state">${String(i)===active?'✓':'+'}</span></button>`).join(''):'<div class="favorite-inline-empty">Lagu tidak ditemukan.</div>';
- list.querySelectorAll('.favorite-inline-song').forEach(row=>row.addEventListener('click',()=>{const sel=document.getElementById('favoriteSongSelect');if(sel)sel.value=row.dataset.songId;renderSongSelect();}));
+ const songs=getLocalSongs().map((s,i)=>({s,i})).filter(x=>!term||(x.s.name+' '+x.s.artist).toLowerCase().includes(term));
+ list.innerHTML=songs.length?songs.map(({s,i})=>`<button type="button" class="favorite-song-option" data-song-id="${i}"><span class="favorite-song-cover">${s.cover?`<img src="${escapeHTML(s.cover)}" alt="">`:'♫'}</span><span><b>${escapeHTML(s.name||('Lagu '+(i+1)))}</b><small>${escapeHTML(s.artist||'Musik lokal')}</small></span><span class="favorite-song-check">✓</span></button>`).join(''):'<div class="favorite-picker-empty">Lagu tidak ditemukan.</div>';
+ list.querySelectorAll('.favorite-song-option').forEach(row=>row.addEventListener('click',()=>{const sel=document.getElementById('favoriteSongSelect');if(sel)sel.value=row.dataset.songId;renderSongSelect();closeFavoritePicker();}));
+ const active=document.getElementById('favoriteSongSelect')?.value; list.querySelectorAll('.favorite-song-option').forEach(row=>row.classList.toggle('selected',row.dataset.songId===String(active)));
 }
-function renderFavoritePicker(q=''){renderFavoriteInline(q)}
-function openFavoritePicker(){document.getElementById('favoriteInlineSearch')?.focus();renderFavoriteInline(document.getElementById('favoriteInlineSearch')?.value||'')}
+function openFavoritePicker(){const m=document.getElementById('favoritePickerModal');if(!m)return;m.classList.add('show');m.setAttribute('aria-hidden','false');const q=document.getElementById('favoritePickerSearch');if(q){q.value='';renderFavoritePicker();setTimeout(()=>q.focus(),80)}}
 function closeFavoritePicker(){const m=document.getElementById('favoritePickerModal');if(m){m.classList.remove('show');m.setAttribute('aria-hidden','true')}}
 
 function getMusicPlayerOpen(){return document.getElementById('musicPanel')}
@@ -720,8 +698,6 @@ function syncAccountBio(){const u=getSession();if(!u||u.role!=='student')return;
  document.getElementById('favoritePickerClose')?.addEventListener('click',closeFavoritePicker);
  document.getElementById('favoritePickerModal')?.addEventListener('click',e=>{if(e.target.id==='favoritePickerModal')closeFavoritePicker()});
  document.getElementById('favoritePickerSearch')?.addEventListener('input',e=>renderFavoritePicker(e.target.value));
- document.getElementById('favoriteInlineSearch')?.addEventListener('input',e=>renderFavoriteInline(e.target.value));
- renderFavoriteInline();
 function renderPlaylistClassTKJ1(){
  const list=document.getElementById('classRadioList'),now=document.getElementById('classRadioNow'),count=document.getElementById('playlistTrackCount'); if(!list)return;
  const all=[];Object.values(getProfiles()).forEach(p=>{if(Array.isArray(p.playlist))p.playlist.forEach(id=>{const n=Number(id);if(Number.isFinite(n)&&!all.some(x=>x.id===n))all.push({id:n})})});
@@ -733,7 +709,7 @@ function renderPlaylistClassTKJ1(){
 }
 renderPlaylistClassTKJ1();
 document.getElementById('addPlaylistClassTKJ1Btn')?.addEventListener('click',()=>{const u=getSession();if(!u||u.role!=='student')return toast('Login sebagai siswa untuk menambahkan lagu.');const p=getProfile(u);if(p.favoriteSongId==='')return toast('Pilih lagu favorit di Profile terlebih dahulu.');if(!p.playlist.includes(Number(p.favoriteSongId)))p.playlist.unshift(Number(p.favoriteSongId));p.playlist=[...new Set(p.playlist)].slice(0,5);saveProfile(u,p);renderPlaylistClassTKJ1();toast('Lagu ditambahkan ke Playlist Class TKJ1.');});
-document.getElementById('openMusicFromPlaylist')?.addEventListener('click',e=>{e.preventDefault();e.stopPropagation();if(typeof window.__openMusicPlayer==='function')window.__openMusicPlayer();});
+document.getElementById('openMusicFromPlaylist')?.addEventListener('click',e=>{e.preventDefault();window.__openMusicPlayer?.();});
 document.getElementById('adminControlLink')?.addEventListener('click',e=>{e.preventDefault();mobileMenu?.classList.remove('show');const u=getSession();if(u?.role==='admin')openAdminPortal();else openAccount()});
 
  // Square photo cropper: drag the image inside a fixed square and zoom before saving.
@@ -765,18 +741,6 @@ document.getElementById('adminControlLink')?.addEventListener('click',e=>{e.prev
 
 applySiteConfig();
 
-/* ===== HARDENED MUSIC BUTTON FALLBACKS =====
-   Keep these independent from initialization order so mobile taps always work. */
-document.addEventListener('click',e=>{
-  const music=e.target.closest?.('#musicButton');
-  const playlist=e.target.closest?.('#openMusicFromPlaylist');
-  if((music||playlist) && typeof window.__openMusicPlayer==='function'){
-    e.preventDefault();
-    e.stopPropagation();
-    window.__openMusicPlayer();
-  }
-},true);
-
 /* ===== LOCAL MUSIC DRAWER ===== */
 (()=>{
  const btn=document.getElementById('musicButton'),panel=document.getElementById('musicPanel'),close=document.getElementById('musicClose'),list=document.getElementById('musicList'),audio=document.getElementById('musicAudio');
@@ -785,74 +749,20 @@ document.addEventListener('click',e=>{
  let currentId=null;
  function closeMusic(){if(panel){panel.classList.remove('show');panel.style.display='none';panel.setAttribute('aria-hidden','true')}}
  function updateRows(){list?.querySelectorAll('.music-row').forEach(row=>{const id=Number(row.dataset.song),icon=row.querySelector('.music-play');const active=id===currentId&&!audio.paused;row.classList.toggle('playing',id===currentId);if(icon)icon.textContent=active?'❚❚':'▶'})}
- function setNowPlaying(s){
-  const box=document.getElementById('musicNowPlaying'),title=document.getElementById('musicNowTitle'),artist=document.getElementById('musicNowArtist');
-  const art=box?.querySelector('.music-now-art');
-  if(!s){if(title)title.textContent='Belum ada lagu';if(artist)artist.textContent='Pilih lagu untuk mulai mendengarkan';if(art)art.innerHTML='<span>♫</span>';return;}
-  if(title)title.textContent=s.name||'Lagu'; if(artist)artist.textContent=s.artist||'Musik lokal';
-  if(art)art.innerHTML=s.cover?`<img src="${escapeHTML(s.cover)}" alt="" onerror="this.style.display='none'"><span>♫</span>`:'<span>♫</span>';
- }
  function render(){
   if(!list)return;
-  list.innerHTML=songs.length?songs.map((s,i)=>`<div class="music-row" data-song="${i}"><button class="music-row-main" type="button" aria-label="Putar ${escapeHTML(s.name)}"><span class="music-cover-wrap"><img class="music-cover" src="${escapeHTML(s.cover)}" alt="Cover ${escapeHTML(s.name)}" onerror="this.onerror=null;this.style.display='none'"><span class="music-cover-fallback">♫</span></span><span class="music-row-info"><b class="music-title" title="${escapeHTML(s.name)}">${escapeHTML(s.name)}</b><small class="music-artist" title="${escapeHTML(s.artist||'Musik lokal')}">${escapeHTML(s.artist||'Musik lokal')}</small></span><span class="music-play">▶</span></button></div>`).join(''):'<div class="music-empty">Belum ada lagu.</div>';
+  list.innerHTML=songs.length?songs.map((s,i)=>`<div class="music-row" data-song="${i}"><button class="music-row-main" type="button" aria-label="Putar ${escapeHTML(s.name)}"><span class="music-cover-wrap"><img class="music-cover" src="${escapeHTML(s.cover)}" alt="Cover ${escapeHTML(s.name)}" onerror="this.onerror=null;this.parentElement.classList.add('fallback');this.remove()"><span class="music-cover-fallback">${escapeHTML((s.name||'M').trim().charAt(0))}</span></span><span class="music-row-info"><b>${escapeHTML(s.name)}</b><small>${escapeHTML(s.artist||'Musik lokal')}</small></span><span class="music-play">▶</span></button></div>`).join(''):'<div class="music-empty">Belum ada lagu.</div>';
   list.querySelectorAll('.music-row-main').forEach(b=>b.addEventListener('click',()=>{
    const row=b.closest('.music-row'),s=songs[Number(row?.dataset.song)];if(!s||!s.src)return;
    const id=s.id;if(currentId===id&&audio.src){if(audio.paused)audio.play().catch(()=>{});else audio.pause();updateRows();return}
-   currentId=id;setNowPlaying(s);audio.src=s.src;audio.dataset.songId=String(id);audio.load();audio.play().catch(()=>{});updateRows()
-  }));
-  if(currentId!==null)setNowPlaying(songs[currentId]);
-  updateRows()
+   currentId=id;audio.src=s.src;audio.dataset.songId=String(id);audio.load();audio.play().catch(()=>{});updateRows()
+  }));updateRows()
  }
  btn?.addEventListener('click',e=>{e.preventDefault();e.stopPropagation();window.__openMusicPlayer?.()});
  close?.addEventListener('click',closeMusic);
  document.addEventListener('click',e=>{if(panel?.classList.contains('show')&&!panel.contains(e.target)&&e.target!==btn)closeMusic()});
- audio?.addEventListener('play',updateRows);audio?.addEventListener('pause',updateRows);audio?.addEventListener('ended',()=>{currentId=null;setNowPlaying(null);updateRows()});audio?.addEventListener('error',()=>toast('File lagu belum ada. Tambahkan MP3 ke assets/music/.'));
+ audio?.addEventListener('play',updateRows);audio?.addEventListener('pause',updateRows);audio?.addEventListener('ended',()=>{currentId=null;updateRows()});audio?.addEventListener('error',()=>toast('File lagu belum ada. Tambahkan MP3 ke assets/music/.'));
  render();
-})();
-
-
-/* ===== MUSIC PLAYER: COMFORTABLE DRAGGING ON PHONE + DESKTOP ===== */
-(()=>{
- const panel=document.getElementById('musicPanel'),handle=panel?.querySelector('[data-music-drag-handle]'); if(!panel||!handle)return;
- let dragging=false,startX=0,startY=0,startL=0,startT=0;
- const clamp=(v,min,max)=>Math.max(min,Math.min(max,v));
- function begin(e){
-   if(e.target.closest('button,input,a,audio'))return;
-   const p=e.touches?.[0]||e; dragging=true;
-   const r=panel.getBoundingClientRect(); startX=p.clientX;startY=p.clientY;startL=r.left;startT=r.top;
-   panel.style.left=r.left+'px';panel.style.top=r.top+'px';panel.style.right='auto';panel.style.bottom='auto';
-   handle.classList.add('dragging'); e.preventDefault?.();
- }
- function move(e){if(!dragging)return;const p=e.touches?.[0]||e;const r=panel.getBoundingClientRect();const left=clamp(startL+p.clientX-startX,8,window.innerWidth-r.width-8);const top=clamp(startT+p.clientY-startY,58,window.innerHeight-r.height-8);panel.style.left=left+'px';panel.style.top=top+'px';e.preventDefault?.()}
- function end(){dragging=false;handle.classList.remove('dragging')}
- handle.addEventListener('pointerdown',begin,{passive:false});window.addEventListener('pointermove',move,{passive:false});window.addEventListener('pointerup',end);
- handle.addEventListener('touchstart',begin,{passive:false});window.addEventListener('touchmove',move,{passive:false});window.addEventListener('touchend',end);
- window.addEventListener('resize',()=>{if(!panel.classList.contains('show'))return;const r=panel.getBoundingClientRect();panel.style.left=clamp(r.left,8,Math.max(8,innerWidth-r.width-8))+'px';panel.style.top=clamp(r.top,58,Math.max(58,innerHeight-r.height-8))+'px'});
-})();
-
-/* ===== REQUEST LAGU POPUP → GOOGLE DRIVE IMAGE ===== */
-(()=>{
- const openBtn=document.getElementById('openPlaylistRequestBtn');
- const modal=document.getElementById('requestLaguModal');
- const closeBtn=document.getElementById('requestLaguClose');
- const form=document.getElementById('playlistRequestForm');
- if(!openBtn||!modal||!form)return;
- const open=()=>{modal.classList.add('show');modal.setAttribute('aria-hidden','false');setTimeout(()=>document.getElementById('requestSongTitle')?.focus(),80)};
- const close=()=>{modal.classList.remove('show');modal.setAttribute('aria-hidden','true')};
- openBtn.addEventListener('click',open);
- closeBtn?.addEventListener('click',close);
- modal.addEventListener('click',e=>{if(e.target===modal)close()});
- document.addEventListener('keydown',e=>{if(e.key==='Escape'&&modal.classList.contains('show'))close()});
- form.addEventListener('submit',async e=>{
-   e.preventDefault();
-   const title=document.getElementById('requestSongTitle')?.value.trim(),artist=document.getElementById('requestSongArtist')?.value.trim();
-   if(!title||!artist)return toast('Judul lagu dan artis/band wajib diisi.');
-   const btn=form.querySelector('button[type=submit]');
-   if(btn){btn.disabled=true;btn.textContent='Mengirim…'}
-   try{await submitSongRequest(title,artist);form.reset();close();toast('Request lagu berhasil dikirim ke Google Drive.')}
-   catch(err){toast(err?.message||'Request lagu gagal dikirim.')}
-   finally{if(btn){btn.disabled=false;btn.textContent='Kirim'}}
- });
 })();
 
 /* ===== DASHBOARD NAVIGATION ===== */
@@ -1052,16 +962,8 @@ document.addEventListener('click',e=>{
  renderFin();
 })();
 (()=>{
- const key='xi-class-ideas-v1';
- function load(){try{return JSON.parse(localStorage.getItem(key)||'[]')}catch{return[]}}
- function save(x){localStorage.setItem(key,JSON.stringify(x));render()}
- function render(){const el=document.getElementById('ideaList');if(!el)return;const a=load();el.innerHTML=a.length?a.slice().sort((x,y)=>(y.votes||0)-(x.votes||0)).map((x,i)=>`<article class="idea-item"><div class="idea-rank">${String(i+1).padStart(2,'0')}</div><button class="idea-vote mini-btn" onclick="voteIdea('${x.id}')">▲ <b>${x.votes||0}</b><small>vote</small></button><div class="idea-copy"><b>${escapeHTML(x.title)}</b><small>${escapeHTML(x.author||'Admin')} • ${escapeHTML(x.date||'')}</small><p>${escapeHTML(x.desc||'')}</p></div></article>`).join(''):'<div class="finance-empty">Belum ada usulan. Admin dapat menambahkan voting dari Control Panel.</div>'}
- window.voteIdea=id=>{const a=load(),x=a.find(v=>v.id===id);if(!x)return;x.votes=(x.votes||0)+1;save(a);toast('Vote kamu tercatat.')};
- window.loadClassIdeasAdmin=load;
- window.deleteClassIdea=id=>{const a=load().filter(x=>x.id!==id);localStorage.setItem(key,JSON.stringify(a));toast('Usulan dihapus.')};
- window.adminAddClassIdea=async()=>{const title=await openTaskInput({title:'Tambah Usulan Vooting',hint:'Masukkan judul pilihan/usulan kelas.',placeholder:'Contoh: Seragam kelas baru'});if(!title)return;const desc=await openTaskInput({title:'Deskripsi Usulan',hint:'Jelaskan pilihan atau usulan ini.',textarea:true,placeholder:'Tulis penjelasan singkat...'});const a=load();const u=getSessionSafe()||{};a.unshift({id:Date.now().toString(),title:title.trim(),desc:(desc||'').trim(),author:u.name||'Administrator',date:new Date().toLocaleDateString('id-ID'),votes:0});save(a);toast('Usulan berhasil ditambahkan ke Vooting Class.');adminRender('voting')};
- render();
-})();;
+ const key='xi-class-ideas-v1';function load(){try{return JSON.parse(localStorage.getItem(key)||'[]')}catch{return[]}}function save(x){localStorage.setItem(key,JSON.stringify(x));render()}function render(){const el=document.getElementById('ideaList');if(!el)return;const a=load();el.innerHTML=a.length?a.sort((x,y)=>(y.votes||0)-(x.votes||0)).map(x=>`<div class="idea-item"><button class="idea-vote mini-btn" onclick="voteIdea('${x.id}')">▲<br>${x.votes||0}</button><div><b>${escapeHTML(x.title)}</b><small>${escapeHTML(x.author||'Siswa')} • ${escapeHTML(x.date||'')}</small><p style="margin-top:6px;font-size:10px;color:var(--muted)">${escapeHTML(x.desc||'')}</p></div></div>`).join(''):'<div class="finance-empty">Belum ada ide. Jadilah yang pertama.</div>'}window.voteIdea=id=>{const a=load(),x=a.find(v=>v.id===id);if(!x)return;x.votes=(x.votes||0)+1;save(a)};document.getElementById('addIdeaBtn')?.addEventListener('click',()=>{const u=getSession();if(!u||u.role!=='student')return toast('Login sebagai siswa untuk mengirim ide.');const title=prompt('Judul ide:');if(!title?.trim())return;const desc=prompt('Jelaskan ide kamu:')||'';const a=load();a.unshift({id:Date.now().toString(),title:title.trim(),desc,author:u.name,date:new Date().toLocaleDateString('id-ID'),votes:0});save(a);toast('Ide berhasil ditambahkan.')});render();
+})();
 
 /* ===== PHOTO FACE ATTENDANCE (NO OWN SERVER / NO DATABASE) ===== */
 const FACE_ATTENDANCE_KEY='xi-face-attendance';
@@ -1410,53 +1312,6 @@ function postDriveForm_(params){
   try{form.submit()}catch(e){finish(e)}
  });
 }
-
-/* ===== DRIVE IMAGE EXPORTS: KAS + REQUEST LAGU ===== */
-function makeDriveCardImage_(title, rows, accent='XI TKJ 1') {
-  const w=1200, rowH=92, h=Math.max(620, 270 + rows.length*rowH);
-  const c=document.createElement('canvas'); c.width=w; c.height=h;
-  const x=c.getContext('2d');
-  const g=x.createLinearGradient(0,0,w,h); g.addColorStop(0,'#0b1025'); g.addColorStop(1,'#17102c'); x.fillStyle=g; x.fillRect(0,0,w,h);
-  x.fillStyle='#6b5cff'; x.fillRect(0,0,14,h);
-  x.fillStyle='#f5f6ff'; x.font='800 44px Arial'; x.fillText(title,58,78);
-  x.fillStyle='#9da5c8'; x.font='500 22px Arial'; x.fillText(accent,60,118);
-  let y=188;
-  rows.forEach((r,i)=>{
-    x.fillStyle='rgba(255,255,255,.055)'; x.fillRect(48,y-38,w-96,70);
-    x.fillStyle='#9da5c8'; x.font='600 18px Arial'; x.fillText(String(r.label||''),70,y);
-    x.fillStyle='#f5f6ff'; x.font='700 26px Arial'; x.fillText(String(r.value||''),360,y);
-    y+=rowH;
-  });
-  x.fillStyle='#777f9e'; x.font='500 16px Arial'; x.fillText('Dibuat otomatis oleh XI TKJ 1 Class Website • '+new Date().toLocaleString('id-ID'),60,h-38);
-  return c.toDataURL('image/png').split(',')[1];
-}
-function sendDriveImage_(imageData,fileName,kind,meta={}){
-  if(!DRIVE_UPLOAD_URL)return Promise.reject(new Error('Google Drive belum dikonfigurasi'));
-  return postDriveForm_({action:kind==='song-request'?'saveSongRequest':kind==='finance-snapshot'?'saveFinanceSnapshot':'saveDriveImage',imageData,mimeType:'image/png',fileName,kind,meta:JSON.stringify(meta),title:meta.title||'',artist:meta.artist||'',name:meta.name||'',nisn:meta.nisn||'',date:localDateKey(),time:new Date().toLocaleTimeString('id-ID',{hour12:false})});
-}
-function exportFinanceSnapshotToDrive(){
-  const f=getFin(); const month=new Intl.DateTimeFormat('id-ID',{month:'long',year:'numeric'}).format(new Date());
-  const data=makeDriveCardImage_('Keuangan Kelas',[
-    {label:'SALDO KAS',value:money(f.balance)},
-    {label:'PEMASUKAN',value:money(f.income)},
-    {label:'PENGELUARAN',value:money(f.expense)},
-    {label:'IURAN RUTIN',value:'Rp 2.000 / Selasa'},
-    {label:'PERIODE',value:month}
-  ]);
-  return sendDriveImage_(data,'Keuangan-Kelas-'+localDateKey()+'.png','finance-snapshot',{month,balance:f.balance,income:f.income,expense:f.expense});
-}
-function submitSongRequest(title,artist){
-  const u=getSessionSafe?.(); if(!u||u.role!=='student')return Promise.reject(new Error('Login sebagai siswa untuk mengirim request lagu.'));
-  const name=u.name||u.displayName||'Siswa';
-  const data=makeDriveCardImage_('Request Lagu',[
-    {label:'NAMA SISWA',value:name},
-    {label:'JUDUL LAGU',value:title},
-    {label:'ARTIS / BAND',value:artist},
-    {label:'WAKTU',value:new Date().toLocaleString('id-ID')}
-  ],'XI TKJ 1 • MUSIC HUB');
-  return sendDriveImage_(data,'Request-Lagu-'+cleanFileName_(name)+'-'+cleanFileName_(title)+'.png','song-request',{name,title,artist,nisn:u.nisn||''});
-}
-function cleanFileName_(v){return String(v||'data').replace(/[^a-z0-9 _.-]/gi,'').trim().replace(/\\s+/g,'-').slice(0,60)||'data'}
 
 async function verifyFaceUpload_(record,tries=14){
  for(let i=0;i<tries;i++){

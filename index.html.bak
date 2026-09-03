@@ -36,7 +36,7 @@
 
 <header class="navbar">
 <a href="#home" class="brand"><div class="brand-logo">XI</div><div class="brand-text"><strong>XI TKJ 1</strong><small>CLASS WEBSITE</small></div></a>
-<div class="music-tools"><button class="music-button" id="musicButton" type="button" title="Music" onclick="window.__forceOpenMusic&&window.__forceOpenMusic()"><span class="music-glyph">♫</span><span class="music-label">Music</span></button></div>
+<button class="music-button" id="musicButton" type="button" title="Music" onclick="window.__openMusicPlayer&&window.__openMusicPlayer()"><span class="music-glyph">♫</span><span class="music-label">Music</span></button>
 <nav class="nav-links" aria-label="Navigasi utama">
 <a href="#home">Home</a>
 <a href="#students">Kelas</a>
@@ -99,7 +99,7 @@
       <div class="menu-list">
         <a href="#finance"><span class="menu-icon">Rp</span><span><b>Keuangan Kelas</b><small>Kas, grafik, dan status pembayaran</small></span><em>›</em></a>
         <a href="#playlistClassTKJ1"><span class="menu-icon">♪</span><span><b>Playlist Class TKJ1</b><small>Playlist musik bersama kelas</small></span><em>›</em></a>
-        <a href="#classIdeas"><span class="menu-icon">💡</span><span><b>Vooting Class</b><small>Voting dan usulan anggota kelas</small></span><em>›</em></a>
+        <a href="#classIdeas"><span class="menu-icon">💡</span><span><b>Idea Board</b><small>Ide dan usulan anggota kelas</small></span><em>›</em></a>
         <a href="#events"><span class="menu-icon">E</span><span><b>Event</b><small>Kegiatan dan agenda kelas</small></span><em>›</em></a>
         <a href="#links"><span class="menu-icon">↗</span><span><b>Link Hub</b><small>Tautan penting kelas</small></span><em>›</em></a>
         <a href="#faceAttendance" id="faceAttendanceLink" hidden><span class="menu-icon">A</span><span><b>Absen Foto Muka</b><small>Absensi khusus siswa</small></span><strong class="menu-new-badge">ABSEN</strong></a>
@@ -323,18 +323,17 @@
 </section>
 
 <section class="section" id="classIdeas">
-  <div class="section-heading"><div><p>CLASS VOTING</p><h2>Vooting <span>Class</span></h2></div><span class="section-live"><i></i> Voting & usulan kelas</span></div>
-  <div class="idea-board-card"><div class="feature-head"><div><h3>Vooting Class XI TKJ 1</h3><small>Pilih dan dukung usulan kelas. Penambahan usulan hanya dapat dilakukan oleh Admin.</small></div></div><div id="ideaList" class="idea-list"></div></div>
+  <div class="section-heading"><div><p>CLASS IDEAS</p><h2>Idea <span>Board</span></h2></div><button class="mini-btn" id="addIdeaBtn">＋ Tambah ide</button></div>
+  <div class="idea-board-card"><div class="feature-head"><div><h3>Tempat ide untuk XI TKJ 1</h3><small>Usulan kegiatan, project, fasilitas, atau hal yang ingin dikembangkan bersama.</small></div></div><div id="ideaList" class="idea-list"></div></div>
 </section>
 <section class="section" id="playlistClassTKJ1">
-  <div class="section-heading"><div><p>XI TKJ 1 • MUSIC HUB</p><h2>Playlist <span>Class TKJ1</span></h2></div><div class="section-live"><i></i> Playlist bersama kelas</div></div>
+  <div class="section-heading"><div><p>CLASS PLAYLIST</p><h2>Playlist <span>Class TKJ1</span></h2></div><div class="section-live"><i></i> Playlist bersama kelas</div></div>
   <div class="playlist-class-card">
-    <div class="playlist-class-intro"><div class="playlist-brand-mark">♫</div><div><span class="eyebrow">SHARED MUSIC • XI TKJ 1</span><h3>Playlist Class TKJ1</h3><p>Kumpulan lagu favorit siswa, jadi satu playlist kelas.</p></div></div>
+    <div class="playlist-class-intro"><div class="playlist-brand-mark">♫</div><div><span class="eyebrow">XI TKJ 1 • SHARED MUSIC</span><h3>Playlist Class TKJ1</h3><p>Lagu favorit yang dikumpulkan dari playlist siswa.</p></div></div>
     <div id="classRadioNow" class="playlist-now"></div>
     <div class="playlist-divider"><span>TRACKS</span><span id="playlistTrackCount">0 lagu</span></div>
     <div id="classRadioList" class="playlist-tracklist"></div>
-    <div class="feature-actions playlist-actions"><button id="addPlaylistClassTKJ1Btn" type="button">＋ Tambahkan lagu favorit</button><button id="openMusicFromPlaylist" type="button" onclick="window.__forceOpenMusic&&window.__forceOpenMusic()">▶ Buka Music Player</button><button id="openPlaylistRequestBtn" type="button" class="playlist-request-open">♫ Request Lagu</button></div>
-
+    <div class="feature-actions playlist-actions"><button id="addPlaylistClassTKJ1Btn" type="button">＋ Tambahkan lagu favorit</button><button id="openMusicFromPlaylist" type="button">▶ Buka Music Player</button></div>
   </div>
 </section>
 <section class="section" id="about">
@@ -379,9 +378,7 @@
   <button class="admin-tab" data-admin="piket"><span>◌</span>Piket</button>
   <button class="admin-tab" data-admin="attendance"><span>▦</span>Scan Absensi</button>
   <button class="admin-tab" data-admin="face-attendance"><span>◉</span>Cek Absensi</button>
-  <button class="admin-tab" data-admin="finance"><span>Rp</span>Keuangan Kelas</button>
-  <button class="admin-tab" data-admin="voting"><span>✓</span>Vooting Class</button>
-  <button class="admin-tab" data-admin="song-requests"><span>♫</span>Request Lagu</button>
+  <button class="admin-tab" data-admin="finance"><span>Rp</span>Kas Kelas</button>
   <button class="admin-tab" data-admin="announcements"><span>!</span>Pengumuman</button>
   <button class="admin-tab" data-admin="events"><span>✦</span>Event</button>
   <button class="admin-tab" data-admin="links"><span>↗</span>Link Hub</button>
@@ -443,7 +440,7 @@
           <label>Bio<textarea id="profileBioInput" maxlength="220" placeholder="Tulis bio singkat..."></textarea></label>
           <label>Minat<input id="profileInterestsInput" type="text" maxlength="120" placeholder="Contoh: desain, jaringan, coding"></label>
           <label>Skill<input id="profileSkillsInput" type="text" maxlength="120" placeholder="Contoh: networking, editing"></label>
-          <div class="profile-music-card"><div class="profile-music-head"><div><span class="eyebrow">PERSONAL SOUND</span><h3>♫ Musik Profile</h3><small>Pilih lagu favoritmu dari koleksi musik XI TKJ 1.</small></div><span class="profile-music-badge">FAVORIT</span></div><input id="favoriteSongSelect" type="hidden" value=""><div class="profile-music-picker"><div class="profile-music-picker-top"><div><b>Pilih lagu</b><small>Semua lagu tetap ditampilkan di sini.</small></div><div class="profile-music-search"><span>⌕</span><input id="favoriteInlineSearch" type="search" placeholder="Cari lagu atau artis..."></div></div><div id="favoriteInlineList" class="favorite-inline-list"></div></div><div class="profile-selected-song" id="profileSelectedSong"><div class="profile-selected-cover"><span class="profile-selected-icon">♫</span><img id="favoritePickerCover" src="" alt="Cover lagu favorit" hidden></div><div class="profile-selected-copy"><small>LAGU TERPILIH</small><b id="favoritePickerTitle">Belum memilih lagu</b><span id="favoritePickerArtist">Pilih salah satu lagu di atas</span></div><button type="button" class="profile-selected-play" id="profileSelectedPlay" aria-label="Putar lagu favorit">▶</button></div><button class="mini-btn profile-save-song" id="saveFavoriteSong" type="button">Simpan Lagu Favorit</button><div id="profilePlaylistEditor" class="profile-playlist"></div></div>
+          <div class="profile-music-card"><div class="profile-music-head"><div><span class="eyebrow">PERSONAL SOUND</span><h3>🎵 Musik Profile</h3><small>Pilih satu lagu favorit untuk ditampilkan di profilmu.</small></div></div><input id="favoriteSongSelect" type="hidden" value=""><button id="openFavoritePicker" class="favorite-picker-trigger" type="button"><span class="favorite-picker-icon">♫</span><span class="favorite-picker-copy"><b id="favoritePickerTitle">Pilih lagu favorit</b><small id="favoritePickerArtist">Belum ada lagu dipilih</small></span><span class="favorite-picker-arrow">›</span></button><button class="mini-btn profile-save-song" id="saveFavoriteSong" type="button">Simpan Lagu Favorit</button><div id="profilePlaylistEditor" class="profile-playlist"></div></div>
         </div>
       </div>
       <input type="file" id="profilePhotoInput" accept="image/*" hidden>
@@ -662,23 +659,10 @@
   </div>
 </div>
 
-<div class="request-lagu-modal" id="requestLaguModal" aria-hidden="true">
-  <div class="request-lagu-box" role="dialog" aria-modal="true" aria-labelledby="requestLaguTitle">
-    <button class="request-lagu-close" id="requestLaguClose" type="button" aria-label="Tutup">×</button>
-    <div class="request-lagu-heading"><span class="eyebrow">XI TKJ 1 • MUSIC</span><h2 id="requestLaguTitle">Request Lagu</h2><p>Ajukan lagu yang ingin ditambahkan ke playlist kelas.</p></div>
-    <form id="playlistRequestForm" class="request-lagu-form">
-      <label><span>Judul Lagu</span><input id="requestSongTitle" type="text" maxlength="120" required autocomplete="off" placeholder="Masukkan Judul Lagu"></label>
-      <label><span>Nama Artis/Band</span><input id="requestSongArtist" type="text" maxlength="100" required autocomplete="off" placeholder="Masukkan Nama Artis/Band"></label>
-      <div class="request-lagu-actions"><button type="submit" class="request-lagu-send">Kirim</button></div>
-    </form>
-  </div>
-</div>
-
 <div class="music-panel" id="musicPanel" aria-hidden="true">
-  <div class="music-panel-head" data-music-drag-handle><div><span class="eyebrow">XI TKJ 1 MUSIC</span><h3>Music Player</h3><p>Semua pengunjung bisa mendengarkan lagu. Login hanya diperlukan untuk menambah atau menghapus lagu.</p></div><button class="music-close" id="musicClose" aria-label="Tutup">×</button></div>
+  <div class="music-panel-head"><div><span class="eyebrow">XI TKJ 1 MUSIC</span><h3>Music Player</h3><p>Semua pengunjung bisa mendengarkan lagu. Login hanya diperlukan untuk menambah atau menghapus lagu.</p></div><button class="music-close" id="musicClose" aria-label="Tutup">×</button></div>
   <div class="music-drop"><div class="music-drop-icon">♫</div><div><b>Music lokal</b><small>Lagu ditambahkan manual ke folder <code>assets/music/</code>. Semua pengunjung bisa langsung memutarnya.</small></div></div>
   <div class="music-list" id="musicList"><div class="music-empty">Daftar lagu masih kosong.</div></div>
-  <div class="music-now-playing" id="musicNowPlaying"><div class="music-now-art"><span>♫</span></div><div class="music-now-copy"><small>NOW PLAYING</small><b id="musicNowTitle">Belum ada lagu</b><span id="musicNowArtist">Pilih lagu untuk mulai mendengarkan</span></div></div>
   <audio id="musicAudio" controls preload="metadata"></audio>
 </div>
 
@@ -715,45 +699,6 @@
 <div class="modal" id="infoModal"><div class="modal-box"><button class="modal-close" id="modalClose">×</button><div class="modal-icon">XI</div><h2>XI TKJ 1</h2><p>Website kelas digital untuk menyimpan informasi, jadwal, data siswa, kegiatan, dan kenangan keluarga besar XI TKJ 1.</p><button class="btn modal-ok" id="modalOk">Siap!</button></div></div>
 
 
-<script>
-/* XI TKJ 1 — touch-safe music controls. These controls are intentionally independent
-   from the main app so one unrelated JS error cannot disable Music/Playlist. */
-(function(){
-  function songs(){return Array.isArray(window.LOCAL_MUSIC)?window.LOCAL_MUSIC:[]}
-  function esc(v){return String(v??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]))}
-  window.__forceOpenMusic=function(){
-    const panel=document.getElementById('musicPanel'); if(!panel)return;
-    panel.style.display='block'; panel.classList.add('show'); panel.setAttribute('aria-hidden','false');
-    const list=document.getElementById('musicList'), audio=document.getElementById('musicAudio');
-    if(list && !list.dataset.emergencyReady){
-      list.dataset.emergencyReady='1';
-      list.innerHTML=songs().length?songs().map((s,i)=>`<button type="button" class="music-row-main emergency-music-row" data-emergency-song="${i}"><span class="music-cover-wrap"><img class="music-cover" src="${esc(s.cover||'')}" alt="" onerror="this.style.display='none'"></span><span class="music-row-info"><b>${esc(s.name||'Lagu '+(i+1))}</b><small>${esc(s.artist||'Musik lokal')}</small></span><span class="music-play">▶</span></button>`).join(''):'<div class="music-empty">Belum ada lagu di music-list.js.</div>';
-      list.querySelectorAll('[data-emergency-song]').forEach(b=>b.addEventListener('click',function(){
-        const s=songs()[Number(this.dataset.emergencySong)]; if(!s||!s.src||!audio)return;
-        audio.src=s.src; audio.load(); audio.play().catch(()=>{});
-      }));
-    }
-  };
-  window.__forceOpenFavoritePicker=function(){
-    const m=document.getElementById('favoritePickerModal'); if(!m)return;
-    m.classList.add('show');m.setAttribute('aria-hidden','false');
-    const list=document.getElementById('favoritePickerList'); if(!list)return;
-    const current=document.getElementById('favoriteSongSelect')?.value||'';
-    list.innerHTML=songs().length?songs().map((s,i)=>`<button type="button" class="favorite-song-option ${String(i)===String(current)?'selected':''}" data-song-id="${i}"><span class="favorite-song-cover">${s.cover?`<img src="${esc(s.cover)}" alt="">`:'♫'}</span><span><b>${esc(s.name||'Lagu '+(i+1))}</b><small>${esc(s.artist||'Musik lokal')}</small></span><span class="favorite-song-check">✓</span></button>`).join(''):'<div class="favorite-picker-empty">Belum ada lagu di music-list.js.</div>';
-    list.querySelectorAll('.favorite-song-option').forEach(row=>row.addEventListener('click',function(){
-      const sel=document.getElementById('favoriteSongSelect'); if(sel)sel.value=this.dataset.songId;
-      const title=document.getElementById('favoritePickerTitle'), artist=document.getElementById('favoritePickerArtist'), s=songs()[Number(this.dataset.songId)];
-      if(title)title.textContent=s?.name||'Lagu favorit'; if(artist)artist.textContent=s?.artist||'Musik lokal';
-      list.querySelectorAll('.favorite-song-option').forEach(x=>x.classList.remove('selected'));this.classList.add('selected');
-      m.classList.remove('show');m.setAttribute('aria-hidden','true');
-    }));
-  };
-  document.addEventListener('DOMContentLoaded',function(){
-    const fav=document.getElementById('openFavoritePicker'); if(fav)fav.onclick=function(e){e.preventDefault();e.stopPropagation();window.__forceOpenFavoritePicker()};
-    const close=document.getElementById('musicClose'); if(close)close.onclick=function(e){e.preventDefault();const p=document.getElementById('musicPanel');p?.classList.remove('show');if(p)p.style.display='none'};
-  });
-})();
-</script>
 <script src="music-list.js"></script>
 <script src="drive-config.js"></script>
 <script src="script.js?v=custom-fonts-premium-1"></script>

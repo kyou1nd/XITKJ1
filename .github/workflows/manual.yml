@@ -1,0 +1,21 @@
+name: Music Bot
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  music-bot:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Ambil file repository
+        uses: actions/checkout@v4
+
+      - name: Jalankan bot
+        run: echo "Music bot siap dijalankan"
+
+      - name: Selesai
+        run: echo "Request lagu akan diproses di sini"

@@ -1930,3 +1930,60 @@ document.getElementById('facePhotoViewerImage')?.addEventListener('click',e=>{
  };
  update();setInterval(update,1000);
 })();
+/* ===== CLASS ALBUM — V15 CLEAN STORY GALLERY ===== */
+(()=>{
+ const albums={
+  'yogyakarta':{title:'Yogyakarta',meta:'5 momen perjalanan kelas',photos:['assets/album/yogyakarta/01.jpg','assets/album/yogyakarta/02.jpg','assets/album/yogyakarta/03.jpg','assets/album/yogyakarta/04.jpg','assets/album/yogyakarta/05.jpg'],live:[0,1],videos:{0:'assets/album/yogyakarta/01.mp4',1:'assets/album/yogyakarta/02.mp4'}},
+  'j2-free-fire':{title:'J2 Free Fire',meta:'4 momen • Juara 2 Free Fire',photos:['assets/album/j2-free-fire/01.jpg','assets/album/j2-free-fire/02.jpg','assets/album/j2-free-fire/03.jpg','assets/album/j2-free-fire/04.jpg'],live:[0,1,2],videos:{0:'assets/album/j2-free-fire/01.mp4',1:'assets/album/j2-free-fire/02.mp4',2:'assets/album/j2-free-fire/03.mp4'}},
+  'fotbar-xi-tkj1':{title:'Fotbar XI TKJ1',meta:'3 foto • Satu kelas, satu cerita',photos:['assets/album/fotbar-xi-tkj1/01.jpg','assets/album/fotbar-xi-tkj1/02.jpg','assets/album/fotbar-xi-tkj1/03.jpg'],live:[],videos:{}}
+ };
+ let active=null,index=0;
+ const $=id=>document.getElementById(id),modal=$('albumModal'),grid=$('albumPhotoGrid'),title=$('albumModalTitle'),meta=$('albumModalMeta'),count=$('albumModalCount'),viewer=$('albumViewer'),viewerImg=$('albumViewerImage'),viewerVideo=$('albumViewerVideo'),caption=$('albumViewerCaption'),film=$('albumFilmstrip'),vTitle=$('albumViewerTitle'),vKicker=$('albumViewerKicker'),vNum=$('albumViewerNumber'),vTotal=$('albumViewerTotal'),vProgress=$('albumViewerProgress'),livePill=$('albumLivePill'),mediaWrap=document.querySelector('.album-media-wrap');
+ if(!modal||!grid||!viewer||!mediaWrap)return;
+ const esc=s=>String(s).replace(/[&<>'"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c]));
+ function stopVideo(){viewerVideo.pause();viewerVideo.removeAttribute('src');viewerVideo.load();viewerVideo.hidden=true;}
+ function setRatio(src){const probe=new Image();probe.onload=()=>{mediaWrap.style.setProperty('--album-ratio',`${probe.naturalWidth}/${probe.naturalHeight}`)};probe.src=src;}
+ function openAlbum(key){const a=albums[key];if(!a)return;active=key;title.textContent=a.title;meta.textContent=a.meta;count.textContent=`${String(a.photos.length).padStart(2,'0')} FOTO`;
+  grid.innerHTML=a.photos.map((src,i)=>`<button class="album-photo" type="button" data-photo-index="${i}" aria-label="Buka foto ${i+1}"><img src="${esc(src)}" alt="${esc(a.title)} foto ${i+1}" loading="lazy"><span class="album-photo-num">${String(i+1).padStart(2,'0')}</span></button>`).join('');
+  modal.classList.add('show');modal.setAttribute('aria-hidden','false');document.body.style.overflow='hidden';
+ }
+ function closeAlbum(){modal.classList.remove('show');modal.setAttribute('aria-hidden','true');if(!viewer.classList.contains('show'))document.body.style.overflow='';}
+ function renderFilm(){const a=albums[active];film.innerHTML=a.photos.map((src,i)=>`<button type="button" data-film-index="${i}" class="${i===index?'active':''}" aria-label="Buka foto ${i+1}"><img src="${esc(src)}" alt=""></button>`).join('');film.querySelector('.active')?.scrollIntoView({block:'nearest',inline:'center',behavior:'smooth'});}
+ function showViewer(i){const a=albums[active];if(!a)return;index=(i+a.photos.length)%a.photos.length;stopVideo();const isLive=!!a.videos[index];
+  setRatio(a.photos[index]);
+  viewerImg.src=a.photos[index];viewerImg.alt=`${a.title} foto ${index+1}`;
+  viewerImg.hidden=isLive;
+  viewerVideo.poster=a.photos[index];
+  if(isLive){
+   viewerVideo.src=a.videos[index];
+   viewerVideo.muted=true;
+   viewerVideo.loop=true;
+   viewerVideo.hidden=false;
+   viewerVideo.onloadedmetadata=()=>{
+     if(viewerVideo.videoWidth&&viewerVideo.videoHeight){
+       mediaWrap.style.setProperty('--album-ratio',`${viewerVideo.videoWidth}/${viewerVideo.videoHeight}`);
+     }
+     viewerVideo.play().catch(()=>{});
+   };
+   viewerVideo.play().catch(()=>{});
+  }
+  livePill.hidden=true;caption.textContent='Foto';vTitle.textContent=a.title;vKicker.textContent='CLASS ARCHIVE';vNum.textContent=String(index+1).padStart(2,'0');vTotal.textContent=String(a.photos.length).padStart(2,'0');vProgress.style.width=`${((index+1)/a.photos.length)*100}%`;renderFilm();viewer.classList.add('show');viewer.setAttribute('aria-hidden','false');
+ }
+ function closeViewer(){stopVideo();viewer.classList.remove('show');viewer.setAttribute('aria-hidden','true');document.body.style.overflow='';}
+ document.querySelectorAll('[data-album]').forEach(b=>b.addEventListener('click',()=>openAlbum(b.dataset.album)));
+ document.querySelectorAll('[data-close-album]').forEach(b=>b.addEventListener('click',closeAlbum));
+ grid.addEventListener('click',e=>{const b=e.target.closest('[data-photo-index]');if(b)showViewer(Number(b.dataset.photoIndex));});
+ film.addEventListener('click',e=>{const b=e.target.closest('[data-film-index]');if(b)showViewer(Number(b.dataset.filmIndex));});
+ document.querySelector('[data-close-viewer]')?.addEventListener('click',closeViewer);document.querySelector('[data-viewer-prev]')?.addEventListener('click',()=>showViewer(index-1));document.querySelector('[data-viewer-next]')?.addEventListener('click',()=>showViewer(index+1));
+ viewer.addEventListener('click',e=>{if(e.target===viewer||e.target.classList.contains('album-viewer-backdrop'))closeViewer();});
+ document.addEventListener('keydown',e=>{if(e.key==='Escape'){if(viewer.classList.contains('show'))closeViewer();else if(modal.classList.contains('show'))closeAlbum()}if(viewer.classList.contains('show')&&e.key==='ArrowLeft')showViewer(index-1);if(viewer.classList.contains('show')&&e.key==='ArrowRight')showViewer(index+1);});
+ let tx=0;viewer.addEventListener('touchstart',e=>{tx=e.changedTouches[0].clientX},{passive:true});viewer.addEventListener('touchend',e=>{const dx=e.changedTouches[0].clientX-tx;if(Math.abs(dx)>50)showViewer(index+(dx<0?1:-1))},{passive:true});
+})();
+/* ===== V14 ALBUM CLICK RELIABILITY PATCH ===== */
+(()=>{
+  document.addEventListener('click',(e)=>{
+    const folder=e.target.closest?.('#albumFolderGrid [data-album]');
+    if(!folder)return;
+    if(folder.tagName==='BUTTON') e.preventDefault();
+  },true);
+})();

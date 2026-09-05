@@ -82,6 +82,7 @@
         <a href="#about"><span class="menu-icon">◈</span><span><b>Tentang Kelas</b><small>Cerita, visi dan informasi XI TKJ 1</small></span><em>›</em></a>
         <a href="#schedule"><span class="menu-icon">◷</span><span><b>Jadwal</b><small>Pelajaran dan agenda hari ini</small></span><em>›</em></a>
         <a href="#piket"><span class="menu-icon">✓</span><span><b>Piket</b><small>Jadwal tugas kebersihan</small></span><em>›</em></a>
+        <a href="#albumClass"><span class="menu-icon">▣</span><span><b>Album Kelas</b><small>Kenangan XI TKJ 1</small></span><em>›</em></a>
       </div>
     </div>
     <div class="menu-section">
@@ -215,22 +216,39 @@
 <div class="piket-result" id="piketResult">Cari nama siswa untuk menemukan hari piket.</div>
 </section>
 
-<section class="section" id="students">
-<div class="section-heading"><div><p>OUR MEMBERS</p><h2>Anggota <span>Kelas</span></h2></div></div>
-<div class="class-structure" aria-label="Struktur Kelas XI TKJ 1"><div class="structure-title"><span>CLASS ORGANIZATION</span><h3>Struktur Kelas</h3></div>
-  <div class="class-structure-leader"><span class="structure-role">WALI KELAS</span><strong>Bu Luluk</strong></div>
-  <div class="structure-connector leader-connector"></div>
-  <div class="structure-top-row">
-    <div class="structure-item"><span>Ketua Kelas</span><b>Irfan</b></div>
-    <div class="structure-item"><span>Wakil Ketua</span><b>Lucky</b></div>
+
+<section class="section class-album-section" id="albumClass">
+  <div class="album-title-row">
+    <div class="section-heading"><div><p>CLASS MEMORIES</p><h2>Album <span>Kelas</span></h2></div></div>
+    <div class="album-title-note"><span class="album-title-dot"></span><b>3 Album</b><small>Kenangan XI TKJ 1</small></div>
   </div>
-  <div class="structure-connector branch-connector"></div>
-  <div class="structure-bottom-row">
-    <div class="structure-item"><span>Bendahara 1</span><b>Savira</b></div>
-    <div class="structure-item"><span>Bendahara 2</span><b>Reyhana</b></div>
-    <div class="structure-item"><span>Sekertaris 1</span><b>Dina</b></div>
-    <div class="structure-item"><span>Sekertaris 2</span><b>Alya</b></div>
+  <p class="album-intro">Satu folder, satu cerita. Pilih album dan buka semua momen kelas dalam tampilan galeri.</p>
+  <div class="album-folder-grid" id="albumFolderGrid">
+    <button class="album-folder-card album-yogya" data-album="yogyakarta" type="button" aria-label="Buka album Yogyakarta">
+      <span class="album-folder-collage"><img class="main" src="assets/album/yogyakarta/01.jpg" alt=""><img class="sub one" src="assets/album/yogyakarta/02.jpg" alt=""><img class="sub two" src="assets/album/yogyakarta/05.jpg" alt=""><span class="album-folder-shine"></span><span class="album-count">05 <small>FOTO</small></span></span>
+      <span class="album-folder-content"><span class="album-kicker">CLASS TRIP</span><b>Yogyakarta</b><small>Perjalanan & kenangan kelas</small></span><span class="album-open">Buka Album <i>↗</i></span>
+    </button>
+    <button class="album-folder-card album-freefire" data-album="j2-free-fire" type="button" aria-label="Buka album J2 Free Fire">
+      <span class="album-folder-collage"><img class="main" src="assets/album/j2-free-fire/01.jpg" alt=""><img class="sub one" src="assets/album/j2-free-fire/02.jpg" alt=""><img class="sub two" src="assets/album/j2-free-fire/04.jpg" alt=""><span class="album-folder-shine"></span><span class="album-count">04 <small>FOTO</small></span></span>
+      <span class="album-folder-content"><span class="album-kicker">ACHIEVEMENT</span><b>J2 Free Fire</b><small>Juara 2 & momen Free Fire</small></span><span class="album-open">Buka Album <i>↗</i></span>
+    </button>
+    <button class="album-folder-card album-fotbar" data-album="fotbar-xi-tkj1" type="button" aria-label="Buka album Fotbar XI TKJ1">
+      <span class="album-folder-collage"><img class="main" src="assets/album/fotbar-xi-tkj1/01.jpg" alt=""><img class="sub one" src="assets/album/fotbar-xi-tkj1/02.jpg" alt=""><img class="sub two" src="assets/album/fotbar-xi-tkj1/03.jpg" alt=""><span class="album-folder-shine"></span><span class="album-count">03 <small>FOTO</small></span></span>
+      <span class="album-folder-content"><span class="album-kicker">TOGETHER</span><b>Fotbar XI TKJ1</b><small>Foto bareng satu kelas</small></span><span class="album-open">Buka Album <i>↗</i></span>
+    </button>
   </div>
+</section>
+
+<div class="album-modal" id="albumModal" aria-hidden="true">
+  <div class="album-modal-backdrop" data-close-album></div>
+  <div class="album-modal-dialog" role="dialog" aria-modal="true" aria-label="Album Kelas">
+    <div class="album-modal-topline"><span>XI TKJ 1 / CLASS ARCHIVE</span><span id="albumModalCount"></span></div>
+    <div class="album-modal-head"><div><span class="eyebrow">ALBUM KELAS</span><h2 id="albumModalTitle">Album</h2><p id="albumModalMeta"></p></div><button class="album-close" type="button" data-close-album aria-label="Tutup">×</button></div>
+    <div class="album-modal-divider"></div><div class="album-photo-grid" id="albumPhotoGrid"></div>
+  </div>
+</div>
+<div class="album-viewer" id="albumViewer" aria-hidden="true">
+  <div class="album-viewer-backdrop"></div><div class="album-viewer-frame"><div class="album-viewer-top"><div><span id="albumViewerKicker">ALBUM KELAS</span><b id="albumViewerTitle">Album</b></div><button class="album-viewer-close" data-close-viewer type="button" aria-label="Tutup">×</button></div><div class="album-stage"><button class="album-viewer-nav prev" data-viewer-prev type="button" aria-label="Foto sebelumnya">‹</button><div class="album-media-wrap"><img id="albumViewerImage" alt="Foto album"><video id="albumViewerVideo" playsinline controls preload="metadata"></video><span class="album-live-pill" id="albumLivePill">● LIVE MOMENT</span></div><button class="album-viewer-nav next" data-viewer-next type="button" aria-label="Foto berikutnya">›</button></div><div class="album-viewer-bottom"><div class="album-viewer-caption" id="albumViewerCaption"></div><div class="album-progress"><span id="albumViewerNumber">01</span><i><em id="albumViewerProgress"></em></i><span id="albumViewerTotal">05</span></div></div><div class="album-filmstrip" id="albumFilmstrip"></div></div>
 </div>
 <div class="student-toolbar"><div class="search-box"><span>⌕</span><input type="text" id="studentSearch" placeholder="Cari nama siswa..."></div><select id="studentFilter"><option value="all">Semua</option><option value="L">Laki-laki</option><option value="P">Perempuan</option></select></div>
 <div class="students-grid" id="studentsGrid"></div>

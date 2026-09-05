@@ -61,5 +61,21 @@ window.LOCAL_MUSIC = [
     "cover": "https://i.ytimg.com/vi/G4nNBckyZQU/hqdefault.jpg",
     "type": "youtube",
     "youtubeId": "G4nNBckyZQU"
+  },
+  {
+    "name": "Marshmello ft. Khalid - Silence (Official Lyric Video)",
+    "artist": "Marshmello",
+    "src": "https://www.youtube.com/watch?v=tk36ovCMsU8",
+    "cover": "https://i.ytimg.com/vi/tk36ovCMsU8/hqdefault.jpg",
+    "type": "youtube",
+    "youtubeId": "tk36ovCMsU8"
+  },
+  {
+    "name": ".Feast - o,Tuan (Official Music Video)",
+    "artist": ".Feast",
+    "src": "https://www.youtube.com/watch?v=9sBktY09RpU",
+    "cover": "https://i.ytimg.com/vi/9sBktY09RpU/hqdefault.jpg",
+    "type": "youtube",
+    "youtubeId": "9sBktY09RpU"
   }
 ];

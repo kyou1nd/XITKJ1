@@ -36,5 +36,13 @@ window.LOCAL_MUSIC = [
     "cover": "https://i.ytimg.com/vi/SYStnfDWcXw/hqdefault.jpg",
     "type": "youtube",
     "youtubeId": "SYStnfDWcXw"
-  }
+  },
+  {
+  name: "TULUS - Teh Hijau (Official Lyric Video)",
+  artist: "Tulus",
+  src: "https://www.youtube.com/watch?v=RO75uUZiAw0",
+  cover: "https://i.ytimg.com/vi/RO75uUZiAw0/hqdefault.jpg",
+  type: "youtube",
+  youtubeId: "RO75uUZiAw0"
+}
 ];

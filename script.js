@@ -777,39 +777,77 @@ document.addEventListener('click',e=>{
   }
 },true);
 
-/* ===== LOCAL MUSIC DRAWER ===== */
+/* ===== MUSIC PLAYER — LOCAL MP3 + YOUTUBE ===== */
 (()=>{
- const btn=document.getElementById('musicButton'),panel=document.getElementById('musicPanel'),close=document.getElementById('musicClose'),list=document.getElementById('musicList'),audio=document.getElementById('musicAudio');
- window.__openMusicPlayer=()=>{ if(!panel)return false; render(); panel.style.display='block'; panel.classList.add('show'); panel.setAttribute('aria-hidden','false'); return true; };
- const songs=(Array.isArray(window.LOCAL_MUSIC)?window.LOCAL_MUSIC:[]).map((s,i)=>({id:i,name:s.name||'Lagu '+(i+1),artist:s.artist||'',src:s.src||'',cover:s.cover||'',type:s.type||'audio/mpeg'}));
+ const btn=document.getElementById('musicButton'),panel=document.getElementById('musicPanel'),close=document.getElementById('musicClose'),list=document.getElementById('musicList'),audio=document.getElementById('musicAudio'),ytBox=document.getElementById('musicYoutubePlayer');
+ const songs=(Array.isArray(window.LOCAL_MUSIC)?window.LOCAL_MUSIC:[]).map((s,i)=>({id:i,name:s.name||'Lagu '+(i+1),artist:s.artist||'',src:s.src||'',cover:s.cover||'',type:s.type||'audio/mpeg',youtubeId:s.youtubeId||extractYoutubeId(s.src||'')}));
  let currentId=null;
- function closeMusic(){if(panel){panel.classList.remove('show');panel.style.display='none';panel.setAttribute('aria-hidden','true')}}
- function updateRows(){list?.querySelectorAll('.music-row').forEach(row=>{const id=Number(row.dataset.song),icon=row.querySelector('.music-play');const active=id===currentId&&!audio.paused;row.classList.toggle('playing',id===currentId);if(icon)icon.textContent=active?'❚❚':'▶'})}
+ function extractYoutubeId(url){
+  const m=String(url||'').match(/(?:youtube\.com\/(?:watch\?v=|embed\/|shorts\/)|youtu\.be\/)([A-Za-z0-9_-]{6,})/i);
+  return m?m[1]:'';
+ }
+ function isYouTube(s){return s?.type==='youtube'||!!s?.youtubeId}
+ function hideYouTube(){if(!ytBox)return;ytBox.innerHTML='';ytBox.hidden=true;}
+ function stopCurrentMedia(){
+  try{audio.pause();}catch{}
+  audio.removeAttribute('src');
+  audio.load();
+  hideYouTube();
+ }
+ window.__openMusicPlayer=()=>{if(!panel)return false;render();panel.style.display='block';panel.classList.add('show');panel.setAttribute('aria-hidden','false');return true;};
+ function closeMusic(){stopCurrentMedia();currentId=null;setNowPlaying(null);updateRows();if(panel){panel.classList.remove('show');panel.style.display='none';panel.setAttribute('aria-hidden','true')}}
+ function updateRows(){
+  list?.querySelectorAll('.music-row').forEach(row=>{
+   const id=Number(row.dataset.song),icon=row.querySelector('.music-play');
+   const active=id===currentId;
+   row.classList.toggle('playing',active);
+   if(icon)icon.textContent=active?'❚❚':'▶';
+  });
+ }
  function setNowPlaying(s){
-  const box=document.getElementById('musicNowPlaying'),title=document.getElementById('musicNowTitle'),artist=document.getElementById('musicNowArtist');
-  const art=box?.querySelector('.music-now-art');
+  const box=document.getElementById('musicNowPlaying'),title=document.getElementById('musicNowTitle'),artist=document.getElementById('musicNowArtist'),art=box?.querySelector('.music-now-art');
   if(!s){if(title)title.textContent='Belum ada lagu';if(artist)artist.textContent='Pilih lagu untuk mulai mendengarkan';if(art)art.innerHTML='<span>♫</span>';return;}
-  if(title)title.textContent=s.name||'Lagu'; if(artist)artist.textContent=s.artist||'Musik lokal';
-  if(art)art.innerHTML=s.cover?`<img src="${escapeHTML(s.cover)}" alt="" onerror="this.style.display='none'"><span>♫</span>`:'<span>♫</span>';
+  if(title)title.textContent=s.name||'Lagu';
+  if(artist)artist.textContent=s.artist||'Musik lokal';
+  if(art)art.innerHTML=s.cover?`<img src="${escapeHTML(s.cover)}" alt="" onerror="this.onerror=null;this.style.display='none'"><span>♫</span>`:'<span>♫</span>';
  }
  function render(){
   if(!list)return;
-  list.innerHTML=songs.length?songs.map((s,i)=>`<div class="music-row" data-song="${i}"><button class="music-row-main" type="button" aria-label="Putar ${escapeHTML(s.name)}"><span class="music-cover-wrap"><img class="music-cover" src="${escapeHTML(s.cover)}" alt="Cover ${escapeHTML(s.name)}" onerror="this.onerror=null;this.style.display='none'"><span class="music-cover-fallback">♫</span></span><span class="music-row-info"><b class="music-title" title="${escapeHTML(s.name)}">${escapeHTML(s.name)}</b><small class="music-artist" title="${escapeHTML(s.artist||'Musik lokal')}">${escapeHTML(s.artist||'Musik lokal')}</small></span><span class="music-play">▶</span></button></div>`).join(''):'<div class="music-empty">Belum ada lagu.</div>';
+  list.innerHTML=songs.length?songs.map((s,i)=>`<div class="music-row" data-song="${i}"><button class="music-row-main" type="button" aria-label="Putar ${escapeHTML(s.name)}"><span class="music-cover-wrap"><img class="music-cover" src="${escapeHTML(s.cover)}" alt="Cover ${escapeHTML(s.name)}" onerror="this.onerror=null;this.style.display='none'"><span class="music-cover-fallback">♫</span></span><span class="music-row-info"><b class="music-title" title="${escapeHTML(s.name)}">${escapeHTML(s.name)}</b><small class="music-artist" title="${escapeHTML(s.artist||'Musik lokal')}">${escapeHTML(s.artist||'Musik lokal')}${isYouTube(s)?' • YouTube':''}</small></span><span class="music-play">▶</span></button></div>`).join(''):'<div class="music-empty">Belum ada lagu.</div>';
   list.querySelectorAll('.music-row-main').forEach(b=>b.addEventListener('click',()=>{
-   const row=b.closest('.music-row'),s=songs[Number(row?.dataset.song)];if(!s||!s.src)return;
-   const id=s.id;if(currentId===id&&audio.src){if(audio.paused)audio.play().catch(()=>{});else audio.pause();updateRows();return}
-   currentId=id;setNowPlaying(s);audio.src=s.src;audio.dataset.songId=String(id);audio.load();audio.play().catch(()=>{});updateRows()
+   const row=b.closest('.music-row'),s=songs[Number(row?.dataset.song)];if(!s||!s.src&&!s.youtubeId)return;
+   const id=s.id;
+   if(currentId===id){
+    if(isYouTube(s)){
+     const frame=ytBox?.querySelector('iframe');
+     if(frame){
+      try{frame.contentWindow.postMessage(JSON.stringify({event:'command',func:'pauseVideo',args:[]}), '*');}catch{}
+     }
+    }else if(audio.paused)audio.play().catch(()=>{});else audio.pause();
+    return;
+   }
+   currentId=id;setNowPlaying(s);stopCurrentMedia();
+   if(isYouTube(s)){
+    const vid=s.youtubeId||extractYoutubeId(s.src);
+    if(!vid){toast('Link YouTube tidak valid.');return;}
+    ytBox.hidden=false;
+    ytBox.innerHTML=`<div class="music-youtube-frame"><iframe src="https://www.youtube.com/embed/${encodeURIComponent(vid)}?autoplay=1&rel=0&playsinline=1&modestbranding=1" title="${escapeHTML(s.name)}" allow="autoplay; encrypted-media; picture-in-picture" allowfullscreen loading="eager"></iframe><div class="music-youtube-label"><span>YOUTUBE</span><b>${escapeHTML(s.name)}</b></div></div>`;
+   }else{
+    audio.src=s.src;audio.dataset.songId=String(id);audio.load();audio.play().catch(()=>toast('Browser memblokir autoplay. Tekan tombol play pada player.'));
+   }
+   updateRows();
   }));
   if(currentId!==null)setNowPlaying(songs[currentId]);
-  updateRows()
+  updateRows();
  }
  btn?.addEventListener('click',e=>{e.preventDefault();e.stopPropagation();window.__openMusicPlayer?.()});
  close?.addEventListener('click',closeMusic);
  document.addEventListener('click',e=>{if(panel?.classList.contains('show')&&!panel.contains(e.target)&&e.target!==btn)closeMusic()});
- audio?.addEventListener('play',updateRows);audio?.addEventListener('pause',updateRows);audio?.addEventListener('ended',()=>{currentId=null;setNowPlaying(null);updateRows()});audio?.addEventListener('error',()=>toast('File lagu belum ada. Tambahkan MP3 ke assets/music/.'));
+ audio?.addEventListener('play',updateRows);audio?.addEventListener('pause',updateRows);
+ audio?.addEventListener('ended',()=>{currentId=null;setNowPlaying(null);updateRows()});
+ audio?.addEventListener('error',()=>{if(currentId!==null&&!isYouTube(songs[currentId]))toast('File MP3 tidak ditemukan.');});
  render();
 })();
-
 
 /* ===== MUSIC PLAYER: COMFORTABLE DRAGGING ON PHONE + DESKTOP ===== */
 (()=>{

@@ -28,5 +28,13 @@ window.LOCAL_MUSIC = [
     src: "assets/music/Blank%20Space%20-%20Taylor%20Swift.mp3",
     cover: "assets/music/covers/blank-space.jpeg",
     type: "audio/mpeg"
+  },
+  {
+    "name": "Iqro (Lirik) - Raim Laode",
+    "artist": "Indo Hitplay",
+    "src": "https://www.youtube.com/watch?v=SYStnfDWcXw",
+    "cover": "https://i.ytimg.com/vi/SYStnfDWcXw/hqdefault.jpg",
+    "type": "youtube",
+    "youtubeId": "SYStnfDWcXw"
   }
 ];

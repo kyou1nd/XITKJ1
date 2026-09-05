@@ -24,7 +24,7 @@ jobs:
         with:
           python-version: "3.x"
 
-      - name: Cari lagu di YouTube
+      - name: Cari lagu dan simpan ke playlist
         env:
           YOUTUBE_API_KEY: ${{ secrets.YOUTUBE_API_KEY }}
           QUERY: ${{ inputs.query }}
@@ -34,15 +34,19 @@ jobs:
           import json
           import urllib.parse
           import urllib.request
+          from pathlib import Path
 
           api_key = os.environ["YOUTUBE_API_KEY"]
-          query = os.environ["QUERY"]
+          query = os.environ["QUERY"].strip()
+
+          if not query:
+              raise SystemExit("Judul lagu kosong.")
 
           params = urllib.parse.urlencode({
               "part": "snippet",
               "q": query,
               "type": "video",
-              "maxResults": 5,
+              "maxResults": 1,
               "key": api_key
           })
 
@@ -51,16 +55,101 @@ jobs:
           with urllib.request.urlopen(url) as response:
               data = json.load(response)
 
-          print("\nHasil pencarian:\n")
+          items = data.get("items", [])
 
-          for item in data.get("items", []):
-              video_id = item["id"]["videoId"]
-              title = item["snippet"]["title"]
-              channel = item["snippet"]["channelTitle"]
+          if not items:
+              raise SystemExit(f"Lagu tidak ditemukan: {query}")
 
-              print(f"- {title}")
-              print(f"  Channel : {channel}")
-              print(f"  ID      : {video_id}")
-              print(f"  URL     : https://www.youtube.com/watch?v={video_id}")
-              print()
-          PY
+          item = items[0]
+
+          video_id = item["id"]["videoId"]
+          title = item["snippet"]["title"]
+          channel = item["snippet"]["channelTitle"]
+          thumbnail = item["snippet"]["thumbnails"]["high"]["url"]
+
+          playlist = Path("music-list.js")
+
+          if playlist.exists():
+              text = playlist.read_text(encoding="utf-8")
+
+              marker = "window.LOCAL_MUSIC = "
+              start = text.find(marker)
+
+              if start == -1:
+                  raise SystemExit(
+                      "Format music-list.js tidak dikenali."
+                  )
+
+              array_start = text.find("[", start)
+              array_end = text.rfind("];")
+
+              if array_start == -1 or array_end == -1:
+                  raise SystemExit(
+                      "Array LOCAL_MUSIC tidak ditemukan."
+                  )
+
+              raw = text[array_start:array_end + 1]
+
+              try:
+                  songs = json.loads(raw)
+              except json.JSONDecodeError:
+                  raise SystemExit(
+                      "Format music-list.js tidak kompatibel."
+                  )
+
+          else:
+              songs = []
+
+          new_song = {
+              "name": title,
+              "artist": channel,
+              "src": f"https://www.youtube.com/watch?v={video_id}",
+              "cover": thumbnail,
+              "type": "youtube",
+              "youtubeId": video_id
+          }
+
+          exists = any(
+              song.get("youtubeId") == video_id
+              for song in songs
+          )
+
+          if exists:
+              print("Lagu sudah ada di playlist.")
+          else:
+              songs.append(new_song)
+              print(f"Lagu ditambahkan: {title}")
+
+          header = (
+              "// Playlist YouTube XI TKJ 1.\n"
+              "// Lagu disimpan sebagai data YouTube.\n"
+              "window.LOCAL_MUSIC = "
+          )
+
+          playlist.write_text(
+              header
+              + json.dumps(
+                  songs,
+                  ensure_ascii=False,
+                  indent=2
+              )
+              + ";\n",
+              encoding="utf-8"
+          )
+
+          print(f"YouTube ID: {video_id}")
+
+      - name: Commit playlist
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+          git add music-list.js
+
+          if git diff --cached --quiet; then
+            echo "Tidak ada perubahan."
+            exit 0
+          fi
+
+          git commit -m "Add requested YouTube song"
+          git push

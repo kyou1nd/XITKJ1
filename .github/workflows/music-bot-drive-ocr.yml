@@ -13,52 +13,110 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      # ==========================================
+      # 1. Ambil repository
+      # ==========================================
       - name: Checkout repository
         uses: actions/checkout@v5
 
+      # ==========================================
+      # 2. Setup Python
+      # ==========================================
       - name: Setup Python
         uses: actions/setup-python@v6
         with:
           python-version: "3.x"
 
+      # ==========================================
+      # 3. Install OCR
+      # ==========================================
       - name: Install OCR tools
         run: |
           sudo apt-get update
           sudo apt-get install -y tesseract-ocr tesseract-ocr-eng
-          python -m pip install --upgrade pip
-          pip install gdown pillow pytesseract
 
+          python -m pip install --upgrade pip
+
+          pip install \
+            gdown \
+            pillow \
+            pytesseract
+
+      # ==========================================
+      # 4. Download PNG dari Google Drive
+      # ==========================================
       - name: Download PNG requests from Google Drive
         env:
           DRIVE_FOLDER_URL: https://drive.google.com/drive/folders/1oO4PNM4-kQpB4UVk-kWSz7mLC0XaTfko
         run: |
+          echo "Membuat folder request..."
+
           rm -rf drive_music_requests
           mkdir -p drive_music_requests
 
-          gdown --folder "$DRIVE_FOLDER_URL" \
+          echo "Download PNG dari Google Drive..."
+
+          gdown \
+            --folder "$DRIVE_FOLDER_URL" \
             --output drive_music_requests \
             --remaining-ok \
             --quiet || true
 
-          find drive_music_requests -type f -iname "*.png" -print || true
+          echo ""
+          echo "File PNG yang ditemukan:"
 
+          find drive_music_requests \
+            -type f \
+            -iname "*.png" \
+            -print || true
+
+      # ==========================================
+      # 5. OCR + YouTube + Update Playlist
+      # ==========================================
       - name: Read PNG with OCR and update music list
         env:
           YOUTUBE_API_KEY: ${{ secrets.YOUTUBE_API_KEY }}
         run: |
+          echo "Menjalankan Music Drive OCR Bot..."
+
           python tools/music_drive_bot.py
 
+      # ==========================================
+      # 6. Commit perubahan
+      # ==========================================
       - name: Commit automatic playlist changes
         run: |
+          echo "Menyiapkan commit..."
+
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
 
-          git add music-list.js .musicbot/processed.json
+          # Pastikan folder .musicbot tersedia
+          mkdir -p .musicbot
+
+          # Pastikan processed.json tersedia
+          if [ ! -f ".musicbot/processed.json" ]; then
+            echo "[]" > .musicbot/processed.json
+          fi
+
+          echo "Menambahkan perubahan..."
+
+          git add music-list.js
+          git add .musicbot/processed.json
+
+          echo ""
+          echo "Memeriksa perubahan..."
 
           if git diff --cached --quiet; then
-            echo "Tidak ada request lagu baru."
+            echo "Tidak ada perubahan playlist."
             exit 0
           fi
 
-          git commit -m "Auto add requested music from Drive"
+          echo "Perubahan ditemukan."
+
+          git status
+
+          git commit \
+            -m "Auto add requested music from Drive"
+
           git push

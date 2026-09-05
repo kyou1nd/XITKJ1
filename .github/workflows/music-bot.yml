@@ -52,8 +52,11 @@ jobs:
 
           url = "https://www.googleapis.com/youtube/v3/search?" + params
 
-          with urllib.request.urlopen(url) as response:
-              data = json.load(response)
+          try:
+              with urllib.request.urlopen(url) as response:
+                  data = json.load(response)
+          except Exception as e:
+              raise SystemExit(f"Gagal mengakses YouTube API: {e}")
 
           items = data.get("items", [])
 
@@ -69,37 +72,24 @@ jobs:
 
           playlist = Path("music-list.js")
 
-          if playlist.exists():
-              text = playlist.read_text(encoding="utf-8")
+          if not playlist.exists():
+              raise SystemExit("File music-list.js tidak ditemukan.")
 
-              marker = "window.LOCAL_MUSIC = "
-              start = text.find(marker)
+          text = playlist.read_text(encoding="utf-8")
 
-              if start == -1:
-                  raise SystemExit(
-                      "Format music-list.js tidak dikenali."
-                  )
+          marker = "window.LOCAL_MUSIC = ["
 
-              array_start = text.find("[", start)
-              array_end = text.rfind("];")
+          if marker not in text:
+              raise SystemExit(
+                  "Format music-list.js tidak sesuai."
+              )
 
-              if array_start == -1 or array_end == -1:
-                  raise SystemExit(
-                      "Array LOCAL_MUSIC tidak ditemukan."
-                  )
+          # Cek apakah video sudah ada
+          if video_id in text:
+              print("Lagu ini sudah ada di playlist.")
+              raise SystemExit(0)
 
-              raw = text[array_start:array_end + 1]
-
-              try:
-                  songs = json.loads(raw)
-              except json.JSONDecodeError:
-                  raise SystemExit(
-                      "Format music-list.js tidak kompatibel."
-                  )
-
-          else:
-              songs = []
-
+          # Buat object lagu baru
           new_song = {
               "name": title,
               "artist": channel,
@@ -109,37 +99,45 @@ jobs:
               "youtubeId": video_id
           }
 
-          exists = any(
-              song.get("youtubeId") == video_id
-              for song in songs
+          song_text = json.dumps(
+              new_song,
+              ensure_ascii=False,
+              indent=2
           )
 
-          if exists:
-              print("Lagu sudah ada di playlist.")
+          # Cari penutup array LOCAL_MUSIC
+          end = text.rfind("];")
+
+          if end == -1:
+              raise SystemExit(
+                  "Penutup array LOCAL_MUSIC tidak ditemukan."
+              )
+
+          # Tambahkan koma jika sudah ada lagu
+          before = text[:end].rstrip()
+
+          if before.endswith("}"):
+              addition = ",\n  " + song_text.replace("\n", "\n  ")
           else:
-              songs.append(new_song)
-              print(f"Lagu ditambahkan: {title}")
+              addition = "\n  " + song_text.replace("\n", "\n  ")
 
-          header = (
-              "// Playlist YouTube XI TKJ 1.\n"
-              "// Lagu disimpan sebagai data YouTube.\n"
-              "window.LOCAL_MUSIC = "
-          )
+          text = before + addition + "\n" + text[end:]
 
           playlist.write_text(
-              header
-              + json.dumps(
-                  songs,
-                  ensure_ascii=False,
-                  indent=2
-              )
-              + ";\n",
+              text,
               encoding="utf-8"
           )
 
-          print(f"YouTube ID: {video_id}")
+          print("================================")
+          print("LAGU BERHASIL DITAMBAHKAN")
+          print("================================")
+          print(f"Judul   : {title}")
+          print(f"Channel : {channel}")
+          print(f"Video ID: {video_id}")
+          print("================================")
+          PY
 
-      - name: Commit playlist
+      - name: Commit playlist ke GitHub
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"

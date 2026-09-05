@@ -2,6 +2,11 @@ name: Music Bot
 
 on:
   workflow_dispatch:
+    inputs:
+      query:
+        description: "Judul lagu yang ingin dicari"
+        required: true
+        type: string
 
 permissions:
   contents: write
@@ -14,8 +19,48 @@ jobs:
       - name: Ambil file repository
         uses: actions/checkout@v4
 
-      - name: Jalankan bot
-        run: echo "Music bot siap dijalankan"
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.x"
 
-      - name: Selesai
-        run: echo "Request lagu akan diproses di sini"
+      - name: Cari lagu di YouTube
+        env:
+          YOUTUBE_API_KEY: ${{ secrets.YOUTUBE_API_KEY }}
+          QUERY: ${{ inputs.query }}
+        run: |
+          python - <<'PY'
+          import os
+          import json
+          import urllib.parse
+          import urllib.request
+
+          api_key = os.environ["YOUTUBE_API_KEY"]
+          query = os.environ["QUERY"]
+
+          params = urllib.parse.urlencode({
+              "part": "snippet",
+              "q": query,
+              "type": "video",
+              "maxResults": 5,
+              "key": api_key
+          })
+
+          url = "https://www.googleapis.com/youtube/v3/search?" + params
+
+          with urllib.request.urlopen(url) as response:
+              data = json.load(response)
+
+          print("\nHasil pencarian:\n")
+
+          for item in data.get("items", []):
+              video_id = item["id"]["videoId"]
+              title = item["snippet"]["title"]
+              channel = item["snippet"]["channelTitle"]
+
+              print(f"- {title}")
+              print(f"  Channel : {channel}")
+              print(f"  ID      : {video_id}")
+              print(f"  URL     : https://www.youtube.com/watch?v={video_id}")
+              print()
+          PY

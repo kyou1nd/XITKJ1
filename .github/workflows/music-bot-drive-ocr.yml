@@ -29,7 +29,7 @@ jobs:
           python-version: "3.x"
 
       # ==========================================
-      # 3. INSTALL OCR
+      # 3. INSTALL OCR + GDOWN
       # ==========================================
       - name: Install OCR tools
         run: |
@@ -38,23 +38,27 @@ jobs:
 
           python -m pip install --upgrade pip
 
-          pip install \
+          pip install --upgrade \
             gdown \
             pillow \
             pytesseract
 
+          echo ""
+          echo "Versi gdown:"
+          gdown --version
+
       # ==========================================
-      # 4. PREPARE FOLDER
+      # 4. SIAPKAN FOLDER
       # ==========================================
       - name: Prepare request folder
         run: |
           rm -rf drive_music_requests
           mkdir -p drive_music_requests
 
-          echo "Folder request dibuat."
+          echo "Folder request siap."
 
       # ==========================================
-      # 5. DOWNLOAD GOOGLE DRIVE
+      # 5. DOWNLOAD DARI GOOGLE DRIVE
       # ==========================================
       - name: Download PNG requests from Google Drive
         env:
@@ -69,16 +73,15 @@ jobs:
           echo "$DRIVE_FOLDER_URL"
 
           echo ""
-          echo "Mulai download..."
+          echo "Download PNG..."
 
           gdown \
             --folder "$DRIVE_FOLDER_URL" \
-            --output drive_music_requests \
-            --remaining-ok
+            --output drive_music_requests
 
           echo ""
           echo "=========================================="
-          echo " SEMUA FILE YANG TERDOWNLOAD"
+          echo " SEMUA FILE"
           echo "=========================================="
 
           find drive_music_requests \
@@ -87,7 +90,7 @@ jobs:
 
           echo ""
           echo "=========================================="
-          echo " FILE PNG YANG DITEMUKAN"
+          echo " FILE PNG"
           echo "=========================================="
 
           PNG_COUNT=$(find drive_music_requests \
@@ -99,8 +102,12 @@ jobs:
 
           if [ "$PNG_COUNT" -eq 0 ]; then
             echo ""
-            echo "Tidak ada PNG request yang ditemukan."
-            echo "Periksa izin folder Google Drive."
+            echo "Tidak ada PNG ditemukan."
+            echo ""
+            echo "Kemungkinan:"
+            echo "1. Folder Drive belum bisa diakses publik."
+            echo "2. PNG belum berada di folder tersebut."
+            echo "3. Link folder salah."
           else
             echo ""
             echo "PNG ditemukan:"
@@ -124,12 +131,12 @@ jobs:
           python tools/music_drive_bot.py
 
       # ==========================================
-      # 7. CHECK RESULT
+      # 7. CEK HASIL
       # ==========================================
       - name: Check generated files
         run: |
           echo "=========================================="
-          echo " HASIL"
+          echo " HASIL BOT"
           echo "=========================================="
 
           echo ""
@@ -156,44 +163,32 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
 
-          # Pastikan folder state tersedia
           mkdir -p .musicbot
 
-          # Kalau belum ada, buat processed.json
           if [ ! -f ".musicbot/processed.json" ]; then
             echo "[]" > .musicbot/processed.json
           fi
 
-          echo ""
-          echo "Menambahkan music-list.js..."
           git add music-list.js
 
-          echo "Menambahkan processed.json..."
           git add -f .musicbot/processed.json
 
           echo ""
-          echo "Perubahan yang akan di-commit:"
+          echo "Perubahan:"
           git status --short
 
-          # Kalau tidak ada perubahan
           if git diff --cached --quiet; then
             echo ""
             echo "Tidak ada perubahan."
             exit 0
           fi
 
-          echo ""
-          echo "Membuat commit..."
-
           git commit \
             -m "Auto add requested music from Drive"
-
-          echo ""
-          echo "Push ke GitHub..."
 
           git push
 
           echo ""
           echo "=========================================="
-          echo " BERHASIL"
+          echo " BERHASIL PUSH"
           echo "=========================================="

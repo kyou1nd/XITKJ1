@@ -53,5 +53,13 @@ window.LOCAL_MUSIC = [
     "cover": "https://i.ytimg.com/vi/oIYWenB637c/hqdefault.jpg",
     "type": "youtube",
     "youtubeId": "oIYWenB637c"
+  },
+  {
+    "name": "Utopia - Hujan | Official 4K Remastered Video",
+    "artist": "Aquarius Musikindo",
+    "src": "https://www.youtube.com/watch?v=G4nNBckyZQU",
+    "cover": "https://i.ytimg.com/vi/G4nNBckyZQU/hqdefault.jpg",
+    "type": "youtube",
+    "youtubeId": "G4nNBckyZQU"
   }
 ];

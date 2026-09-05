@@ -13,14 +13,15 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+
       # ==========================================
-      # 1. Ambil repository
+      # 1. CHECKOUT
       # ==========================================
       - name: Checkout repository
         uses: actions/checkout@v5
 
       # ==========================================
-      # 2. Setup Python
+      # 2. SETUP PYTHON
       # ==========================================
       - name: Setup Python
         uses: actions/setup-python@v6
@@ -28,7 +29,7 @@ jobs:
           python-version: "3.x"
 
       # ==========================================
-      # 3. Install OCR
+      # 3. INSTALL OCR
       # ==========================================
       - name: Install OCR tools
         run: |
@@ -43,80 +44,156 @@ jobs:
             pytesseract
 
       # ==========================================
-      # 4. Download PNG dari Google Drive
+      # 4. PREPARE FOLDER
+      # ==========================================
+      - name: Prepare request folder
+        run: |
+          rm -rf drive_music_requests
+          mkdir -p drive_music_requests
+
+          echo "Folder request dibuat."
+
+      # ==========================================
+      # 5. DOWNLOAD GOOGLE DRIVE
       # ==========================================
       - name: Download PNG requests from Google Drive
         env:
           DRIVE_FOLDER_URL: https://drive.google.com/drive/folders/1oO4PNM4-kQpB4UVk-kWSz7mLC0XaTfko
         run: |
-          echo "Membuat folder request..."
+          echo "=========================================="
+          echo " GOOGLE DRIVE MUSIC REQUEST"
+          echo "=========================================="
 
-          rm -rf drive_music_requests
-          mkdir -p drive_music_requests
+          echo ""
+          echo "Folder:"
+          echo "$DRIVE_FOLDER_URL"
 
-          echo "Download PNG dari Google Drive..."
+          echo ""
+          echo "Mulai download..."
 
           gdown \
             --folder "$DRIVE_FOLDER_URL" \
             --output drive_music_requests \
-            --remaining-ok \
-            --quiet || true
+            --remaining-ok
 
           echo ""
-          echo "File PNG yang ditemukan:"
+          echo "=========================================="
+          echo " SEMUA FILE YANG TERDOWNLOAD"
+          echo "=========================================="
 
           find drive_music_requests \
             -type f \
-            -iname "*.png" \
             -print || true
 
+          echo ""
+          echo "=========================================="
+          echo " FILE PNG YANG DITEMUKAN"
+          echo "=========================================="
+
+          PNG_COUNT=$(find drive_music_requests \
+            -type f \
+            -iname "*.png" \
+            | wc -l)
+
+          echo "Jumlah PNG: $PNG_COUNT"
+
+          if [ "$PNG_COUNT" -eq 0 ]; then
+            echo ""
+            echo "Tidak ada PNG request yang ditemukan."
+            echo "Periksa izin folder Google Drive."
+          else
+            echo ""
+            echo "PNG ditemukan:"
+            find drive_music_requests \
+              -type f \
+              -iname "*.png" \
+              -print
+          fi
+
       # ==========================================
-      # 5. OCR + YouTube + Update Playlist
+      # 6. OCR + YOUTUBE API
       # ==========================================
       - name: Read PNG with OCR and update music list
         env:
           YOUTUBE_API_KEY: ${{ secrets.YOUTUBE_API_KEY }}
         run: |
-          echo "Menjalankan Music Drive OCR Bot..."
+          echo "=========================================="
+          echo " MUSIC DRIVE OCR BOT"
+          echo "=========================================="
 
           python tools/music_drive_bot.py
 
       # ==========================================
-      # 6. Commit perubahan
+      # 7. CHECK RESULT
+      # ==========================================
+      - name: Check generated files
+        run: |
+          echo "=========================================="
+          echo " HASIL"
+          echo "=========================================="
+
+          echo ""
+          echo "music-list.js:"
+          ls -lh music-list.js || true
+
+          echo ""
+          echo ".musicbot:"
+          ls -lah .musicbot || true
+
+          echo ""
+          echo "Git status:"
+          git status --short
+
+      # ==========================================
+      # 8. COMMIT + PUSH
       # ==========================================
       - name: Commit automatic playlist changes
         run: |
-          echo "Menyiapkan commit..."
+          echo "=========================================="
+          echo " COMMIT AUTOMATIC PLAYLIST"
+          echo "=========================================="
 
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
 
-          # Pastikan folder .musicbot tersedia
+          # Pastikan folder state tersedia
           mkdir -p .musicbot
 
-          # Pastikan processed.json tersedia
+          # Kalau belum ada, buat processed.json
           if [ ! -f ".musicbot/processed.json" ]; then
             echo "[]" > .musicbot/processed.json
           fi
 
-          echo "Menambahkan perubahan..."
-
+          echo ""
+          echo "Menambahkan music-list.js..."
           git add music-list.js
-          git add .musicbot/processed.json
+
+          echo "Menambahkan processed.json..."
+          git add -f .musicbot/processed.json
 
           echo ""
-          echo "Memeriksa perubahan..."
+          echo "Perubahan yang akan di-commit:"
+          git status --short
 
+          # Kalau tidak ada perubahan
           if git diff --cached --quiet; then
-            echo "Tidak ada perubahan playlist."
+            echo ""
+            echo "Tidak ada perubahan."
             exit 0
           fi
 
-          echo "Perubahan ditemukan."
-
-          git status
+          echo ""
+          echo "Membuat commit..."
 
           git commit \
             -m "Auto add requested music from Drive"
 
+          echo ""
+          echo "Push ke GitHub..."
+
           git push
+
+          echo ""
+          echo "=========================================="
+          echo " BERHASIL"
+          echo "=========================================="

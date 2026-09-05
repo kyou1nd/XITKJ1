@@ -1,70 +1,53 @@
 import os
 import re
 import json
-import ast
 import hashlib
 from pathlib import Path
 from urllib.parse import urlencode
-from urllib.request import urlopen, Request
+from urllib.request import Request, urlopen
 
 import pytesseract
 from PIL import Image
 
 
-# ============================================================
-# CONFIG
-# ============================================================
-
 ROOT = Path(__file__).resolve().parents[1]
 
 PLAYLIST = ROOT / "music-list.js"
 REQUEST_DIR = ROOT / "drive_music_requests"
+
 STATE_DIR = ROOT / ".musicbot"
 PROCESSED_FILE = STATE_DIR / "processed.json"
 
 YOUTUBE_API_KEY = os.environ.get("YOUTUBE_API_KEY", "").strip()
 
-# Folder Google Drive request lagu
-DRIVE_FOLDER_ID = "1oO4PNM4-kQpB4UVk-kWSz7mLC0XaTfko"
+
+def log(text):
+    print(f"[MusicBot] {text}", flush=True)
 
 
-# ============================================================
-# UTILITY
-# ============================================================
+# =========================================================
+# STATE
+# =========================================================
 
-def log(message):
-    print(f"[MusicBot] {message}", flush=True)
-
-
-def ensure_state():
+def load_processed():
     STATE_DIR.mkdir(parents=True, exist_ok=True)
 
     if not PROCESSED_FILE.exists():
-        PROCESSED_FILE.write_text(
-            "[]",
-            encoding="utf-8"
-        )
-
-
-def load_processed():
-    ensure_state()
+        return set()
 
     try:
         data = json.loads(
             PROCESSED_FILE.read_text(encoding="utf-8")
         )
 
-        if isinstance(data, list):
-            return set(data)
-
-        return set()
+        return set(data)
 
     except Exception:
         return set()
 
 
 def save_processed(processed):
-    ensure_state()
+    STATE_DIR.mkdir(parents=True, exist_ok=True)
 
     PROCESSED_FILE.write_text(
         json.dumps(
@@ -76,26 +59,18 @@ def save_processed(processed):
     )
 
 
-# ============================================================
-# READ music-list.js
-# ============================================================
+# =========================================================
+# JAVASCRIPT PARSER
+# =========================================================
 
-def extract_playlist_array(text):
-    """
-    Mengambil array dari:
-
-    window.LOCAL_MUSIC = [
-        ...
-    ];
-    """
-
+def find_playlist_array(text):
     marker = "window.LOCAL_MUSIC"
 
     marker_pos = text.find(marker)
 
     if marker_pos == -1:
         raise ValueError(
-            "window.LOCAL_MUSIC tidak ditemukan di music-list.js"
+            "window.LOCAL_MUSIC tidak ditemukan."
         )
 
     start = text.find("[", marker_pos)
@@ -106,162 +81,323 @@ def extract_playlist_array(text):
         )
 
     depth = 0
-    in_string = False
-    string_char = None
-    escape = False
+    quote = None
+    escaped = False
 
     for i in range(start, len(text)):
 
-        char = text[i]
+        ch = text[i]
 
-        if in_string:
+        if quote:
 
-            if escape:
-                escape = False
+            if escaped:
+                escaped = False
                 continue
 
-            if char == "\\":
-                escape = True
+            if ch == "\\":
+                escaped = True
                 continue
 
-            if char == string_char:
-                in_string = False
-                string_char = None
+            if ch == quote:
+                quote = None
 
             continue
 
-        if char in ("'", '"'):
-            in_string = True
-            string_char = char
-            continue
+        if ch in ("'", '"'):
+            quote = ch
 
-        if char == "[":
+        elif ch == "[":
             depth += 1
 
-        elif char == "]":
+        elif ch == "]":
             depth -= 1
 
             if depth == 0:
-                return text[start:i + 1]
+                return start, i
 
     raise ValueError(
-        "Array LOCAL_MUSIC tidak memiliki penutup ]."
+        "Array LOCAL_MUSIC tidak lengkap."
     )
 
 
-def convert_js_array_to_python(raw):
+def parse_js_strings(array_text):
     """
-    music-list.js bukan JSON murni karena key seperti:
+    Membaca object JavaScript satu per satu.
 
-    {
-      name: "...",
-      artist: "..."
-    }
-
-    Fungsi ini mengubah key tersebut agar bisa
-    dibaca oleh Python.
+    Tidak menggunakan ast.literal_eval.
+    Tidak mengubah URL.
     """
 
-    # Hapus komentar // ...
-    raw = re.sub(
-        r"//.*?$",
-        "",
-        raw,
-        flags=re.MULTILINE
+    objects = []
+
+    depth = 0
+    object_start = None
+
+    quote = None
+    escaped = False
+
+    for i, ch in enumerate(array_text):
+
+        if quote:
+
+            if escaped:
+                escaped = False
+                continue
+
+            if ch == "\\":
+                escaped = True
+                continue
+
+            if ch == quote:
+                quote = None
+
+            continue
+
+        if ch in ("'", '"'):
+            quote = ch
+            continue
+
+        if ch == "{":
+
+            if depth == 0:
+                object_start = i
+
+            depth += 1
+
+        elif ch == "}":
+
+            depth -= 1
+
+            if depth == 0 and object_start is not None:
+
+                obj_text = array_text[
+                    object_start:i + 1
+                ]
+
+                objects.append(
+                    obj_text
+                )
+
+                object_start = None
+
+    return objects
+
+
+def js_unescape(value):
+    """
+    Mengubah escape JavaScript sederhana.
+    """
+
+    value = value.replace(
+        r"\/",
+        "/"
     )
 
-    # Ubah key JavaScript:
-    #
-    # name:
-    #
-    # menjadi:
-    #
-    # "name":
-    raw = re.sub(
-        r'([{\[,])\s*([A-Za-z_$][A-Za-z0-9_$]*)\s*:',
-        r'\1 "\2":',
-        raw
+    value = value.replace(
+        r"\"",
+        '"'
     )
 
-    # Python ast bisa membaca trailing comma,
-    # string JSON, object, dan array.
-    return ast.literal_eval(raw)
+    value = value.replace(
+        r"\'",
+        "'"
+    )
+
+    value = value.replace(
+        r"\n",
+        "\n"
+    )
+
+    value = value.replace(
+        r"\r",
+        "\r"
+    )
+
+    return value
+
+
+def parse_object(obj_text):
+
+    result = {}
+
+    pattern = re.compile(
+        r"""
+        (?:
+            ["'](?P<quoted_key>[^"']+)["']
+            |
+            (?P<plain_key>[A-Za-z_$][A-Za-z0-9_$]*)
+        )
+        \s*:\s*
+        (?:
+            "(?P<double>(?:\\.|[^"\\])*)"
+            |
+            '(?P<single>(?:\\.|[^'\\])*)'
+        )
+        """,
+        re.VERBOSE | re.DOTALL
+    )
+
+    for match in pattern.finditer(obj_text):
+
+        key = (
+            match.group("quoted_key")
+            or match.group("plain_key")
+        )
+
+        value = (
+            match.group("double")
+            if match.group("double") is not None
+            else match.group("single")
+        )
+
+        result[key] = js_unescape(value)
+
+    return result
 
 
 def load_playlist():
-    """
-    Membaca music-list.js dengan format:
-
-    window.LOCAL_MUSIC = [
-        {...}
-    ];
-    """
 
     if not PLAYLIST.exists():
-        log("music-list.js belum ada. Membuat playlist kosong.")
+
+        log(
+            "music-list.js tidak ditemukan."
+        )
+
         return []
 
     text = PLAYLIST.read_text(
         encoding="utf-8"
     )
 
-    raw_array = extract_playlist_array(text)
+    start, end = find_playlist_array(text)
 
-    try:
-        songs = convert_js_array_to_python(raw_array)
-    except Exception as error:
-        log("Gagal membaca music-list.js.")
-        log(f"Detail: {error}")
-        raise
+    array_text = text[
+        start:end + 1
+    ]
 
-    if not isinstance(songs, list):
-        raise ValueError(
-            "LOCAL_MUSIC harus berupa array/list."
-        )
+    object_texts = parse_js_strings(
+        array_text
+    )
+
+    songs = []
+
+    for obj in object_texts:
+
+        try:
+            song = parse_object(obj)
+
+            if song:
+                songs.append(song)
+
+        except Exception as error:
+
+            log(
+                f"Gagal membaca object: {error}"
+            )
+
+    log(
+        f"Playlist terbaca: {len(songs)} lagu"
+    )
 
     return songs
 
 
-# ============================================================
-# WRITE music-list.js
-# ============================================================
+# =========================================================
+# WRITE PLAYLIST
+# =========================================================
 
-def save_playlist(songs):
-    """
-    Menyimpan playlist kembali dalam format
-    JavaScript yang sesuai dengan website.
-    """
+def js_quote(value):
 
-    playlist_json = json.dumps(
-        songs,
-        ensure_ascii=False,
-        indent=2
+    return json.dumps(
+        str(value),
+        ensure_ascii=False
     )
 
-    content = """// Musik XI TKJ 1.
-// Playlist ini diperbarui otomatis oleh Music Bot.
-// Jangan hapus window.LOCAL_MUSIC.
 
-window.LOCAL_MUSIC = %s;
-""" % playlist_json
+def song_to_js(song):
+
+    lines = [
+        "  {"
+    ]
+
+    preferred_order = [
+        "name",
+        "artist",
+        "src",
+        "cover",
+        "type",
+        "youtubeId",
+        "requestedBy",
+        "requestTime"
+    ]
+
+    keys = []
+
+    for key in preferred_order:
+
+        if key in song:
+            keys.append(key)
+
+    for key in song:
+
+        if key not in keys:
+            keys.append(key)
+
+    for index, key in enumerate(keys):
+
+        comma = "," if index < len(keys) - 1 else ""
+
+        lines.append(
+            f'    {js_quote(key)}: {js_quote(song[key])}{comma}'
+        )
+
+    lines.append("  }")
+
+    return "\n".join(lines)
+
+
+def save_playlist(songs):
+
+    blocks = []
+
+    for song in songs:
+
+        blocks.append(
+            song_to_js(song)
+        )
+
+    content = (
+        "// Musik XI TKJ 1.\n"
+        "// Playlist diperbarui otomatis oleh Music Bot.\n"
+        "window.LOCAL_MUSIC = [\n"
+        + ",\n".join(blocks)
+        + "\n];\n"
+    )
 
     PLAYLIST.write_text(
         content,
         encoding="utf-8"
     )
 
+    log(
+        "music-list.js berhasil diperbarui."
+    )
 
-# ============================================================
+
+# =========================================================
 # OCR
-# ============================================================
+# =========================================================
 
-def clean_text(value):
+def clean(value):
+
     if not value:
         return ""
 
-    value = value.replace("\r", "\n")
+    value = value.replace(
+        "\r",
+        ""
+    )
 
-    # Rapikan spasi
     value = re.sub(
         r"[ \t]+",
         " ",
@@ -271,132 +407,108 @@ def clean_text(value):
     return value.strip()
 
 
-def find_field(text, field_names):
-    """
-    Mencari format seperti:
+def find_field(text, names):
 
-    Nama Siswa : Budi
-    Judul Lagu: Iqro
-    Nama Artis: Raim Laode
-    Waktu: 12:30
-    """
+    for line in text.splitlines():
 
-    lines = text.splitlines()
-
-    for line in lines:
-
-        line = clean_text(line)
+        line = clean(line)
 
         if not line:
             continue
 
-        for field in field_names:
+        for name in names:
 
-            pattern = (
-                r"^\s*"
-                + re.escape(field)
-                + r"\s*[:\-]\s*(.+?)\s*$"
-            )
-
-            match = re.search(
-                pattern,
+            match = re.match(
+                rf"^{re.escape(name)}\s*[:\-]\s*(.+)$",
                 line,
                 flags=re.IGNORECASE
             )
 
             if match:
-                return clean_text(
+
+                return clean(
                     match.group(1)
                 )
 
     return ""
 
 
-def parse_request_text(text):
-    """
-    Mengambil data request dari hasil OCR.
-    """
-
-    student = find_field(
-        text,
-        [
-            "Nama Siswa",
-            "Nama Siswa.",
-            "Nama"
-        ]
-    )
-
-    title = find_field(
-        text,
-        [
-            "Judul Lagu",
-            "Judul Lagu.",
-            "Judul"
-        ]
-    )
-
-    artist = find_field(
-        text,
-        [
-            "Nama Artis",
-            "Nama Artis.",
-            "Artis",
-            "Artist"
-        ]
-    )
-
-    request_time = find_field(
-        text,
-        [
-            "Waktu",
-            "Jam",
-            "Time"
-        ]
-    )
+def parse_ocr(text):
 
     return {
-        "student": student,
-        "title": title,
-        "artist": artist,
-        "time": request_time
+        "student": find_field(
+            text,
+            [
+                "Nama Siswa",
+                "Nama"
+            ]
+        ),
+
+        "title": find_field(
+            text,
+            [
+                "Judul Lagu",
+                "Judul"
+            ]
+        ),
+
+        "artist": find_field(
+            text,
+            [
+                "Nama Artis",
+                "Artis",
+                "Artist"
+            ]
+        ),
+
+        "time": find_field(
+            text,
+            [
+                "Waktu",
+                "Jam",
+                "Time"
+            ]
+        )
     }
 
 
-def run_ocr(image_path):
-    log(f"OCR: {image_path.name}")
+def run_ocr(path):
 
-    image = Image.open(image_path)
+    image = Image.open(path)
 
-    # Pastikan RGB
     if image.mode != "RGB":
         image = image.convert("RGB")
 
-    # OCR
+    # OCR dengan beberapa mode agar PNG request lebih mudah dibaca
     text = pytesseract.image_to_string(
         image,
-        config="--psm 6",
-        lang="eng"
+        lang="eng",
+        config="--psm 6"
     )
 
     return text
 
 
-# ============================================================
-# YOUTUBE API
-# ============================================================
+# =========================================================
+# YOUTUBE
+# =========================================================
 
 def search_youtube(title, artist):
+
     if not YOUTUBE_API_KEY:
+
         raise RuntimeError(
             "YOUTUBE_API_KEY belum tersedia."
         )
 
-    if artist:
-        query = f"{title} {artist}"
-    else:
-        query = title
+    query = title
 
-    log(f"Cari YouTube: {query}")
+    if artist:
+        query += " " + artist
+
+    log(
+        f"Mencari YouTube: {query}"
+    )
 
     params = urlencode({
         "part": "snippet",
@@ -414,7 +526,7 @@ def search_youtube(title, artist):
     request = Request(
         url,
         headers={
-            "User-Agent": "XI-TKJ1-MusicBot/1.0"
+            "User-Agent": "XI-TKJ1-MusicBot"
         }
     )
 
@@ -424,38 +536,34 @@ def search_youtube(title, artist):
     ) as response:
 
         data = json.loads(
-            response.read().decode("utf-8")
+            response.read().decode(
+                "utf-8"
+            )
         )
 
-    items = data.get("items", [])
+    items = data.get(
+        "items",
+        []
+    )
 
     if not items:
-        log("YouTube: tidak ditemukan.")
         return None
 
     item = items[0]
 
-    video_id = (
-        item.get("id", {})
-        .get("videoId")
-    )
-
-    snippet = item.get(
-        "snippet",
+    video_id = item.get(
+        "id",
         {}
+    ).get(
+        "videoId"
     )
 
     if not video_id:
         return None
 
-    channel = snippet.get(
-        "channelTitle",
-        artist or "Unknown"
-    )
-
-    youtube_title = snippet.get(
-        "title",
-        title
+    snippet = item.get(
+        "snippet",
+        {}
     )
 
     thumbnails = snippet.get(
@@ -463,102 +571,115 @@ def search_youtube(title, artist):
         {}
     )
 
-    thumbnail = (
-        thumbnails.get("high", {}).get("url")
-        or thumbnails.get("medium", {}).get("url")
-        or thumbnails.get("default", {}).get("url")
-        or f"https://i.ytimg.com/vi/{video_id}/hqdefault.jpg"
+    cover = (
+        thumbnails.get(
+            "high",
+            {}
+        ).get("url")
+        or
+        thumbnails.get(
+            "medium",
+            {}
+        ).get("url")
+        or
+        f"https://i.ytimg.com/vi/{video_id}/hqdefault.jpg"
     )
 
     return {
         "videoId": video_id,
-        "title": youtube_title,
-        "channel": channel,
-        "thumbnail": thumbnail
-    }
-
-
-# ============================================================
-# CREATE SONG
-# ============================================================
-
-def make_song(request, youtube):
-    title = request["title"]
-    artist = request["artist"]
-
-    return {
-        "name": youtube["title"] or title,
-        "artist": youtube["channel"] or artist or "Unknown",
-        "src": (
-            "https://www.youtube.com/watch?v="
-            + youtube["videoId"]
+        "title": snippet.get(
+            "title",
+            title
         ),
-        "cover": youtube["thumbnail"],
-        "type": "youtube",
-        "youtubeId": youtube["videoId"],
-        "requestedBy": request["student"],
-        "requestTime": request["time"]
+        "channel": snippet.get(
+            "channelTitle",
+            artist or "Unknown"
+        ),
+        "cover": cover
     }
 
 
-# ============================================================
-# DUPLICATE CHECK
-# ============================================================
+# =========================================================
+# DUPLICATE
+# =========================================================
 
-def already_exists(songs, video_id):
+def duplicate(songs, video_id):
+
     for song in songs:
 
-        if not isinstance(song, dict):
-            continue
+        if song.get(
+            "youtubeId"
+        ) == video_id:
 
-        if song.get("youtubeId") == video_id:
             return True
 
         src = str(
-            song.get("src", "")
+            song.get(
+                "src",
+                ""
+            )
         )
 
         if video_id in src:
+
             return True
 
     return False
 
 
-# ============================================================
-# PROCESS ONE PNG
-# ============================================================
+# =========================================================
+# PROCESS PNG
+# =========================================================
 
-def process_png(image_path, songs, processed):
+def process_png(path, songs, processed):
+
     file_hash = hashlib.sha256(
-        image_path.read_bytes()
+        path.read_bytes()
     ).hexdigest()
 
     if file_hash in processed:
+
         log(
-            f"SKIP: {image_path.name} "
-            "(sudah diproses)"
+            f"SKIP: {path.name} sudah diproses."
         )
+
         return False
 
-    log("=" * 60)
-    log(f"REQUEST: {image_path.name}")
+    log(
+        f"Memproses: {path.name}"
+    )
 
-    # --------------------------------------------------------
+    # -------------------------
     # OCR
-    # --------------------------------------------------------
+    # -------------------------
 
     try:
+
         ocr_text = run_ocr(
-            image_path
+            path
         )
+
     except Exception as error:
-        log(f"OCR ERROR: {error}")
+
+        log(
+            f"OCR ERROR: {error}"
+        )
+
         return False
 
-    log("Hasil OCR:")
-    print(ocr_text)
+    print(
+        "\n----- HASIL OCR -----"
+    )
 
-    request = parse_request_text(
+    print(
+        ocr_text
+    )
+
+    print(
+        "---------------------\n"
+    )
+
+    request = parse_ocr(
         ocr_text
     )
 
@@ -578,70 +699,91 @@ def process_png(image_path, songs, processed):
         f"Waktu      : {request['time']}"
     )
 
-    # --------------------------------------------------------
-    # VALIDASI
-    # --------------------------------------------------------
-
     if not request["title"]:
+
         log(
-            "REQUEST DILEWATI: "
-            "Judul Lagu tidak terbaca."
+            "Judul lagu tidak terbaca. "
+            "PNG akan dicoba lagi pada run berikutnya."
         )
 
         return False
 
-    # --------------------------------------------------------
-    # YOUTUBE
-    # --------------------------------------------------------
+    # -------------------------
+    # YouTube
+    # -------------------------
 
     try:
-        youtube = search_youtube(
+
+        result = search_youtube(
             request["title"],
             request["artist"]
         )
 
     except Exception as error:
+
         log(
             f"YouTube API ERROR: {error}"
         )
 
         return False
 
-    if not youtube:
+    if not result:
+
         log(
-            "REQUEST DILEWATI: "
             "Video YouTube tidak ditemukan."
         )
 
         return False
 
-    # --------------------------------------------------------
-    # DUPLICATE
-    # --------------------------------------------------------
+    video_id = result[
+        "videoId"
+    ]
 
-    if already_exists(
+    if duplicate(
         songs,
-        youtube["videoId"]
+        video_id
     ):
+
         log(
             "Lagu sudah ada di playlist."
         )
 
-        processed.add(file_hash)
+        processed.add(
+            file_hash
+        )
 
         return False
 
-    # --------------------------------------------------------
-    # ADD SONG
-    # --------------------------------------------------------
+    # -------------------------
+    # ADD
+    # -------------------------
 
-    new_song = make_song(
-        request,
-        youtube
-    )
+    song = {
+        "name": result["title"],
+        "artist": result["channel"],
+        "src": (
+            "https://www.youtube.com/watch?v="
+            + video_id
+        ),
+        "cover": result["cover"],
+        "type": "youtube",
+        "youtubeId": video_id
+    }
+
+    if request["student"]:
+
+        song["requestedBy"] = (
+            request["student"]
+        )
+
+    if request["time"]:
+
+        song["requestTime"] = (
+            request["time"]
+        )
 
     songs.append(
-        new_song
+        song
     )
 
     processed.add(
@@ -649,64 +791,53 @@ def process_png(image_path, songs, processed):
     )
 
     log(
-        "BERHASIL MENAMBAHKAN:"
+        "BERHASIL:"
     )
 
     log(
-        f"{new_song['name']} "
-        f"- {new_song['artist']}"
+        f"{result['title']} - "
+        f"{result['channel']}"
     )
 
     return True
 
 
-# ============================================================
+# =========================================================
 # MAIN
-# ============================================================
+# =========================================================
 
 def main():
 
-    log("==========================================")
-    log(" XI TKJ 1 MUSIC BOT")
-    log(" Google Drive PNG → OCR → YouTube")
-    log("==========================================")
+    log(
+        "=========================================="
+    )
 
-    # --------------------------------------------------------
-    # Check API
-    # --------------------------------------------------------
+    log(
+        " XI TKJ 1 MUSIC BOT"
+    )
+
+    log(
+        " Google Drive PNG -> OCR -> YouTube"
+    )
+
+    log(
+        "=========================================="
+    )
 
     if not YOUTUBE_API_KEY:
+
         raise RuntimeError(
             "Secret YOUTUBE_API_KEY tidak ditemukan."
         )
-
-    # --------------------------------------------------------
-    # Prepare
-    # --------------------------------------------------------
-
-    ensure_state()
 
     processed = load_processed()
 
     songs = load_playlist()
 
-    log(
-        f"Playlist saat ini: {len(songs)} lagu"
-    )
-
-    # --------------------------------------------------------
-    # Request folder
-    # --------------------------------------------------------
-
     if not REQUEST_DIR.exists():
 
         log(
-            "Folder drive_music_requests "
-            "tidak ditemukan."
-        )
-
-        log(
-            "Tidak ada PNG request."
+            "Folder drive_music_requests tidak ada."
         )
 
         return
@@ -718,27 +849,23 @@ def main():
     if not png_files:
 
         log(
-            "Tidak ada file PNG request."
+            "Tidak ada PNG request."
         )
 
         return
 
     log(
-        f"Ditemukan {len(png_files)} PNG."
+        f"Ditemukan {len(png_files)} PNG request."
     )
 
     changed = False
 
-    # --------------------------------------------------------
-    # Process
-    # --------------------------------------------------------
-
-    for image_path in png_files:
+    for path in png_files:
 
         try:
 
             result = process_png(
-                image_path,
+                path,
                 songs,
                 processed
             )
@@ -749,22 +876,13 @@ def main():
         except Exception as error:
 
             log(
-                f"ERROR memproses "
-                f"{image_path.name}: {error}"
+                f"ERROR {path.name}: {error}"
             )
-
-    # --------------------------------------------------------
-    # Save
-    # --------------------------------------------------------
 
     if changed:
 
         save_playlist(
             songs
-        )
-
-        log(
-            "music-list.js berhasil diperbarui."
         )
 
     else:
@@ -778,10 +896,12 @@ def main():
     )
 
     log(
-        f"Playlist akhir: {len(songs)} lagu"
+        f"Playlist akhir: {len(songs)} lagu."
     )
 
-    log("Selesai.")
+    log(
+        "Bot selesai."
+    )
 
 
 if __name__ == "__main__":

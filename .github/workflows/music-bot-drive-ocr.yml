@@ -1,0 +1,64 @@
+name: Music Bot - Google Drive PNG Request
+
+on:
+  schedule:
+    - cron: "*/5 * * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  music-request-bot:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v5
+
+      - name: Setup Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.x"
+
+      - name: Install OCR tools
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y tesseract-ocr tesseract-ocr-eng
+          python -m pip install --upgrade pip
+          pip install gdown pillow pytesseract
+
+      - name: Download PNG requests from Google Drive
+        env:
+          DRIVE_FOLDER_URL: https://drive.google.com/drive/folders/1oO4PNM4-kQpB4UVk-kWSz7mLC0XaTfko
+        run: |
+          rm -rf drive_music_requests
+          mkdir -p drive_music_requests
+
+          gdown --folder "$DRIVE_FOLDER_URL" \
+            --output drive_music_requests \
+            --remaining-ok \
+            --quiet || true
+
+          find drive_music_requests -type f -iname "*.png" -print || true
+
+      - name: Read PNG with OCR and update music list
+        env:
+          YOUTUBE_API_KEY: ${{ secrets.YOUTUBE_API_KEY }}
+        run: |
+          python tools/music_drive_bot.py
+
+      - name: Commit automatic playlist changes
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+          git add music-list.js .musicbot/processed.json
+
+          if git diff --cached --quiet; then
+            echo "Tidak ada request lagu baru."
+            exit 0
+          fi
+
+          git commit -m "Auto add requested music from Drive"
+          git push

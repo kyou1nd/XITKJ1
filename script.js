@@ -777,76 +777,60 @@ document.addEventListener('click',e=>{
   }
 },true);
 
-/* ===== MUSIC PLAYER — LOCAL MP3 + YOUTUBE ===== */
+/* ===== MUSIC PLAYER — PREMIUM CUSTOM CONTROLS ===== */
 (()=>{
  const btn=document.getElementById('musicButton'),panel=document.getElementById('musicPanel'),close=document.getElementById('musicClose'),list=document.getElementById('musicList'),audio=document.getElementById('musicAudio'),ytBox=document.getElementById('musicYoutubePlayer');
- const songs=(Array.isArray(window.LOCAL_MUSIC)?window.LOCAL_MUSIC:[]).map((s,i)=>({id:i,name:s.name||'Lagu '+(i+1),artist:s.artist||'',src:s.src||'',cover:s.cover||'',type:s.type||'audio/mpeg',youtubeId:s.youtubeId||extractYoutubeId(s.src||'')}));
- let currentId=null;
- function extractYoutubeId(url){
-  const m=String(url||'').match(/(?:youtube\.com\/(?:watch\?v=|embed\/|shorts\/)|youtu\.be\/)([A-Za-z0-9_-]{6,})/i);
-  return m?m[1]:'';
- }
+ const nowTitle=document.getElementById('musicNowTitle'),nowArtist=document.getElementById('musicNowArtist'),nowArt=document.querySelector('#musicNowPlaying .music-now-art'),nowStatus=document.getElementById('musicNowStatus');
+ const lyricsBox=document.getElementById('musicLyricsSticky'),lyricsTitle=document.getElementById('musicLyricsStickyTitle'),lyricsBody=document.getElementById('musicLyricsStickyBody');
+ const seek=document.getElementById('musicSeek'),currentTimeEl=document.getElementById('musicCurrentTime'),durationEl=document.getElementById('musicDuration'),mainPlay=document.getElementById('musicMainPlay'),prevBtn=document.getElementById('musicPrev'),nextBtn=document.getElementById('musicNext'),volume=document.getElementById('musicVolume'),sourceLabel=document.getElementById('musicSourceLabel');
+ const songs=(Array.isArray(window.LOCAL_MUSIC)?window.LOCAL_MUSIC:[]).map((s,i)=>({id:i,name:s.name||'Lagu '+(i+1),artist:s.artist||'',src:s.src||'',cover:s.cover||'',type:s.type||'audio/mpeg',youtubeId:s.youtubeId||extractYoutubeId(s.src||''),lyrics:s.lyrics||''}));
+ let currentId=null,ytPlayer=null,ytReadyPromise=null,raf=0;
+ function extractYoutubeId(url){const m=String(url||'').match(/(?:youtube\.com\/(?:watch\?v=|embed\/|shorts\/)|youtu\.be\/)([A-Za-z0-9_-]{6,})/i);return m?m[1]:'';}
  function isYouTube(s){return s?.type==='youtube'||!!s?.youtubeId}
- function hideYouTube(){if(!ytBox)return;ytBox.innerHTML='';ytBox.hidden=true;}
- function stopCurrentMedia(){
-  try{audio.pause();}catch{}
-  audio.removeAttribute('src');
-  audio.load();
-  hideYouTube();
+ function fmt(t){if(!Number.isFinite(t)||t<0)t=0;const sec=Math.floor(t%60),min=Math.floor(t/60);return `${min}:${String(sec).padStart(2,'0')}`}
+ function setProgress(cur,dur){if(currentTimeEl)currentTimeEl.textContent=fmt(cur);if(durationEl)durationEl.textContent=dur?fmt(dur):'0:00';if(seek&&dur){seek.max=1000;seek.value=Math.round(Math.max(0,Math.min(1,cur/dur))*1000)}}
+ function setPlaying(on){if(mainPlay)mainPlay.textContent=on?'❚❚':'▶';if(nowStatus)nowStatus.textContent=on?'PLAYING':(currentId!==null?'PAUSED':'READY');document.getElementById('musicNowPlaying')?.classList.toggle('is-playing',!!on)}
+ function stopCurrentMedia(){cancelAnimationFrame(raf);try{audio.pause();}catch{}audio.removeAttribute('src');audio.load();if(ytPlayer){try{ytPlayer.stopVideo();ytPlayer.destroy();}catch{}ytPlayer=null}if(ytBox){ytBox.innerHTML='';ytBox.hidden=true}}
+ function closeMusic(){if(panel){panel.classList.remove('show');panel.style.display='none';panel.setAttribute('aria-hidden','true')}}
+ window.__openMusicPlayer=()=>{if(!panel)return false;render();panel.style.display='block';panel.classList.add('show');panel.setAttribute('aria-hidden','false');return true};
+ function loadYTApi(){if(window.YT?.Player)return Promise.resolve();if(ytReadyPromise)return ytReadyPromise;ytReadyPromise=new Promise((resolve,reject)=>{const prev=window.onYouTubeIframeAPIReady;window.onYouTubeIframeAPIReady=()=>{try{prev?.()}catch{}resolve()};const sc=document.createElement('script');sc.src='https://www.youtube.com/iframe_api';sc.async=true;sc.onerror=reject;document.head.appendChild(sc)});return ytReadyPromise}
+ function updateNowPlaying(s,playing=true){
+   const np=document.getElementById('musicNowPlaying');
+   if(!s){if(nowTitle)nowTitle.textContent='Belum ada lagu';if(nowArtist)nowArtist.textContent='Pilih lagu dari playlist';if(nowStatus)nowStatus.textContent='READY';if(np)np.classList.remove('active','is-playing');if(nowArt)nowArt.innerHTML='<span>♫</span>';if(lyricsBox){lyricsBox.hidden=true;lyricsBox.removeAttribute('data-visible')}if(sourceLabel)sourceLabel.textContent='LOCAL AUDIO';setProgress(0,0);return}
+   if(nowTitle)nowTitle.textContent=s.name||'Lagu';if(nowArtist)nowArtist.textContent=s.artist||'Musik lokal';if(nowStatus)nowStatus.textContent=playing?'PLAYING':'PAUSED';if(np)np.classList.add('active');if(np)np.classList.toggle('is-playing',playing);
+   if(nowArt)nowArt.innerHTML=s.cover?`<img src="${escapeHTML(s.cover)}" alt="" onerror="this.onerror=null;this.style.display='none'"><span>♫</span>`:'<span>♫</span>';
+   if(sourceLabel)sourceLabel.textContent=isYouTube(s)?'YOUTUBE AUDIO':'LOCAL AUDIO';
+   if(lyricsBox){lyricsBox.hidden=false;lyricsBox.setAttribute('data-visible','true');if(lyricsTitle)lyricsTitle.textContent=s.name||'Lirik';const text=String(s.lyrics||'').trim();if(lyricsBody)lyricsBody.innerHTML=text?escapeHTML(text).replace(/\n/g,'<br>'):'<div class="lyrics-empty">Lirik belum ditambahkan untuk lagu ini.</div>'}
  }
- window.__openMusicPlayer=()=>{if(!panel)return false;render();panel.style.display='block';panel.classList.add('show');panel.setAttribute('aria-hidden','false');return true;};
- function closeMusic(){stopCurrentMedia();currentId=null;setNowPlaying(null);updateRows();if(panel){panel.classList.remove('show');panel.style.display='none';panel.setAttribute('aria-hidden','true')}}
- function updateRows(){
-  list?.querySelectorAll('.music-row').forEach(row=>{
-   const id=Number(row.dataset.song),icon=row.querySelector('.music-play');
-   const active=id===currentId;
-   row.classList.toggle('playing',active);
-   if(icon)icon.textContent=active?'❚❚':'▶';
-  });
- }
- function setNowPlaying(s){
-  const box=document.getElementById('musicNowPlaying'),title=document.getElementById('musicNowTitle'),artist=document.getElementById('musicNowArtist'),art=box?.querySelector('.music-now-art');
-  if(!s){if(title)title.textContent='Belum ada lagu';if(artist)artist.textContent='Pilih lagu untuk mulai mendengarkan';if(art)art.innerHTML='<span>♫</span>';return;}
-  if(title)title.textContent=s.name||'Lagu';
-  if(artist)artist.textContent=s.artist||'Musik lokal';
-  if(art)art.innerHTML=s.cover?`<img src="${escapeHTML(s.cover)}" alt="" onerror="this.onerror=null;this.style.display='none'"><span>♫</span>`:'<span>♫</span>';
- }
+ function updateRows(){list?.querySelectorAll('.music-row').forEach(row=>{const active=Number(row.dataset.song)===currentId;row.classList.toggle('playing',active);const icon=row.querySelector('.music-play');if(icon)icon.textContent=active&&(audio.paused===false||ytPlayer?.getPlayerState?.()===1)?'❚❚':'▶'})}
  function render(){
-  if(!list)return;
-  list.innerHTML=songs.length?songs.map((s,i)=>`<div class="music-row" data-song="${i}"><button class="music-row-main" type="button" aria-label="Putar ${escapeHTML(s.name)}"><span class="music-cover-wrap"><img class="music-cover" src="${escapeHTML(s.cover)}" alt="Cover ${escapeHTML(s.name)}" onerror="this.onerror=null;this.style.display='none'"><span class="music-cover-fallback">♫</span></span><span class="music-row-info"><b class="music-title" title="${escapeHTML(s.name)}">${escapeHTML(s.name)}</b><small class="music-artist" title="${escapeHTML(s.artist||'Musik lokal')}">${escapeHTML(s.artist||'Musik lokal')}${isYouTube(s)?' • YouTube':''}</small></span><span class="music-play">▶</span></button></div>`).join(''):'<div class="music-empty">Belum ada lagu.</div>';
-  list.querySelectorAll('.music-row-main').forEach(b=>b.addEventListener('click',()=>{
-   const row=b.closest('.music-row'),s=songs[Number(row?.dataset.song)];if(!s||!s.src&&!s.youtubeId)return;
-   const id=s.id;
-   if(currentId===id){
-    if(isYouTube(s)){
-     const frame=ytBox?.querySelector('iframe');
-     if(frame){
-      try{frame.contentWindow.postMessage(JSON.stringify({event:'command',func:'pauseVideo',args:[]}), '*');}catch{}
-     }
-    }else if(audio.paused)audio.play().catch(()=>{});else audio.pause();
-    return;
-   }
-   currentId=id;setNowPlaying(s);stopCurrentMedia();
-   if(isYouTube(s)){
-    const vid=s.youtubeId||extractYoutubeId(s.src);
-    if(!vid){toast('Link YouTube tidak valid.');return;}
-    ytBox.hidden=false;
-    ytBox.innerHTML=`<div class="music-youtube-frame"><iframe src="https://www.youtube.com/embed/${encodeURIComponent(vid)}?autoplay=1&rel=0&playsinline=1&modestbranding=1" title="${escapeHTML(s.name)}" allow="autoplay; encrypted-media; picture-in-picture" allowfullscreen loading="eager"></iframe><div class="music-youtube-label"><span>YOUTUBE</span><b>${escapeHTML(s.name)}</b></div></div>`;
-   }else{
-    audio.src=s.src;audio.dataset.songId=String(id);audio.load();audio.play().catch(()=>toast('Browser memblokir autoplay. Tekan tombol play pada player.'));
-   }
-   updateRows();
-  }));
-  if(currentId!==null)setNowPlaying(songs[currentId]);
-  updateRows();
+  if(!list)return;const badge=document.getElementById('musicCountBadge');if(badge)badge.textContent=`${songs.length} TRACK${songs.length===1?'':'S'}`;
+  list.innerHTML=songs.length?songs.map((s,i)=>`<div class="music-row" data-song="${i}"><button class="music-row-main" type="button" aria-label="Putar ${escapeHTML(s.name)}"><span class="music-cover-wrap"><img class="music-cover" src="${escapeHTML(s.cover)}" alt="Cover ${escapeHTML(s.name)}" onerror="this.onerror=null;this.style.display='none'"><span class="music-cover-fallback">♫</span></span><span class="music-row-info"><b class="music-title" title="${escapeHTML(s.name)}">${escapeHTML(s.name)}</b><small class="music-artist" title="${escapeHTML(s.artist||'Musik lokal')}">${escapeHTML(s.artist||'Musik lokal')}</small></span><span class="music-play">▶</span></button></div>`).join(''):'<div class="music-empty">Belum ada lagu.</div>';
+  list.querySelectorAll('.music-row-main').forEach(b=>b.addEventListener('click',()=>playSong(Number(b.closest('.music-row')?.dataset.song))));
+  if(currentId!==null&&songs[currentId])updateNowPlaying(songs[currentId],true);updateRows();
  }
- btn?.addEventListener('click',e=>{e.preventDefault();e.stopPropagation();window.__openMusicPlayer?.()});
- close?.addEventListener('click',closeMusic);
- document.addEventListener('click',e=>{if(panel?.classList.contains('show')&&!panel.contains(e.target)&&e.target!==btn)closeMusic()});
- audio?.addEventListener('play',updateRows);audio?.addEventListener('pause',updateRows);
- audio?.addEventListener('ended',()=>{currentId=null;setNowPlaying(null);updateRows()});
- audio?.addEventListener('error',()=>{if(currentId!==null&&!isYouTube(songs[currentId]))toast('File MP3 tidak ditemukan.');});
- render();
+ async function playSong(index){
+   const s=songs[index];if(!s||(!s.src&&!s.youtubeId))return;
+   if(currentId===index){togglePlay();return}
+   stopCurrentMedia();currentId=index;setProgress(0,0);updateNowPlaying(s,true);
+   if(isYouTube(s)){
+     const vid=s.youtubeId||extractYoutubeId(s.src);if(!vid){toast('Link YouTube tidak valid.');return}
+     if(ytBox){ytBox.hidden=false;ytBox.innerHTML='';}
+     try{await loadYTApi();ytPlayer=new YT.Player(ytBox,{height:'1',width:'1',videoId:vid,playerVars:{autoplay:1,controls:0,playsinline:1,rel:0,modestbranding:1},events:{onReady:e=>{e.target.setVolume(Number(volume?.value||1)*100);e.target.playVideo();setPlaying(true);startYTProgress()},onStateChange:e=>{if(e.data===YT.PlayerState.PLAYING){setPlaying(true);startYTProgress()}else if(e.data===YT.PlayerState.PAUSED){setPlaying(false)}else if(e.data===YT.PlayerState.ENDED){setPlaying(false);playNext()}}}})}catch{toast('YouTube tidak dapat diputar.');setPlaying(false)}
+   }else{audio.src=s.src;audio.volume=Number(volume?.value||1);audio.load();audio.play().then(()=>setPlaying(true)).catch(()=>{setPlaying(false);toast('File MP3 tidak ditemukan.')})}
+   updateRows();
+ }
+ function togglePlay(){const s=songs[currentId];if(!s)return;if(isYouTube(s)){if(!ytPlayer)return;const st=ytPlayer.getPlayerState();if(st===1)ytPlayer.pauseVideo();else ytPlayer.playVideo()}else{if(audio.paused)audio.play().catch(()=>{});else audio.pause()}}
+ function playNext(){if(!songs.length)return;playSong((currentId===null?0:(currentId+1)%songs.length))}
+ function playPrev(){if(!songs.length)return;playSong((currentId===null?0:(currentId-1+songs.length)%songs.length))}
+ function startYTProgress(){cancelAnimationFrame(raf);const tick=()=>{if(ytPlayer&&currentId!==null){let c=0,d=0;try{c=ytPlayer.getCurrentTime()||0;d=ytPlayer.getDuration()||0}catch{}setProgress(c,d);raf=requestAnimationFrame(tick)}};raf=requestAnimationFrame(tick)}
+ btn?.addEventListener('click',e=>{e.preventDefault();e.stopPropagation();window.__openMusicPlayer?.()});close?.addEventListener('click',closeMusic);mainPlay?.addEventListener('click',togglePlay);prevBtn?.addEventListener('click',playPrev);nextBtn?.addEventListener('click',playNext);
+ seek?.addEventListener('input',()=>{const s=songs[currentId],d=Number(durationEl?.dataset?.seconds||0);if(!s)return;if(isYouTube(s)&&ytPlayer){const dur=ytPlayer.getDuration()||d;ytPlayer.seekTo((Number(seek.value)/1000)*dur,true)}else if(audio.duration){audio.currentTime=(Number(seek.value)/1000)*audio.duration}});
+ volume?.addEventListener('input',()=>{const v=Number(volume.value);audio.volume=v;if(ytPlayer)ytPlayer.setVolume(v*100)});
+ audio?.addEventListener('loadedmetadata',()=>{durationEl.dataset.seconds=String(audio.duration||0);setProgress(audio.currentTime||0,audio.duration||0)});
+ audio?.addEventListener('timeupdate',()=>{if(currentId!==null){durationEl.dataset.seconds=String(audio.duration||0);setProgress(audio.currentTime||0,audio.duration||0)}});
+ audio?.addEventListener('play',()=>{setPlaying(true);updateRows()});audio?.addEventListener('pause',()=>{setPlaying(false);updateRows()});audio?.addEventListener('ended',playNext);audio?.addEventListener('error',()=>{if(currentId!==null&&!isYouTube(songs[currentId]))toast('File MP3 tidak ditemukan.')});
+ document.addEventListener('click',e=>{if(panel?.classList.contains('show')&&!panel.contains(e.target)&&e.target!==btn)closeMusic()});render();
 })();
 
 /* ===== MUSIC PLAYER: COMFORTABLE DRAGGING ON PHONE + DESKTOP ===== */

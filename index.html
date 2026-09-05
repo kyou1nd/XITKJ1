@@ -693,12 +693,48 @@
 </div>
 
 <div class="music-panel" id="musicPanel" aria-hidden="true">
-  <div class="music-panel-head" data-music-drag-handle><div><span class="eyebrow">XI TKJ 1 MUSIC</span><h3>Music Player</h3><p>Semua pengunjung bisa mendengarkan lagu. Login hanya diperlukan untuk menambah atau menghapus lagu.</p></div><button class="music-close" id="musicClose" aria-label="Tutup">×</button></div>
-  <div class="music-drop"><div class="music-drop-icon">♫</div><div><b>Music lokal</b><small>Lagu ditambahkan manual ke folder <code>assets/music/</code>. Semua pengunjung bisa langsung memutarnya.</small></div></div>
+  <div class="music-panel-glow"></div>
+  <div class="music-panel-head" data-music-drag-handle>
+    <div class="music-brand-line"><span class="music-brand-icon">♪</span><span class="eyebrow">MUSIC XI TKJ1</span><span class="music-live-dot">MUSIC</span></div>
+    <div class="music-head-row"><div><h3>Music XI TKJ1</h3><p>Playlist kelas bersama — putar lagu tanpa menghentikan musik saat panel ditutup.</p></div><button class="music-close" id="musicClose" aria-label="Tutup">×</button></div>
+  </div>
+  <div class="music-hero">
+    <div class="music-hero-art"><div class="music-orbit o1"></div><div class="music-orbit o2"></div><div class="music-hero-disc">♫</div><div class="music-eq"><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div></div>
+    <div class="music-hero-copy"><span>CLASS PLAYLIST</span><b>Music XI TKJ1</b><small>Shared music • premium listening</small></div>
+  </div>
+  <div class="music-drop"><div class="music-drop-icon">♫</div><div><b>Playlist kelas</b><small>Lagu baru dari Music Bot akan muncul otomatis di sini.</small></div><span class="music-count-badge" id="musicCountBadge">0 TRACKS</span></div>
+  <div class="music-section-title"><span>QUEUE</span><small>Tap a track to play</small></div>
   <div class="music-list" id="musicList"><div class="music-empty">Daftar lagu masih kosong.</div></div>
-  <div class="music-now-playing" id="musicNowPlaying"><div class="music-now-art"><span>♫</span></div><div class="music-now-copy"><small>NOW PLAYING</small><b id="musicNowTitle">Belum ada lagu</b><span id="musicNowArtist">Pilih lagu untuk mulai mendengarkan</span></div></div>
-  <div class="music-youtube-player" id="musicYoutubePlayer" hidden aria-label="YouTube music player"></div>
-  <audio id="musicAudio" controls preload="metadata"></audio>
+  <div class="music-now-playing" id="musicNowPlaying" aria-live="polite">
+    <div class="music-now-art"><span>♫</span></div>
+    <div class="music-now-copy"><small>NOW PLAYING</small><b id="musicNowTitle">Belum ada lagu</b><span id="musicNowArtist">Pilih lagu dari playlist</span></div>
+    <div class="music-now-status"><i></i><span id="musicNowStatus">READY</span></div>
+  </div>
+  <div class="music-lyrics-sticky" id="musicLyricsSticky" hidden>
+    <div class="music-lyrics-sticky-head"><span>LYRICS</span><b id="musicLyricsStickyTitle">Belum ada lagu</b></div>
+    <div class="music-lyrics-sticky-body" id="musicLyricsStickyBody">Pilih lagu untuk menampilkan lirik.</div>
+  </div>
+  <div class="music-youtube-player" id="musicYoutubePlayer" hidden aria-hidden="true"></div>
+  <div class="music-controls" id="musicControls" aria-label="Kontrol pemutar musik">
+    <div class="music-progress-row">
+      <span id="musicCurrentTime">0:00</span>
+      <input id="musicSeek" type="range" min="0" max="1000" value="0" step="1" aria-label="Posisi lagu">
+      <span id="musicDuration">0:00</span>
+    </div>
+    <div class="music-control-row">
+      <button type="button" class="music-control-btn secondary" id="musicPrev" aria-label="Lagu sebelumnya">⏮</button>
+      <button type="button" class="music-control-btn primary" id="musicMainPlay" aria-label="Putar atau jeda">▶</button>
+      <button type="button" class="music-control-btn secondary" id="musicNext" aria-label="Lagu berikutnya">⏭</button>
+      <div class="music-volume"><span>⌕</span><input id="musicVolume" type="range" min="0" max="1" value="1" step="0.01" aria-label="Volume"></div>
+    </div>
+    <div class="music-control-meta"><span><i></i> HIGH QUALITY</span><span id="musicSourceLabel">LOCAL AUDIO</span></div>
+  </div>
+  <audio id="musicAudio" preload="metadata"></audio>
+  <div class="music-footer"><span>♪ MUSIC XI TKJ1</span><span>LOCAL + YOUTUBE</span></div>
+</div>
+
+    <div class="music-lyrics-body" id="musicLyricsBody">Pilih lagu untuk melihat lirik.</div>
+  </div>
 </div>
 
 <div class="tool-modal" id="toolModal"><div class="tool-modal-box"><button class="modal-close" id="toolClose">×</button><div id="toolModalContent"></div></div></div>
@@ -769,7 +805,7 @@
   };
   document.addEventListener('DOMContentLoaded',function(){
     const fav=document.getElementById('openFavoritePicker'); if(fav)fav.onclick=function(e){e.preventDefault();e.stopPropagation();window.__forceOpenFavoritePicker()};
-    const close=document.getElementById('musicClose'); if(close)close.onclick=function(e){e.preventDefault();const p=document.getElementById('musicPanel');p?.classList.remove('show');if(p)p.style.display='none'};
+    const close=document.getElementById('musicClose'); if(close)close.onclick=function(e){e.preventDefault();e.stopPropagation();const p=document.getElementById('musicPanel');p?.classList.remove('show');if(p){p.style.display='none';p.setAttribute('aria-hidden','true')}};
   });
 })();
 </script>

@@ -18,13 +18,15 @@ jobs:
     steps:
       - name: Ambil file repository
         uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
 
       - name: Setup Python
         uses: actions/setup-python@v6
         with:
           python-version: "3.x"
 
-      - name: Cari lagu dan simpan ke playlist
+      - name: Cari lagu YouTube
         env:
           YOUTUBE_API_KEY: ${{ secrets.YOUTUBE_API_KEY }}
           QUERY: ${{ inputs.query }}
@@ -39,9 +41,6 @@ jobs:
           api_key = os.environ["YOUTUBE_API_KEY"]
           query = os.environ["QUERY"].strip()
 
-          if not query:
-              raise SystemExit("Judul lagu kosong.")
-
           params = urllib.parse.urlencode({
               "part": "snippet",
               "q": query,
@@ -52,16 +51,13 @@ jobs:
 
           url = "https://www.googleapis.com/youtube/v3/search?" + params
 
-          try:
-              with urllib.request.urlopen(url) as response:
-                  data = json.load(response)
-          except Exception as e:
-              raise SystemExit(f"Gagal mengakses YouTube API: {e}")
+          with urllib.request.urlopen(url) as response:
+              data = json.load(response)
 
           items = data.get("items", [])
 
           if not items:
-              raise SystemExit(f"Lagu tidak ditemukan: {query}")
+              raise SystemExit("Lagu tidak ditemukan.")
 
           item = items[0]
 
@@ -70,74 +66,69 @@ jobs:
           channel = item["snippet"]["channelTitle"]
           thumbnail = item["snippet"]["thumbnails"]["high"]["url"]
 
-          playlist = Path("music-list.js")
-
-          if not playlist.exists():
-              raise SystemExit("File music-list.js tidak ditemukan.")
-
-          text = playlist.read_text(encoding="utf-8")
-
-          marker = "window.LOCAL_MUSIC = ["
-
-          if marker not in text:
-              raise SystemExit(
-                  "Format music-list.js tidak sesuai."
-              )
-
-          # Cek apakah video sudah ada
-          if video_id in text:
-              print("Lagu ini sudah ada di playlist.")
-              raise SystemExit(0)
-
-          # Buat object lagu baru
-          new_song = {
-              "name": title,
-              "artist": channel,
-              "src": f"https://www.youtube.com/watch?v={video_id}",
-              "cover": thumbnail,
-              "type": "youtube",
-              "youtubeId": video_id
-          }
-
-          song_text = json.dumps(
-              new_song,
-              ensure_ascii=False,
-              indent=2
-          )
-
-          # Cari penutup array LOCAL_MUSIC
-          end = text.rfind("];")
-
-          if end == -1:
-              raise SystemExit(
-                  "Penutup array LOCAL_MUSIC tidak ditemukan."
-              )
-
-          # Tambahkan koma jika sudah ada lagu
-          before = text[:end].rstrip()
-
-          if before.endswith("}"):
-              addition = ",\n  " + song_text.replace("\n", "\n  ")
-          else:
-              addition = "\n  " + song_text.replace("\n", "\n  ")
-
-          text = before + addition + "\n" + text[end:]
-
-          playlist.write_text(
-              text,
-              encoding="utf-8"
-          )
-
           print("================================")
-          print("LAGU BERHASIL DITAMBAHKAN")
+          print("LAGU DITEMUKAN")
           print("================================")
           print(f"Judul   : {title}")
           print(f"Channel : {channel}")
           print(f"Video ID: {video_id}")
           print("================================")
+
+          file = Path("music-list.js")
+
+          if not file.exists():
+              raise SystemExit("music-list.js tidak ditemukan.")
+
+          text = file.read_text(encoding="utf-8")
+
+          if video_id in text:
+              print("Lagu sudah ada di playlist.")
+              raise SystemExit(0)
+
+          new_song = f'''  {{
+            name: {json.dumps(title, ensure_ascii=False)},
+            artist: {json.dumps(channel, ensure_ascii=False)},
+            src: "https://www.youtube.com/watch?v={video_id}",
+            cover: "https://i.ytimg.com/vi/{video_id}/hqdefault.jpg",
+            type: "youtube",
+            youtubeId: "{video_id}"
+          }}'''
+
+          marker = "window.LOCAL_MUSIC = ["
+
+          if marker not in text:
+              raise SystemExit("window.LOCAL_MUSIC tidak ditemukan.")
+
+          end = text.rfind("];")
+
+          if end == -1:
+              raise SystemExit("Penutup playlist tidak ditemukan.")
+
+          before = text[:end].rstrip()
+
+          if before.endswith("}"):
+              before += ","
+
+          text = before + "\n" + new_song + "\n" + text[end:]
+
+          file.write_text(text, encoding="utf-8")
+
+          print("================================")
+          print("PLAYLIST BERHASIL DIUPDATE")
+          print("================================")
+
           PY
 
-      - name: Commit playlist ke GitHub
+      - name: Cek perubahan
+        run: |
+          echo "Isi music-list.js:"
+          cat music-list.js
+
+          echo ""
+          echo "Perubahan Git:"
+          git diff -- music-list.js
+
+      - name: Commit dan Push
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
@@ -145,9 +136,13 @@ jobs:
           git add music-list.js
 
           if git diff --cached --quiet; then
-            echo "Tidak ada perubahan."
+            echo "Tidak ada perubahan untuk di-commit."
             exit 0
           fi
 
-          git commit -m "Add requested YouTube song"
+          git commit -m "Add requested song"
           git push
+
+          echo "================================"
+          echo "PLAYLIST BERHASIL DIKIRIM KE GITHUB"
+          echo "================================"

@@ -5,7 +5,7 @@ window.LOCAL_MUSIC = [
   {
     "name": "Eid-Adha, Please Don't Call",
     "artist": "Bleachers",
-    "src": "assets/music/Eid-Adha%2C%20Please%20Don",
+    "src": "assets/music/Eid-Adha%2C%20Please%20Don't%20Call%20-%20Bleachers.mp3",
     "cover": "assets/music/covers/please-dont-call.jpeg",
     "type": "audio/mpeg"
   },

@@ -363,7 +363,22 @@ function getSiteConfig(){try{return JSON.parse(localStorage.getItem('xi-site-con
 function saveSiteConfig(x){localStorage.setItem('xi-site-config',JSON.stringify(x))}
 function money(n){return 'Rp '+Number(n||0).toLocaleString('id-ID')}
 function getClassTuesdayDates(year,month){const out=[];const d=new Date(year,month,1);while(d.getMonth()===month){if(d.getDay()===2)out.push(new Date(d));d.setDate(d.getDate()+1)}return out}
-function applyMaintenance(){const b=document.getElementById('maintenanceBanner');if(b)b.classList.toggle('show',localStorage.getItem('xi-maintenance-mode')==='1')}
+function applyMaintenance(){
+ const on=localStorage.getItem('xi-maintenance-mode')==='1';
+ const s=getSessionSafe();
+ const isAdmin=s?.role==='admin';
+ const b=document.getElementById('maintenanceBanner');
+ const screen=document.getElementById('maintenanceScreen');
+ const title=document.getElementById('maintenanceTitle'),msg=document.getElementById('maintenanceMessage'),meta=document.getElementById('maintenanceMeta');
+ let cfg={};try{cfg=JSON.parse(localStorage.getItem('xi-maintenance-config')||'{}')}catch{}
+ if(title)title.textContent=cfg.title||'Website Sedang Maintenance';
+ if(msg)msg.textContent=cfg.message||'Website sedang dalam pemeliharaan. Silakan kembali lagi nanti.';
+ if(meta)meta.textContent=cfg.estimate?'Perkiraan selesai: '+cfg.estimate:'';
+ if(b)b.classList.toggle('show',on&&!isAdmin);
+ if(screen) {screen.classList.toggle('show',on&&!isAdmin);screen.setAttribute('aria-hidden',on&&!isAdmin?'false':'true')}
+ document.body.classList.toggle('maintenance-active',on&&!isAdmin);
+} 
+
 function applySiteConfig(){
  const cfg=getSiteConfig();
  if(cfg.welcome)document.querySelector('.welcome')?.replaceChildren(document.createTextNode(cfg.welcome));
@@ -430,7 +445,7 @@ function adminRender(tab='overview'){
  else if(tab==='students')c.innerHTML=`<h3>Database siswa XI TKJ 1</h3><p class="admin-help">Login menggunakan NISN dari data nominasi siswa kelas 10.</p><table class="admin-table"><tr><th>#</th><th>Nama</th><th>NISN</th></tr>${(window.__CLASS_ACCOUNTS||[]).map((x,i)=>`<tr><td>${i+1}</td><td>${escapeHTML(x.name)}</td><td>${escapeHTML(x.nisn)}</td></tr>`).join('')}</table>`;
  else if(tab==='tasks'){const accounts=window.__CLASS_ACCOUNTS||[];c.innerHTML=`<div class="admin-head-row"><div><h3>Kelola Semua Tugas</h3><p style="color:var(--muted)">Tambah dan hapus tugas hanya dari Control Panel admin. Status pengumpulan siswa ada di setiap tugas.</p></div><div class="task-actions"><button class="btn btn-primary" id="adminAddTask">Tambah Tugas</button><button class="mini-btn danger" id="adminDeleteAllTasks">Hapus Semua</button></div></div><div class="admin-task-list">${tasks.map(t=>{const counts={todo:0,doing:0,done:0};accounts.forEach(a=>{counts[studentTaskStatus(t.id,a.nisn)]++});return `<article class="admin-task-row"><div><b>${escapeHTML(t.title)}</b><small>${escapeHTML(t.subject)} • Deadline ${escapeHTML(t.deadline)}</small><span class="admin-task-status">${escapeHTML(t.status)}</span><div class="admin-task-submission-summary"><span class="submission-badge red">Belum: ${counts.todo}</span><span class="submission-badge yellow">Mengerjakan: ${counts.doing}</span><span class="submission-badge green">Sudah: ${counts.done}</span></div><div class="admin-task-submission-detail" id="submissionDetail-${t.id}"><table><tbody>${accounts.map(a=>{const st=studentTaskStatus(t.id,a.nisn);const label=st==='done'?'Sudah Mengerjakan':st==='doing'?'Masih Mengerjakan':'Belum Mengerjakan';const cls=st==='done'?'green':st==='doing'?'yellow':'red';return `<tr><td><b>${escapeHTML(a.name)}</b><br><small>${escapeHTML(a.nisn)}</small></td><td><span class="submission-badge ${cls}">${label}</span></td><td><button class="mini-btn" data-set-submission="${t.id}" data-nisn="${escapeHTML(a.nisn)}">Ubah</button></td></tr>`}).join('')}</tbody></table></div></div><div class="task-actions"><button class="mini-btn" data-toggle-submissions="${t.id}">Lihat Pengumpulan</button><button class="mini-btn danger" data-delete-admin-task="${t.id}">Hapus</button></div></article>`}).join('')||'<div class="empty-state">Belum ada tugas.</div>'}</div>`;document.getElementById('adminAddTask')?.addEventListener('click',adminAddTask);document.getElementById('adminDeleteAllTasks')?.addEventListener('click',async()=>{if(await openTaskConfirm({title:'Hapus Semua Tugas?',hint:'Semua tugas dan data pengumpulannya akan dihapus. Ini tidak dapat dibatalkan.'})){saveTasks([]);saveTaskSubmissions({});renderTasks();adminRender('tasks');toast('Semua tugas dihapus')}});c.querySelectorAll('[data-toggle-submissions]').forEach(b=>b.addEventListener('click',()=>{document.getElementById('submissionDetail-'+b.dataset.toggleSubmissions)?.classList.toggle('show')}));c.querySelectorAll('[data-set-submission]').forEach(b=>b.addEventListener('click',()=>{const id=Number(b.dataset.setSubmission),nisn=b.dataset.nisn,cur=studentTaskStatus(id,nisn),next=cur==='todo'?'doing':cur==='doing'?'done':'todo';setStudentTaskStatus(id,nisn,next);adminRender('tasks');renderTasks()}));c.querySelectorAll('[data-cycle-admin-task]').forEach(b=>b.addEventListener('click',()=>{cycleTask(Number(b.dataset.cycleAdminTask));adminRender('tasks')}));c.querySelectorAll('[data-delete-admin-task]').forEach(b=>b.addEventListener('click',async()=>{await deleteTask(Number(b.dataset.deleteAdminTask))}));}
  else if(tab==='materials'){c.innerHTML=`<div class="admin-head-row"><div><h3>Kelola Materi</h3></div><button class="btn btn-primary" id="adminAddMaterial">Tambah Materi</button></div><div class="admin-material-list">${knowledge.map(m=>`<article class="admin-material-row"><span>MAT</span><div><b>${escapeHTML(m.title)}</b><small>${escapeHTML(m.tag||m.cat)}</small><p>${escapeHTML(m.desc||'')}</p></div><button class="mini-btn danger" data-del-material="${escapeHTML(m.id)}">Hapus</button></article>`).join('')}</div>`;document.getElementById('adminAddMaterial')?.addEventListener('click',adminAddMaterial);c.querySelectorAll('[data-del-material]').forEach(b=>b.addEventListener('click',()=>{if(!confirm('Hapus materi ini?'))return;knowledge=knowledge.filter(x=>x.id!==b.dataset.delMaterial);saveKnowledge();renderKnowledge();adminRender('materials');toast('Materi dihapus')}));}
- else if(tab==='maintenance'){const on=localStorage.getItem('xi-maintenance-mode')==='1';c.innerHTML=`<h3>Maintenance Mode</h3><p class="admin-help">Gunakan saat website sedang diperbaiki. Banner maintenance akan tampil untuk pengunjung.</p><div class="admin-save-row"><button class="btn btn-primary" id="toggleMaintenance">${on?'Matikan Maintenance':'Aktifkan Maintenance'}</button></div>`;document.getElementById('toggleMaintenance')?.addEventListener('click',()=>{const next=localStorage.getItem('xi-maintenance-mode')!=='1';localStorage.setItem('xi-maintenance-mode',next?'1':'0');applyMaintenance();adminRender('maintenance');toast(next?'Maintenance Mode aktif.':'Maintenance Mode dimatikan.')});}
+ else if(tab==='maintenance'){let mc={};try{mc=JSON.parse(localStorage.getItem('xi-maintenance-config')||'{}')}catch{} const on=localStorage.getItem('xi-maintenance-mode')==='1';c.innerHTML=`<div class="admin-head-row"><div><span class="eyebrow">SYSTEM CONTROL</span><h3>Maintenance Mode</h3><p class="admin-help">Saat aktif, pengunjung akan melihat halaman maintenance. Admin yang sudah login tetap bisa membuka website dan Control Panel.</p></div><span class="admin-finance-badge">${on?'● ACTIVE':'○ OFF'}</span></div><div class="admin-form-stack"><label>Judul Maintenance<input id="maintTitle" value="${escapeHTML(mc.title||'Website Sedang Maintenance')}"></label><label>Pesan untuk pengunjung<textarea id="maintMessage">${escapeHTML(mc.message||'Website sedang dalam pemeliharaan. Silakan kembali lagi nanti.')}</textarea></label><label>Perkiraan selesai<input id="maintEstimate" placeholder="Contoh: 15:00 WIB" value="${escapeHTML(mc.estimate||'')}"></label></div><div class="admin-save-row"><button class="btn btn-primary" id="saveMaintenanceCfg">Simpan Pesan</button><button class="mini-btn ${on?'danger':''}" id="toggleMaintenance">${on?'Matikan Maintenance':'Aktifkan Maintenance'}</button></div>`;document.getElementById('saveMaintenanceCfg')?.addEventListener('click',()=>{localStorage.setItem('xi-maintenance-config',JSON.stringify({title:document.getElementById('maintTitle')?.value.trim(),message:document.getElementById('maintMessage')?.value.trim(),estimate:document.getElementById('maintEstimate')?.value.trim()}));applyMaintenance();toast('Pengaturan maintenance disimpan.')});document.getElementById('toggleMaintenance')?.addEventListener('click',()=>{const next=localStorage.getItem('xi-maintenance-mode')!=='1';localStorage.setItem('xi-maintenance-mode',next?'1':'0');applyMaintenance();adminRender('maintenance');toast(next?'Maintenance Mode aktif.':'Maintenance Mode dimatikan.')});}
  else if(tab==='settings')c.innerHTML=`<h3>Pengaturan Sistem Lokal</h3><p class="admin-help">Semua data hanya tersimpan pada browser/perangkat yang digunakan. Tidak ada bracket atau server.</p><div class="admin-save-row"><button class="mini-btn danger" id="resetLocalData">Reset semua data website</button><button class="mini-btn" onclick="exportClassBackup()">Export backup</button></div>`;
  bindAdminConfigButtons();
 }
@@ -781,38 +796,73 @@ document.addEventListener('click',e=>{
 (()=>{
  const btn=document.getElementById('musicButton'),panel=document.getElementById('musicPanel'),close=document.getElementById('musicClose'),list=document.getElementById('musicList'),audio=document.getElementById('musicAudio'),ytBox=document.getElementById('musicYoutubePlayer');
  const nowTitle=document.getElementById('musicNowTitle'),nowArtist=document.getElementById('musicNowArtist'),nowArt=document.querySelector('#musicNowPlaying .music-now-art'),nowStatus=document.getElementById('musicNowStatus');
- const lyricsBox=document.getElementById('musicLyricsSticky'),lyricsTitle=document.getElementById('musicLyricsStickyTitle'),lyricsBody=document.getElementById('musicLyricsStickyBody');
+ const di=document.getElementById('musicDynamicIsland'),diMain=document.getElementById('musicDiMain'),diPlaylist=document.getElementById('musicDiPlaylist'),diCover=document.getElementById('musicDiCover'),diCoverFallback=di?.querySelector('.di-cover span'),diLyric=document.getElementById('musicDiLyric'),diMeta=document.getElementById('musicDiMeta');
  const seek=document.getElementById('musicSeek'),currentTimeEl=document.getElementById('musicCurrentTime'),durationEl=document.getElementById('musicDuration'),mainPlay=document.getElementById('musicMainPlay'),prevBtn=document.getElementById('musicPrev'),nextBtn=document.getElementById('musicNext'),volume=document.getElementById('musicVolume'),sourceLabel=document.getElementById('musicSourceLabel');
- const songs=(Array.isArray(window.LOCAL_MUSIC)?window.LOCAL_MUSIC:[]).map((s,i)=>({id:i,name:s.name||'Lagu '+(i+1),artist:s.artist||'',src:s.src||'',cover:s.cover||'',type:s.type||'audio/mpeg',youtubeId:s.youtubeId||extractYoutubeId(s.src||''),lyrics:s.lyrics||''}));
+ const songs=(Array.isArray(window.LOCAL_MUSIC)?window.LOCAL_MUSIC:[]).map((s,i)=>({id:i,name:s.name||'Lagu '+(i+1),artist:s.artist||'',src:s.src||'',cover:s.cover||'',type:s.type||'audio/mpeg',youtubeId:s.youtubeId||extractYoutubeId(s.src||''),lyrics:s.lyrics||'',lyricsData:null,lyricsLoading:false}));
  let currentId=null,ytPlayer=null,ytReadyPromise=null,raf=0;
  function extractYoutubeId(url){const m=String(url||'').match(/(?:youtube\.com\/(?:watch\?v=|embed\/|shorts\/)|youtu\.be\/)([A-Za-z0-9_-]{6,})/i);return m?m[1]:'';}
  function isYouTube(s){return s?.type==='youtube'||!!s?.youtubeId}
  function fmt(t){if(!Number.isFinite(t)||t<0)t=0;const sec=Math.floor(t%60),min=Math.floor(t/60);return `${min}:${String(sec).padStart(2,'0')}`}
  function setProgress(cur,dur){if(currentTimeEl)currentTimeEl.textContent=fmt(cur);if(durationEl)durationEl.textContent=dur?fmt(dur):'0:00';if(seek&&dur){seek.max=1000;seek.value=Math.round(Math.max(0,Math.min(1,cur/dur))*1000)}}
- function setPlaying(on){if(mainPlay)mainPlay.textContent=on?'❚❚':'▶';if(nowStatus)nowStatus.textContent=on?'PLAYING':(currentId!==null?'PAUSED':'READY');document.getElementById('musicNowPlaying')?.classList.toggle('is-playing',!!on)}
- function stopCurrentMedia(){cancelAnimationFrame(raf);try{audio.pause();}catch{}audio.removeAttribute('src');audio.load();if(ytPlayer){try{ytPlayer.stopVideo();ytPlayer.destroy();}catch{}ytPlayer=null}if(ytBox){ytBox.innerHTML='';ytBox.hidden=true}}
+ function hideDynamicIsland(){
+   if(di){di.classList.remove('active','expanded','playlist-open');di.setAttribute('aria-hidden','true')}
+   if(diPlaylist)diPlaylist.setAttribute('aria-hidden','true')
+ }
+ function renderDynamicPlaylist(){
+   if(!diPlaylist)return;
+   diPlaylist.innerHTML=songs.length?songs.map((s,i)=>`<button class="di-song" type="button" data-di-song="${i}"><span class="di-song-art">${s.cover?`<img src="${escapeHTML(s.cover)}" alt="">`:'♫'}</span><span class="di-song-copy"><b>${escapeHTML(s.name)}</b><small>${escapeHTML(s.artist||'Musik lokal')}</small></span><span class="di-song-state">${i===currentId?'●':'▶'}</span></button>`).join(''):'<div class="di-song-empty">Belum ada lagu.</div>';
+   diPlaylist.querySelectorAll('[data-di-song]').forEach(b=>b.addEventListener('click',e=>{
+     e.preventDefault();e.stopPropagation();const i=Number(b.dataset.diSong);if(Number.isInteger(i))playSong(i);
+   }));
+ }
+ function toggleDynamicPlaylist(){
+   if(!di?.classList.contains('active'))return;
+   const open=di.classList.toggle('playlist-open');
+   if(diPlaylist)diPlaylist.setAttribute('aria-hidden',open?'false':'true');
+ }
+ function setDynamicSong(s){
+   if(!di||!s)return;
+   if(diCover){if(s.cover){diCover.hidden=false;diCover.src=s.cover}else{diCover.hidden=true}}
+   if(diCoverFallback)diCoverFallback.style.display=s.cover?'none':'inline';
+   if(diLyric)diLyric.textContent=s.name||'Music sedang diputar';
+   if(diMeta)diMeta.textContent=`${s.artist||'Unknown'} • XI TKJ 1`;
+   renderDynamicPlaylist();
+ }
+ function showDynamicIsland(s){
+   if(!di||!s)return;
+   setDynamicSong(s);
+   di.classList.add('active');
+   di.classList.remove('expanded');
+   di.setAttribute('aria-hidden','false');
+ }
+ function setPlaying(on){
+   if(mainPlay)mainPlay.textContent=on?'❚❚':'▶';
+   if(nowStatus)nowStatus.textContent=on?'PLAYING':(currentId!==null?'PAUSED':'READY');
+   document.getElementById('musicNowPlaying')?.classList.toggle('is-playing',!!on);
+   if(on&&currentId!==null)showDynamicIsland(songs[currentId]);else hideDynamicIsland();
+ }
+ function stopCurrentMedia(){cancelAnimationFrame(raf);hideDynamicIsland();try{audio.pause();}catch{}audio.removeAttribute('src');audio.load();if(ytPlayer){try{ytPlayer.stopVideo();ytPlayer.destroy();}catch{}ytPlayer=null}if(ytBox){ytBox.innerHTML='';ytBox.hidden=true}}
  function closeMusic(){if(panel){panel.classList.remove('show');panel.style.display='none';panel.setAttribute('aria-hidden','true')}}
  window.__openMusicPlayer=()=>{if(!panel)return false;render();panel.style.display='block';panel.classList.add('show');panel.setAttribute('aria-hidden','false');return true};
  function loadYTApi(){if(window.YT?.Player)return Promise.resolve();if(ytReadyPromise)return ytReadyPromise;ytReadyPromise=new Promise((resolve,reject)=>{const prev=window.onYouTubeIframeAPIReady;window.onYouTubeIframeAPIReady=()=>{try{prev?.()}catch{}resolve()};const sc=document.createElement('script');sc.src='https://www.youtube.com/iframe_api';sc.async=true;sc.onerror=reject;document.head.appendChild(sc)});return ytReadyPromise}
- function updateNowPlaying(s,playing=true){
+ function updateNowPlaying(s,playing=false){
    const np=document.getElementById('musicNowPlaying');
-   if(!s){if(nowTitle)nowTitle.textContent='Belum ada lagu';if(nowArtist)nowArtist.textContent='Pilih lagu dari playlist';if(nowStatus)nowStatus.textContent='READY';if(np)np.classList.remove('active','is-playing');if(nowArt)nowArt.innerHTML='<span>♫</span>';if(lyricsBox){lyricsBox.hidden=true;lyricsBox.removeAttribute('data-visible')}if(sourceLabel)sourceLabel.textContent='LOCAL AUDIO';setProgress(0,0);return}
+   if(!s){if(nowTitle)nowTitle.textContent='Belum ada lagu';if(nowArtist)nowArtist.textContent='Pilih lagu dari playlist';if(nowStatus)nowStatus.textContent='READY';if(np)np.classList.remove('active','is-playing');if(nowArt)nowArt.innerHTML='<span>♫</span>';if(sourceLabel)sourceLabel.textContent='LOCAL AUDIO';hideDynamicIsland();setProgress(0,0);return}
    if(nowTitle)nowTitle.textContent=s.name||'Lagu';if(nowArtist)nowArtist.textContent=s.artist||'Musik lokal';if(nowStatus)nowStatus.textContent=playing?'PLAYING':'PAUSED';if(np)np.classList.add('active');if(np)np.classList.toggle('is-playing',playing);
    if(nowArt)nowArt.innerHTML=s.cover?`<img src="${escapeHTML(s.cover)}" alt="" onerror="this.onerror=null;this.style.display='none'"><span>♫</span>`:'<span>♫</span>';
    if(sourceLabel)sourceLabel.textContent=isYouTube(s)?'YOUTUBE AUDIO':'LOCAL AUDIO';
-   if(lyricsBox){lyricsBox.hidden=false;lyricsBox.setAttribute('data-visible','true');if(lyricsTitle)lyricsTitle.textContent=s.name||'Lirik';const text=String(s.lyrics||'').trim();if(lyricsBody)lyricsBody.innerHTML=text?escapeHTML(text).replace(/\n/g,'<br>'):'<div class="lyrics-empty">Lirik belum ditambahkan untuk lagu ini.</div>'}
  }
- function updateRows(){list?.querySelectorAll('.music-row').forEach(row=>{const active=Number(row.dataset.song)===currentId;row.classList.toggle('playing',active);const icon=row.querySelector('.music-play');if(icon)icon.textContent=active&&(audio.paused===false||ytPlayer?.getPlayerState?.()===1)?'❚❚':'▶'})}
+ function updateRows(){renderDynamicPlaylist();list?.querySelectorAll('.music-row').forEach(row=>{const active=Number(row.dataset.song)===currentId;row.classList.toggle('playing',active);const icon=row.querySelector('.music-play');if(icon)icon.textContent=active&&(audio.paused===false||ytPlayer?.getPlayerState?.()===1)?'❚❚':'▶'})}
  function render(){
   if(!list)return;const badge=document.getElementById('musicCountBadge');if(badge)badge.textContent=`${songs.length} TRACK${songs.length===1?'':'S'}`;
   list.innerHTML=songs.length?songs.map((s,i)=>`<div class="music-row" data-song="${i}"><button class="music-row-main" type="button" aria-label="Putar ${escapeHTML(s.name)}"><span class="music-cover-wrap"><img class="music-cover" src="${escapeHTML(s.cover)}" alt="Cover ${escapeHTML(s.name)}" onerror="this.onerror=null;this.style.display='none'"><span class="music-cover-fallback">♫</span></span><span class="music-row-info"><b class="music-title" title="${escapeHTML(s.name)}">${escapeHTML(s.name)}</b><small class="music-artist" title="${escapeHTML(s.artist||'Musik lokal')}">${escapeHTML(s.artist||'Musik lokal')}</small></span><span class="music-play">▶</span></button></div>`).join(''):'<div class="music-empty">Belum ada lagu.</div>';
   list.querySelectorAll('.music-row-main').forEach(b=>b.addEventListener('click',()=>playSong(Number(b.closest('.music-row')?.dataset.song))));
-  if(currentId!==null&&songs[currentId])updateNowPlaying(songs[currentId],true);updateRows();
+  if(currentId!==null&&songs[currentId])updateNowPlaying(songs[currentId],false);updateRows();
  }
  async function playSong(index){
    const s=songs[index];if(!s||(!s.src&&!s.youtubeId))return;
    if(currentId===index){togglePlay();return}
-   stopCurrentMedia();currentId=index;setProgress(0,0);updateNowPlaying(s,true);
+   stopCurrentMedia();currentId=index;audio.removeAttribute('data-emergency-song-index');setProgress(0,0);updateNowPlaying(s,false);
    if(isYouTube(s)){
      const vid=s.youtubeId||extractYoutubeId(s.src);if(!vid){toast('Link YouTube tidak valid.');return}
      if(ytBox){ytBox.hidden=false;ytBox.innerHTML='';}
@@ -823,13 +873,13 @@ document.addEventListener('click',e=>{
  function togglePlay(){const s=songs[currentId];if(!s)return;if(isYouTube(s)){if(!ytPlayer)return;const st=ytPlayer.getPlayerState();if(st===1)ytPlayer.pauseVideo();else ytPlayer.playVideo()}else{if(audio.paused)audio.play().catch(()=>{});else audio.pause()}}
  function playNext(){if(!songs.length)return;playSong((currentId===null?0:(currentId+1)%songs.length))}
  function playPrev(){if(!songs.length)return;playSong((currentId===null?0:(currentId-1+songs.length)%songs.length))}
- function startYTProgress(){cancelAnimationFrame(raf);const tick=()=>{if(ytPlayer&&currentId!==null){let c=0,d=0;try{c=ytPlayer.getCurrentTime()||0;d=ytPlayer.getDuration()||0}catch{}setProgress(c,d);raf=requestAnimationFrame(tick)}};raf=requestAnimationFrame(tick)}
- btn?.addEventListener('click',e=>{e.preventDefault();e.stopPropagation();window.__openMusicPlayer?.()});close?.addEventListener('click',closeMusic);mainPlay?.addEventListener('click',togglePlay);prevBtn?.addEventListener('click',playPrev);nextBtn?.addEventListener('click',playNext);
+ function startYTProgress(){cancelAnimationFrame(raf);const tick=()=>{if(ytPlayer&&currentId!==null){let c=0,d=0;try{c=ytPlayer.getCurrentTime()||0;d=ytPlayer.getDuration()||0}catch{}setProgress(c,d);updateDynamicLyricAt(c);raf=requestAnimationFrame(tick)}};raf=requestAnimationFrame(tick)}
+ btn?.addEventListener('click',e=>{e.preventDefault();e.stopPropagation();window.__openMusicPlayer?.()});close?.addEventListener('click',closeMusic);mainPlay?.addEventListener('click',togglePlay);prevBtn?.addEventListener('click',playPrev);nextBtn?.addEventListener('click',playNext);diMain?.addEventListener('click',e=>{e.preventDefault();e.stopPropagation();toggleDynamicPlaylist()});
  seek?.addEventListener('input',()=>{const s=songs[currentId],d=Number(durationEl?.dataset?.seconds||0);if(!s)return;if(isYouTube(s)&&ytPlayer){const dur=ytPlayer.getDuration()||d;ytPlayer.seekTo((Number(seek.value)/1000)*dur,true)}else if(audio.duration){audio.currentTime=(Number(seek.value)/1000)*audio.duration}});
  volume?.addEventListener('input',()=>{const v=Number(volume.value);audio.volume=v;if(ytPlayer)ytPlayer.setVolume(v*100)});
- audio?.addEventListener('loadedmetadata',()=>{durationEl.dataset.seconds=String(audio.duration||0);setProgress(audio.currentTime||0,audio.duration||0)});
- audio?.addEventListener('timeupdate',()=>{if(currentId!==null){durationEl.dataset.seconds=String(audio.duration||0);setProgress(audio.currentTime||0,audio.duration||0)}});
- audio?.addEventListener('play',()=>{setPlaying(true);updateRows()});audio?.addEventListener('pause',()=>{setPlaying(false);updateRows()});audio?.addEventListener('ended',playNext);audio?.addEventListener('error',()=>{if(currentId!==null&&!isYouTube(songs[currentId]))toast('File MP3 tidak ditemukan.')});
+ audio?.addEventListener('loadedmetadata',()=>{durationEl.dataset.seconds=String(audio.duration||0);setProgress(audio.currentTime||0,audio.duration||0);const s=currentId!==null?songs[currentId]:null;if(s)fetchBetterLyrics(s,audio.duration||0)});
+ audio?.addEventListener('timeupdate',()=>{if(currentId!==null){durationEl.dataset.seconds=String(audio.duration||0);setProgress(audio.currentTime||0,audio.duration||0);updateDynamicLyricAt(audio.currentTime||0)}});
+ audio?.addEventListener('play',()=>{ if(currentId===null){ const ei=Number(audio.dataset.emergencySongIndex); if(Number.isInteger(ei)&&songs[ei]) currentId=ei; } setPlaying(true);updateRows()});audio?.addEventListener('pause',()=>{setPlaying(false);updateRows()});audio?.addEventListener('ended',playNext);audio?.addEventListener('error',()=>{if(currentId!==null&&!isYouTube(songs[currentId]))toast('File MP3 tidak ditemukan.')});
  document.addEventListener('click',e=>{if(panel?.classList.contains('show')&&!panel.contains(e.target)&&e.target!==btn)closeMusic()});render();
 })();
 
@@ -2009,3 +2059,5 @@ document.getElementById('facePhotoViewerImage')?.addEventListener('click',e=>{
     if(folder.tagName==='BUTTON') e.preventDefault();
   },true);
 })();
+
+(function(){document.addEventListener('DOMContentLoaded',function(){const btn=document.getElementById('maintenanceAdminLogin');if(btn)btn.addEventListener('click',function(){document.getElementById('maintenanceScreen')?.classList.remove('show');document.getElementById('maintenanceScreen')?.setAttribute('aria-hidden','true');document.getElementById('accountModal')?.classList.add('show');document.getElementById('accountModal')?.setAttribute('aria-hidden','false');});applyMaintenance();});window.addEventListener('xi-session-changed',applyMaintenance);})();

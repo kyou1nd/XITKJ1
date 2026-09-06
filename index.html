@@ -31,6 +31,7 @@
 </head>
 <body>
 <div id="maintenanceBanner" class="maintenance-banner">MAINTENANCE MODE • Website sedang dalam pemeliharaan. Beberapa fitur mungkin sementara tidak tersedia.</div>
+<div id="maintenanceScreen" class="maintenance-screen" aria-hidden="true"><div class="maintenance-screen-card"><div class="maintenance-mark">⚙</div><span class="eyebrow">XI TKJ 1 • SYSTEM</span><h2 id="maintenanceTitle">Website Sedang Maintenance</h2><p id="maintenanceMessage">Website sedang dalam pemeliharaan. Silakan kembali lagi nanti.</p><div class="maintenance-meta" id="maintenanceMeta"></div><button type="button" class="btn btn-primary" id="maintenanceAdminLogin">Masuk Admin</button></div></div>
 
 <div class="background"><div class="orb orb1"></div><div class="orb orb2"></div><div class="orb orb3"></div></div>
 
@@ -355,6 +356,9 @@
 
   </div>
 </section>
+
+
+
 <section class="section" id="about">
 <div class="section-heading"><div><p>ABOUT XI TKJ 1</p><h2>Tentang <span>XI TKJ 1</span></h2></div></div>
 <div class="class-showcase">
@@ -692,6 +696,18 @@
   </div>
 </div>
 
+<div class="music-dynamic-island" id="musicDynamicIsland" aria-hidden="true">
+  <button class="di-main" id="musicDiMain" type="button" aria-label="Buka Music Player">
+    <span class="di-cover"><img id="musicDiCover" src="" alt="" hidden><span>♫</span></span>
+    <span class="di-info">
+      <b id="musicDiLyric">Music sedang diputar</b>
+      <small id="musicDiMeta">XI TKJ 1 • NOW PLAYING</small>
+    </span>
+    <span class="di-wave" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></span>
+  </button>
+  <div class="di-playlist" id="musicDiPlaylist" aria-hidden="true"></div>
+</div>
+
 <div class="music-panel" id="musicPanel" aria-hidden="true">
   <div class="music-panel-glow"></div>
   <div class="music-panel-head" data-music-drag-handle>
@@ -709,10 +725,6 @@
     <div class="music-now-art"><span>♫</span></div>
     <div class="music-now-copy"><small>NOW PLAYING</small><b id="musicNowTitle">Belum ada lagu</b><span id="musicNowArtist">Pilih lagu dari playlist</span></div>
     <div class="music-now-status"><i></i><span id="musicNowStatus">READY</span></div>
-  </div>
-  <div class="music-lyrics-sticky" id="musicLyricsSticky" hidden>
-    <div class="music-lyrics-sticky-head"><span>LYRICS</span><b id="musicLyricsStickyTitle">Belum ada lagu</b></div>
-    <div class="music-lyrics-sticky-body" id="musicLyricsStickyBody">Pilih lagu untuk menampilkan lirik.</div>
   </div>
   <div class="music-youtube-player" id="musicYoutubePlayer" hidden aria-hidden="true"></div>
   <div class="music-controls" id="musicControls" aria-label="Kontrol pemutar musik">
@@ -733,9 +745,6 @@
   <div class="music-footer"><span>♪ MUSIC XI TKJ1</span><span>LOCAL + YOUTUBE</span></div>
 </div>
 
-    <div class="music-lyrics-body" id="musicLyricsBody">Pilih lagu untuk melihat lirik.</div>
-  </div>
-</div>
 
 <div class="tool-modal" id="toolModal"><div class="tool-modal-box"><button class="modal-close" id="toolClose">×</button><div id="toolModalContent"></div></div></div>
 
@@ -785,7 +794,7 @@
       list.innerHTML=songs().length?songs().map((s,i)=>`<button type="button" class="music-row-main emergency-music-row" data-emergency-song="${i}"><span class="music-cover-wrap"><img class="music-cover" src="${esc(s.cover||'')}" alt="" onerror="this.style.display='none'"></span><span class="music-row-info"><b>${esc(s.name||'Lagu '+(i+1))}</b><small>${esc(s.artist||'Musik lokal')}</small></span><span class="music-play">▶</span></button>`).join(''):'<div class="music-empty">Belum ada lagu di music-list.js.</div>';
       list.querySelectorAll('[data-emergency-song]').forEach(b=>b.addEventListener('click',function(){
         const s=songs()[Number(this.dataset.emergencySong)]; if(!s||!s.src||!audio)return;
-        audio.src=s.src; audio.load(); audio.play().catch(()=>{});
+        audio.src=s.src; audio.dataset.emergencySongIndex=String(Number(this.dataset.emergencySong)); audio.load(); audio.play().catch(()=>{});
       }));
     }
   };

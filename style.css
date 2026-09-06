@@ -3999,26 +3999,7 @@ body:not(.dark) #playlistClassTKJ1 .profile-playlist-row .mini-btn{color:#3d357e
 @keyframes diWave{from{transform:scaleY(.45);opacity:.45}to{transform:scaleY(1);opacity:1}}
 @media(max-width:520px){.music-dynamic-island{bottom:13px;width:calc(100vw - 18px)}.music-dynamic-island.active{height:58px}.music-dynamic-island .di-main{right:86px;padding:6px 9px;gap:8px}.music-dynamic-island .di-cover{width:44px;height:44px;flex-basis:44px;border-radius:13px}.music-dynamic-island .di-action{height:58px;width:51px}.music-dynamic-island #musicDiPause{right:35px}.music-dynamic-island .di-info b{font-size:9px}.music-dynamic-island .di-info small{font-size:6px}}
 
-/* ===== MUSIC V18.3 — YOUTUBE AUDIO PRESENTATION + LYRICS ===== */
-.music-youtube-player{position:absolute!important;width:1px!important;height:1px!important;overflow:hidden!important;opacity:0!important;pointer-events:none!important;left:-9999px!important;top:auto!important}
-.music-youtube-player[hidden]{display:block!important}
-.music-youtube-audio{width:1px!important;height:1px!important;border:0!important;position:absolute!important;opacity:0!important;pointer-events:none!important}
-.di-main{position:relative}
-.di-lyrics{border:0;background:rgba(255,255,255,.08);color:inherit;font:700 8px/1 inherit;padding:7px 8px;border-radius:999px;cursor:pointer;backdrop-filter:blur(10px)}
-.di-lyrics:active{transform:scale(.94)}
-.music-lyrics-modal{position:fixed;inset:0;z-index:10080;display:flex;align-items:flex-end;justify-content:center;padding:16px;opacity:0;visibility:hidden;pointer-events:none;transition:.25s ease;background:rgba(0,0,0,.42);backdrop-filter:blur(12px)}
-.music-lyrics-modal.show{opacity:1;visibility:visible;pointer-events:auto}
-.music-lyrics-box{width:min(620px,100%);max-height:min(78vh,700px);overflow:hidden;border:1px solid rgba(255,255,255,.12);border-radius:28px;background:linear-gradient(145deg,rgba(20,22,31,.98),rgba(8,9,14,.98));box-shadow:0 30px 90px rgba(0,0,0,.45);transform:translateY(25px) scale(.98);transition:.3s ease;color:#fff}
-.music-lyrics-modal.show .music-lyrics-box{transform:none}
-.music-lyrics-head{display:flex;align-items:center;justify-content:space-between;gap:14px;padding:20px 20px 16px;border-bottom:1px solid rgba(255,255,255,.08)}
-.music-lyrics-head span,.music-lyrics-head b,.music-lyrics-head small{display:block}.music-lyrics-head span{font-size:8px;letter-spacing:1.8px;opacity:.55}.music-lyrics-head b{font-size:17px;margin-top:5px}.music-lyrics-head small{font-size:10px;opacity:.55;margin-top:4px}
-.music-lyrics-head button{width:34px;height:34px;border:0;border-radius:50%;background:rgba(255,255,255,.08);color:#fff;font-size:22px;cursor:pointer}
-.music-lyrics-body{padding:24px 22px 32px;overflow:auto;max-height:calc(min(78vh,700px) - 95px);font-size:16px;line-height:1.9;white-space:normal;scroll-behavior:smooth}
-.lyrics-empty{opacity:.6;text-align:center;padding:50px 20px;font-size:13px;line-height:1.7}.lyrics-empty small{display:block;margin-top:10px;font-size:10px}
-
 /* ===== MUSIC XI TKJ1 — FINAL PLAYER / STICKY LYRICS ===== */
-.music-dynamic-island{display:none!important}
-.music-lyrics-modal{display:none!important}
 .music-now-playing{display:flex!important;align-items:center!important;gap:12px!important;min-height:70px!important;padding:12px!important;margin-top:12px!important;border:1px solid rgba(139,125,255,.18)!important;border-radius:18px!important;background:linear-gradient(120deg,rgba(111,94,255,.12),rgba(255,255,255,.035))!important;box-sizing:border-box!important;opacity:1!important;visibility:visible!important}
 .music-now-playing:not(.active){opacity:.72!important}
 .music-now-art{position:relative!important;width:52px!important;height:52px!important;flex:0 0 52px!important;border-radius:14px!important;overflow:hidden!important;display:grid!important;place-items:center!important;background:linear-gradient(135deg,#5e57ff,#c24da8)!important;color:#fff!important;font-size:21px!important;box-shadow:0 10px 25px rgba(82,66,220,.25)!important}
@@ -4096,3 +4077,334 @@ body:not(.dark) #playlistClassTKJ1 .profile-playlist-row .mini-btn{color:#3d357e
  #musicVolume{width:50px!important}
  .music-control-meta{font-size:5px!important}
 }
+
+
+/* ===== MUSIC DYNAMIC ISLAND — LYRICS OUTSIDE PLAYER ===== */
+.music-dynamic-island{position:fixed;left:50%;bottom:22px;z-index:12000;width:min(520px,calc(100vw - 28px));height:0;opacity:0;pointer-events:none;transform:translateX(-50%) translateY(18px) scale(.92);transition:height .28s ease,opacity .24s ease,transform .32s cubic-bezier(.2,.8,.2,1);filter:drop-shadow(0 22px 55px rgba(0,0,0,.42));}
+.music-dynamic-island.active{height:66px;opacity:1;pointer-events:auto;transform:translateX(-50%) translateY(0) scale(1);}
+.music-dynamic-island:before{content:"";position:absolute;inset:-2px;border-radius:36px;background:linear-gradient(120deg,rgba(255,255,255,.16),rgba(255,255,255,.035),rgba(126,112,255,.22));z-index:-1;filter:blur(9px);opacity:.85;}
+.music-dynamic-island .di-main{position:absolute;inset:0 56px 0 0;display:flex;align-items:center;gap:10px;padding:8px 13px;border:1px solid rgba(255,255,255,.13);border-radius:36px 20px 20px 36px;background:linear-gradient(105deg,rgba(9,12,24,.97),rgba(20,19,39,.97));color:#fff;box-shadow:0 18px 55px rgba(0,0,0,.45),inset 0 1px 0 rgba(255,255,255,.07);backdrop-filter:blur(24px);cursor:pointer;text-align:left;}
+.music-dynamic-island .di-cover{position:relative;width:50px;height:50px;flex:0 0 50px;border-radius:15px;overflow:hidden;display:grid;place-items:center;background:linear-gradient(135deg,#5c56ff,#bb50b5);box-shadow:0 8px 22px rgba(75,60,220,.3);}
+.music-dynamic-island .di-cover img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;}
+.music-dynamic-island .di-cover span{font-size:18px;color:#fff;position:relative;z-index:1;}
+.music-dynamic-island .di-info{min-width:0;display:flex;flex:1;flex-direction:column;gap:4px;}
+.music-dynamic-island .di-info b{font-size:11px;line-height:1.25;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:#fff;font-weight:800;}
+.music-dynamic-island .di-info small{font-size:7px;color:#8f98b4;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;letter-spacing:.05em;}
+.music-dynamic-island .di-wave{margin-left:auto;display:flex;align-items:center;gap:2px;height:18px;flex:0 0 auto;}
+.music-dynamic-island .di-wave i{width:2px;border-radius:5px;background:#aaa3ff;animation:diWave .8s ease-in-out infinite alternate;}
+.music-dynamic-island .di-wave i:nth-child(1){height:6px}.music-dynamic-island .di-wave i:nth-child(2){height:13px;animation-delay:.12s}.music-dynamic-island .di-wave i:nth-child(3){height:18px;animation-delay:.22s}.music-dynamic-island .di-wave i:nth-child(4){height:11px;animation-delay:.08s}.music-dynamic-island .di-wave i:nth-child(5){height:7px;animation-delay:.18s}
+.music-dynamic-island .di-action{position:absolute;top:0;width:56px;height:66px;border:1px solid rgba(255,255,255,.1);background:rgba(10,13,25,.97);color:#fff;cursor:pointer;font-size:14px;box-shadow:0 18px 55px rgba(0,0,0,.4);backdrop-filter:blur(24px);}
+.music-dynamic-island #musicDiPause{right:0;border-radius:0 36px 36px 0;color:#b9b4ff}.music-dynamic-island .di-action:hover{background:rgba(34,35,58,.98);color:#fff}
+@keyframes diWave{from{transform:scaleY(.45);opacity:.45}to{transform:scaleY(1);opacity:1}}
+@media(max-width:520px){.music-dynamic-island{bottom:13px;width:calc(100vw - 18px)}.music-dynamic-island.active{height:58px}.music-dynamic-island .di-main{right:49px;padding:6px 9px;gap:8px;border-radius:30px 18px 18px 30px}.music-dynamic-island .di-cover{width:44px;height:44px;flex-basis:44px;border-radius:13px}.music-dynamic-island .di-action{height:58px;width:49px}.music-dynamic-island #musicDiPause{right:0;border-radius:0 30px 30px 0}.music-dynamic-island .di-info b{font-size:9px}.music-dynamic-island .di-info small{font-size:6px}.music-dynamic-island .di-wave{display:none}}
+
+
+/* ===== FINAL MUSIC DYNAMIC ISLAND — TOP CENTER / FIXED ===== */
+.music-dynamic-island{
+  position:fixed!important;
+  top:82px!important;
+  bottom:auto!important;
+  left:50%!important;
+  z-index:99999!important;
+  width:min(360px,calc(100vw - 36px))!important;
+  height:0!important;
+  opacity:0!important;
+  pointer-events:none!important;
+  transform:translateX(-50%) translateY(-10px) scale(.88)!important;
+  transform-origin:top center!important;
+  overflow:visible!important;
+  transition:opacity .24s ease,transform .34s cubic-bezier(.2,.9,.2,1),height .28s ease!important;
+}
+.music-dynamic-island.active{
+  height:52px!important;
+  opacity:1!important;
+  pointer-events:auto!important;
+  transform:translateX(-50%) translateY(0) scale(1)!important;
+}
+.music-dynamic-island:before{
+  content:"";
+  position:absolute;
+  inset:-2px;
+  border-radius:28px;
+  background:linear-gradient(120deg,rgba(255,255,255,.15),rgba(116,98,255,.08),rgba(255,255,255,.04));
+  z-index:-1;
+  filter:blur(8px);
+  opacity:.85;
+}
+.music-dynamic-island .di-main{
+  position:absolute!important;
+  inset:0 48px 0 0!important;
+  display:flex!important;
+  align-items:center!important;
+  gap:9px!important;
+  padding:5px 10px!important;
+  border:1px solid rgba(255,255,255,.13)!important;
+  border-radius:28px 17px 17px 28px!important;
+  background:linear-gradient(105deg,rgba(7,9,18,.97),rgba(19,18,35,.97))!important;
+  color:#fff!important;
+  box-shadow:0 16px 45px rgba(0,0,0,.42),inset 0 1px 0 rgba(255,255,255,.06)!important;
+  backdrop-filter:blur(24px)!important;
+  -webkit-backdrop-filter:blur(24px)!important;
+  cursor:pointer!important;
+  text-align:left!important;
+}
+.music-dynamic-island .di-cover{
+  width:38px!important;height:38px!important;flex:0 0 38px!important;
+  border-radius:12px!important;
+}
+.music-dynamic-island .di-info{gap:2px!important}
+.music-dynamic-island .di-info b{
+  font-size:9px!important;line-height:1.25!important;font-weight:800!important;
+}
+.music-dynamic-island .di-info small{
+  font-size:6px!important;letter-spacing:.06em!important;opacity:.72!important;
+}
+.music-dynamic-island .di-wave{height:14px!important;gap:2px!important}
+.music-dynamic-island .di-wave i{width:2px!important}
+.music-dynamic-island .di-action{
+  top:0!important;right:0!important;width:48px!important;height:52px!important;
+  border:1px solid rgba(255,255,255,.10)!important;
+  border-radius:0 28px 28px 0!important;
+  background:rgba(8,10,20,.98)!important;
+  color:#b9b4ff!important;
+  font-size:12px!important;
+}
+.music-dynamic-island #musicDiPause{right:0!important}
+
+@media(max-width:520px){
+  .music-dynamic-island{top:76px!important;width:min(330px,calc(100vw - 28px))!important}
+  .music-dynamic-island.active{height:48px!important}
+  .music-dynamic-island .di-main{inset:0 45px 0 0!important;padding:4px 8px!important;gap:7px!important}
+  .music-dynamic-island .di-cover{width:36px!important;height:36px!important;flex-basis:36px!important;border-radius:11px!important}
+  .music-dynamic-island .di-action{width:45px!important;height:48px!important}
+  .music-dynamic-island .di-info b{font-size:8.5px!important}
+  .music-dynamic-island .di-info small{font-size:5.5px!important}
+  .music-dynamic-island .di-wave{display:none!important}
+}
+
+
+/* ===== DYNAMIC ISLAND — UNIFIED LAYER / APPLE-STYLE ===== */
+.music-dynamic-island{
+  position:fixed!important;
+  left:50%!important;
+  top:76px!important;
+  bottom:auto!important;
+  width:min(360px,calc(100vw - 28px))!important;
+  height:0!important;
+  transform:translateX(-50%)!important;
+  z-index:99999!important;
+  overflow:visible!important;
+  pointer-events:none!important;
+  transition:height .32s cubic-bezier(.2,.85,.2,1)!important;
+}
+.music-dynamic-island.active{
+  height:52px!important;
+  pointer-events:auto!important;
+}
+/* Satu layer utama: saat dibuka, island melebar ke bawah tanpa membuat bar terpisah. */
+.music-dynamic-island.active.expanded{
+  height:104px!important;
+}
+.music-dynamic-island::before{
+  content:"";
+  position:absolute;
+  inset:-4px;
+  border-radius:32px;
+  background:rgba(8,10,20,.34);
+  filter:blur(10px);
+  opacity:0;
+  transition:opacity .25s ease;
+  z-index:-1;
+}
+.music-dynamic-island.active::before{opacity:1}
+.music-dynamic-island .di-main{
+  position:absolute!important;
+  inset:0!important;
+  width:100%!important;
+  height:52px!important;
+  margin:0!important;
+  border:1px solid rgba(255,255,255,.14)!important;
+  border-radius:28px!important;
+  background:linear-gradient(110deg,rgba(7,9,18,.985),rgba(24,22,42,.985))!important;
+  box-shadow:0 18px 48px rgba(0,0,0,.48),inset 0 1px 0 rgba(255,255,255,.07)!important;
+  backdrop-filter:blur(26px)!important;
+  -webkit-backdrop-filter:blur(26px)!important;
+  transition:border-radius .3s ease,box-shadow .3s ease!important;
+  z-index:2!important;
+}
+.music-dynamic-island.expanded .di-main{
+  border-radius:28px 28px 20px 20px!important;
+  box-shadow:0 20px 55px rgba(0,0,0,.52),inset 0 1px 0 rgba(255,255,255,.07)!important;
+}
+.music-dynamic-island .di-wave{margin-right:2px!important}
+/* Controls are a second visual layer INSIDE the same Dynamic Island shell. */
+.music-dynamic-island .di-controls{
+  position:absolute!important;
+  left:7px!important;
+  right:7px!important;
+  top:48px!important;
+  height:49px!important;
+  transform:translateY(-8px)!important;
+  display:flex!important;
+  align-items:center!important;
+  justify-content:center!important;
+  gap:8px!important;
+  padding:5px 0 7px!important;
+  border:1px solid rgba(255,255,255,.08)!important;
+  border-top:0!important;
+  border-radius:0 0 21px 21px!important;
+  background:linear-gradient(180deg,rgba(19,18,34,.98),rgba(8,10,20,.985))!important;
+  box-shadow:0 12px 30px rgba(0,0,0,.30)!important;
+  opacity:0!important;
+  pointer-events:none!important;
+  visibility:hidden!important;
+  transition:opacity .2s ease,transform .28s cubic-bezier(.2,.9,.2,1),visibility .2s ease!important;
+  z-index:1!important;
+}
+.music-dynamic-island.expanded .di-controls{
+  opacity:1!important;
+  pointer-events:auto!important;
+  visibility:visible!important;
+  transform:translateY(0)!important;
+}
+.music-dynamic-island .di-control{
+  width:40px!important;
+  height:34px!important;
+  border:1px solid rgba(255,255,255,.08)!important;
+  border-radius:12px!important;
+  background:rgba(255,255,255,.075)!important;
+  color:#e9e8ff!important;
+  cursor:pointer!important;
+  font-size:12px!important;
+  display:grid!important;
+  place-items:center!important;
+  transition:transform .15s ease,background .15s ease!important;
+}
+.music-dynamic-island .di-control:hover{background:rgba(130,116,255,.22)!important;transform:translateY(-1px)!important}
+.music-dynamic-island .di-control:active{transform:scale(.92)!important}
+.music-dynamic-island .di-control-main{
+  width:42px!important;
+  height:36px!important;
+  border-radius:50%!important;
+  background:linear-gradient(135deg,#7d68ff,#a993ff)!important;
+  color:#fff!important;
+  box-shadow:0 7px 20px rgba(110,88,255,.3)!important;
+}
+.music-panel .music-close{z-index:100002!important}
+@media(max-width:520px){
+  .music-dynamic-island{top:76px!important;width:min(330px,calc(100vw - 28px))!important}
+  .music-dynamic-island.active{height:48px!important}
+  .music-dynamic-island.active.expanded{height:98px!important}
+  .music-dynamic-island .di-main{height:48px!important}
+  .music-dynamic-island .di-controls{top:44px!important;height:48px!important;left:6px!important;right:6px!important}
+  .music-dynamic-island .di-control{width:38px!important;height:32px!important}
+  .music-dynamic-island .di-control-main{width:40px!important;height:34px!important}
+}
+
+
+/* ===== DYNAMIC ISLAND — SIMPLE SINGLE PILL ===== */
+.music-dynamic-island{
+  position:fixed!important;
+  left:50%!important;
+  top:76px!important;
+  bottom:auto!important;
+  width:min(360px,calc(100vw - 28px))!important;
+  height:0!important;
+  transform:translateX(-50%)!important;
+  z-index:99999!important;
+  overflow:visible!important;
+  pointer-events:none!important;
+  transition:opacity .25s ease,transform .28s ease,height .25s ease!important;
+}
+.music-dynamic-island.active{
+  height:52px!important;
+  opacity:1!important;
+  pointer-events:auto!important;
+  transform:translateX(-50%)!important;
+}
+.music-dynamic-island.active.expanded{height:52px!important;}
+.music-dynamic-island .di-main{
+  inset:0!important;
+  width:100%!important;
+  height:52px!important;
+  border-radius:28px!important;
+}
+.music-dynamic-island .di-controls{display:none!important;}
+@media(max-width:520px){
+  .music-dynamic-island{top:76px!important;width:min(330px,calc(100vw - 28px))!important;}
+  .music-dynamic-island.active,.music-dynamic-island.active.expanded{height:48px!important;}
+  .music-dynamic-island .di-main{height:48px!important;}
+}
+
+
+/* ===== DYNAMIC ISLAND — TAP TO SHOW PLAYLIST (NOT MUSIC PLAYER) ===== */
+.music-dynamic-island{overflow:visible!important;}
+.music-dynamic-island .di-main{cursor:pointer!important;}
+.music-dynamic-island .di-playlist{
+  position:absolute!important;
+  top:calc(100% + 9px)!important;
+  left:50%!important;
+  width:min(360px,calc(100vw - 28px))!important;
+  max-height:min(52vh,360px)!important;
+  transform:translateX(-50%) translateY(-7px) scale(.98)!important;
+  padding:8px!important;
+  box-sizing:border-box!important;
+  display:grid!important;
+  gap:5px!important;
+  overflow:auto!important;
+  border:1px solid rgba(255,255,255,.09)!important;
+  border-radius:22px!important;
+  background:linear-gradient(145deg,rgba(12,17,35,.98),rgba(7,10,23,.98))!important;
+  box-shadow:0 24px 70px rgba(0,0,0,.45),0 0 0 1px rgba(125,105,255,.06) inset!important;
+  backdrop-filter:blur(26px)!important;
+  opacity:0!important;
+  visibility:hidden!important;
+  pointer-events:none!important;
+  transition:opacity .18s ease,transform .22s ease,visibility .18s ease!important;
+}
+.music-dynamic-island.playlist-open .di-playlist{
+  opacity:1!important;
+  visibility:visible!important;
+  pointer-events:auto!important;
+  transform:translateX(-50%) translateY(0) scale(1)!important;
+}
+.music-dynamic-island .di-song{
+  width:100%!important;
+  min-height:58px!important;
+  padding:7px 9px!important;
+  display:grid!important;
+  grid-template-columns:42px minmax(0,1fr) 28px!important;
+  align-items:center!important;
+  gap:9px!important;
+  border:1px solid transparent!important;
+  border-radius:15px!important;
+  background:rgba(255,255,255,.045)!important;
+  color:#fff!important;
+  text-align:left!important;
+  cursor:pointer!important;
+}
+.music-dynamic-island .di-song:hover{background:rgba(126,108,255,.13)!important;border-color:rgba(145,130,255,.14)!important}
+.music-dynamic-island .di-song:active{transform:scale(.985)!important}
+.music-dynamic-island .di-song-art{width:42px!important;height:42px!important;border-radius:11px!important;display:grid!important;place-items:center!important;overflow:hidden!important;background:rgba(255,255,255,.08)!important;color:#b9b2ff!important;font-size:18px!important}
+.music-dynamic-island .di-song-art img{width:100%!important;height:100%!important;object-fit:cover!important}
+.music-dynamic-island .di-song-copy{min-width:0!important;display:flex!important;flex-direction:column!important;gap:3px!important}
+.music-dynamic-island .di-song-copy b{font-size:11px!important;line-height:1.25!important;white-space:nowrap!important;overflow:hidden!important;text-overflow:ellipsis!important;color:#f7f7ff!important}
+.music-dynamic-island .di-song-copy small{font-size:8px!important;line-height:1.2!important;white-space:nowrap!important;overflow:hidden!important;text-overflow:ellipsis!important;color:#8f98b8!important}
+.music-dynamic-island .di-song-state{font-size:10px!important;text-align:center!important;color:#aaa2ff!important}
+.music-dynamic-island .di-song-empty{padding:18px 12px!important;text-align:center!important;color:#8f98b8!important;font-size:10px!important}
+@media(max-width:520px){
+  .music-dynamic-island .di-playlist{top:calc(100% + 8px)!important;width:min(340px,calc(100vw - 22px))!important;max-height:55vh!important;border-radius:19px!important;padding:7px!important}
+  .music-dynamic-island .di-song{min-height:55px!important;grid-template-columns:40px minmax(0,1fr) 25px!important;gap:8px!important;padding:6px 8px!important}
+  .music-dynamic-island .di-song-art{width:40px!important;height:40px!important}
+  .music-dynamic-island .di-song-copy b{font-size:10px!important}.music-dynamic-island .di-song-copy small{font-size:7px!important}
+}
+
+/* Maintenance Mode — admin bypass + visitor lock */
+.maintenance-screen{position:fixed;inset:0;z-index:100050;display:none;align-items:center;justify-content:center;padding:24px;box-sizing:border-box;background:rgba(8,12,28,.92);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px)}
+.maintenance-screen.show{display:flex}
+.maintenance-screen-card{width:min(520px,100%);padding:34px 28px;border:1px solid rgba(255,255,255,.12);border-radius:28px;background:var(--card,#11182d);box-shadow:0 30px 100px rgba(0,0,0,.35);text-align:center}
+.maintenance-mark{width:58px;height:58px;margin:0 auto 16px;border-radius:18px;display:grid;place-items:center;background:rgba(64,85,255,.14);font-size:25px}
+.maintenance-screen-card h2{margin:10px 0 8px;font-size:clamp(24px,5vw,34px)}
+.maintenance-screen-card p{margin:0 auto;color:var(--muted);line-height:1.7;max-width:430px;font-size:12px}
+.maintenance-meta{margin:16px auto 20px;color:var(--text);font-size:11px;font-weight:700}
+.maintenance-screen-card .btn{min-width:150px}

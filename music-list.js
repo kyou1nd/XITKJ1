@@ -3,9 +3,9 @@
 
 window.LOCAL_MUSIC = [
   {
-    "name": "Eid-Adha, Please Don't Call",
+    "name": "Eid-Adha, Please Don",
     "artist": "Bleachers",
-    "src": "assets/music/Eid-Adha%2C%20Please%20Don't%20Call%20-%20Bleachers.mp3",
+    "src": "assets/music/Eid-Adha%2C%20Please%20Don",
     "cover": "assets/music/covers/please-dont-call.jpeg",
     "type": "audio/mpeg"
   },
@@ -77,5 +77,13 @@ window.LOCAL_MUSIC = [
     "cover": "https://i.ytimg.com/vi/9sBktY09RpU/hqdefault.jpg",
     "type": "youtube",
     "youtubeId": "9sBktY09RpU"
+  },
+  {
+    "name": "The 1975 - About You (Official)",
+    "artist": "The1975VEVO",
+    "src": "https://www.youtube.com/watch?v=tGv7CUutzqU",
+    "cover": "https://i.ytimg.com/vi/tGv7CUutzqU/hqdefault.jpg",
+    "type": "youtube",
+    "youtubeId": "tGv7CUutzqU"
   }
 ];

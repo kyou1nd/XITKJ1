@@ -3,7 +3,7 @@
 
 window.LOCAL_MUSIC = [
   {
-    "name": "Please Don",
+    "name": "Eid-Adha, Please Don't Call",
     "artist": "Bleachers",
     "src": "assets/music/Eid-Adha%2C%20Please%20Don",
     "cover": "assets/music/covers/please-dont-call.jpeg",

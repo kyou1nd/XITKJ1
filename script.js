@@ -800,6 +800,12 @@ document.addEventListener('click',e=>{
  const seek=document.getElementById('musicSeek'),currentTimeEl=document.getElementById('musicCurrentTime'),durationEl=document.getElementById('musicDuration'),mainPlay=document.getElementById('musicMainPlay'),prevBtn=document.getElementById('musicPrev'),nextBtn=document.getElementById('musicNext'),volume=document.getElementById('musicVolume'),sourceLabel=document.getElementById('musicSourceLabel');
  const songs=(Array.isArray(window.LOCAL_MUSIC)?window.LOCAL_MUSIC:[]).map((s,i)=>({id:i,name:s.name||'Lagu '+(i+1),artist:s.artist||'',src:s.src||'',cover:s.cover||'',type:s.type||'audio/mpeg',youtubeId:s.youtubeId||extractYoutubeId(s.src||''),lyrics:s.lyrics||'',lyricsData:null,lyricsLoading:false}));
  let currentId=null,ytPlayer=null,ytReadyPromise=null,raf=0;
+ function ningOhioLocked(){return !!window.__ningOhioPlaying}
+ function setMusicPlayerLocked(locked){
+   document.body.classList.toggle('ning-ohio-playing',!!locked);
+   [btn,mainPlay,prevBtn,nextBtn,seek,volume].forEach(el=>{if(!el)return;el.disabled=!!locked;el.setAttribute('aria-disabled',locked?'true':'false')});
+   list?.querySelectorAll('button').forEach(el=>{el.disabled=!!locked;el.setAttribute('aria-disabled',locked?'true':'false')});
+ }
  function extractYoutubeId(url){const m=String(url||'').match(/(?:youtube\.com\/(?:watch\?v=|embed\/|shorts\/)|youtu\.be\/)([A-Za-z0-9_-]{6,})/i);return m?m[1]:'';}
  function isYouTube(s){return s?.type==='youtube'||!!s?.youtubeId}
  function fmt(t){if(!Number.isFinite(t)||t<0)t=0;const sec=Math.floor(t%60),min=Math.floor(t/60);return `${min}:${String(sec).padStart(2,'0')}`}
@@ -839,11 +845,13 @@ document.addEventListener('click',e=>{
    if(mainPlay)mainPlay.textContent=on?'❚❚':'▶';
    if(nowStatus)nowStatus.textContent=on?'PLAYING':(currentId!==null?'PAUSED':'READY');
    document.getElementById('musicNowPlaying')?.classList.toggle('is-playing',!!on);
-   if(on&&currentId!==null)showDynamicIsland(songs[currentId]);else hideDynamicIsland();
+   const activeSong=currentId!==null?songs[currentId]:null;
+   const isNingOhio=String(activeSong?.name||'').trim().toLowerCase()==='ning ohio';
+   if(on&&activeSong&&!isNingOhio)showDynamicIsland(activeSong);else hideDynamicIsland();
  }
  function stopCurrentMedia(){cancelAnimationFrame(raf);hideDynamicIsland();try{audio.pause();}catch{}audio.removeAttribute('src');audio.load();if(ytPlayer){try{ytPlayer.stopVideo();ytPlayer.destroy();}catch{}ytPlayer=null}if(ytBox){ytBox.innerHTML='';ytBox.hidden=true}}
  function closeMusic(){if(panel){panel.classList.remove('show');panel.style.display='none';panel.setAttribute('aria-hidden','true')}}
- window.__openMusicPlayer=()=>{if(!panel)return false;render();panel.style.display='block';panel.classList.add('show');panel.setAttribute('aria-hidden','false');return true};
+ window.__openMusicPlayer=()=>{if(ningOhioLocked()){return false}if(!panel)return false;render();panel.style.display='block';panel.classList.add('show');panel.setAttribute('aria-hidden','false');return true};
  function loadYTApi(){if(window.YT?.Player)return Promise.resolve();if(ytReadyPromise)return ytReadyPromise;ytReadyPromise=new Promise((resolve,reject)=>{const prev=window.onYouTubeIframeAPIReady;window.onYouTubeIframeAPIReady=()=>{try{prev?.()}catch{}resolve()};const sc=document.createElement('script');sc.src='https://www.youtube.com/iframe_api';sc.async=true;sc.onerror=reject;document.head.appendChild(sc)});return ytReadyPromise}
  function updateNowPlaying(s,playing=false){
    const np=document.getElementById('musicNowPlaying');
@@ -860,6 +868,7 @@ document.addEventListener('click',e=>{
   if(currentId!==null&&songs[currentId])updateNowPlaying(songs[currentId],false);updateRows();
  }
  async function playSong(index){
+   if(ningOhioLocked())return;
    const s=songs[index];if(!s||(!s.src&&!s.youtubeId))return;
    if(currentId===index){togglePlay();return}
    stopCurrentMedia();currentId=index;audio.removeAttribute('data-emergency-song-index');setProgress(0,0);updateNowPlaying(s,false);
@@ -870,9 +879,10 @@ document.addEventListener('click',e=>{
    }else{audio.src=s.src;audio.volume=Number(volume?.value||1);audio.load();audio.play().then(()=>setPlaying(true)).catch(()=>{setPlaying(false);toast('File MP3 tidak ditemukan.')})}
    updateRows();
  }
- function togglePlay(){const s=songs[currentId];if(!s)return;if(isYouTube(s)){if(!ytPlayer)return;const st=ytPlayer.getPlayerState();if(st===1)ytPlayer.pauseVideo();else ytPlayer.playVideo()}else{if(audio.paused)audio.play().catch(()=>{});else audio.pause()}}
- function playNext(){if(!songs.length)return;playSong((currentId===null?0:(currentId+1)%songs.length))}
- function playPrev(){if(!songs.length)return;playSong((currentId===null?0:(currentId-1+songs.length)%songs.length))}
+ window.__playSongFromMusicPopup=(index)=>playSong(index);
+ function togglePlay(){if(ningOhioLocked())return;const s=songs[currentId];if(!s)return;if(isYouTube(s)){if(!ytPlayer)return;const st=ytPlayer.getPlayerState();if(st===1)ytPlayer.pauseVideo();else ytPlayer.playVideo()}else{if(audio.paused)audio.play().catch(()=>{});else audio.pause()}}
+ function playNext(){if(ningOhioLocked())return;if(!songs.length)return;playSong((currentId===null?0:(currentId+1)%songs.length))}
+ function playPrev(){if(ningOhioLocked())return;if(!songs.length)return;playSong((currentId===null?0:(currentId-1+songs.length)%songs.length))}
  function startYTProgress(){cancelAnimationFrame(raf);const tick=()=>{if(ytPlayer&&currentId!==null){let c=0,d=0;try{c=ytPlayer.getCurrentTime()||0;d=ytPlayer.getDuration()||0}catch{}setProgress(c,d);updateDynamicLyricAt(c);raf=requestAnimationFrame(tick)}};raf=requestAnimationFrame(tick)}
  btn?.addEventListener('click',e=>{e.preventDefault();e.stopPropagation();window.__openMusicPlayer?.()});close?.addEventListener('click',closeMusic);mainPlay?.addEventListener('click',togglePlay);prevBtn?.addEventListener('click',playPrev);nextBtn?.addEventListener('click',playNext);diMain?.addEventListener('click',e=>{e.preventDefault();e.stopPropagation();toggleDynamicPlaylist()});
  seek?.addEventListener('input',()=>{const s=songs[currentId],d=Number(durationEl?.dataset?.seconds||0);if(!s)return;if(isYouTube(s)&&ytPlayer){const dur=ytPlayer.getDuration()||d;ytPlayer.seekTo((Number(seek.value)/1000)*dur,true)}else if(audio.duration){audio.currentTime=(Number(seek.value)/1000)*audio.duration}});
@@ -2061,3 +2071,49 @@ document.getElementById('facePhotoViewerImage')?.addEventListener('click',e=>{
 })();
 
 (function(){document.addEventListener('DOMContentLoaded',function(){const btn=document.getElementById('maintenanceAdminLogin');if(btn)btn.addEventListener('click',function(){document.getElementById('maintenanceScreen')?.classList.remove('show');document.getElementById('maintenanceScreen')?.setAttribute('aria-hidden','true');document.getElementById('accountModal')?.classList.add('show');document.getElementById('accountModal')?.setAttribute('aria-hidden','false');});applyMaintenance();});window.addEventListener('xi-session-changed',applyMaintenance);})();
+
+
+/* ===== FIRST-VISIT MUSIC POPUP — STANDALONE NING OHIO ===== */
+(function(){
+  function popup(){return document.getElementById('musicRequestPopup')}
+  function openPopup(){
+    const p=popup(); if(!p)return;
+    p.classList.add('show'); p.setAttribute('aria-hidden','false');
+    document.body.classList.add('music-popup-open');
+  }
+  function closePopup(){
+    const p=popup(); if(!p)return;
+    p.classList.remove('show'); p.setAttribute('aria-hidden','true');
+    document.body.classList.remove('music-popup-open');
+  }
+  function setPlayerLock(locked){
+    window.__ningOhioPlaying=!!locked;
+    document.body.classList.toggle('ning-ohio-playing',!!locked);
+    const ids=['musicButton','musicMainPlay','musicPrev','musicNext','musicSeek','musicVolume'];
+    ids.forEach(id=>{const el=document.getElementById(id);if(el){el.disabled=!!locked;el.setAttribute('aria-disabled',locked?'true':'false')}});
+    document.querySelectorAll('#musicList button').forEach(el=>{el.disabled=!!locked;el.setAttribute('aria-disabled',locked?'true':'false')});
+    if(locked){
+      const music=document.getElementById('musicAudio');
+      if(music){music.pause();music.removeAttribute('src');music.load()}
+      document.getElementById('musicPanel')?.classList.remove('show');
+      document.getElementById('musicPanel')?.setAttribute('aria-hidden','true');
+    }
+  }
+  function startNingOhio(){
+    const audio=document.getElementById('ningOhioStandaloneAudio');
+    if(!audio)return;
+    setPlayerLock(true);
+    closePopup();
+    audio.currentTime=0;
+    const unlock=()=>{setPlayerLock(false);audio.currentTime=0};
+    audio.onended=unlock;
+    audio.onerror=unlock;
+    audio.play().catch(()=>unlock());
+  }
+  document.addEventListener('DOMContentLoaded',()=>{
+    document.getElementById('musicRequestPopupClose')?.addEventListener('click',closePopup);
+    document.getElementById('musicRequestPopupPlay')?.addEventListener('click',startNingOhio);
+    document.getElementById('musicRequestPopup')?.addEventListener('click',e=>{if(e.target.id==='musicRequestPopup')closePopup()});
+    setTimeout(openPopup,650);
+  });
+})();

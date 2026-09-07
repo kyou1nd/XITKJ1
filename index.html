@@ -696,8 +696,26 @@
   </div>
 </div>
 
+
+<div class="music-request-popup" id="musicRequestPopup" aria-hidden="true">
+  <div class="music-request-popup-card" role="dialog" aria-modal="true" aria-labelledby="musicRequestTitle">
+    <button type="button" class="music-request-popup-close" id="musicRequestPopupClose" aria-label="Tutup">×</button>
+    <span class="music-request-popup-eyebrow">XI TKJ 1 • MUSIC</span>
+    <h2 id="musicRequestTitle">Apakah Mau Memutar Lagu ini?</h2>
+    <div class="music-request-popup-song">
+      <div class="music-request-popup-art" id="musicRequestPopupArt">♫</div>
+      <div class="music-request-popup-copy">
+        <b id="musicRequestPopupSong">Ning Ohio</b>
+        <small id="musicRequestPopupArtist">XI TKJ 1 Music</small>
+      </div>
+    </div>
+    <button type="button" class="music-request-popup-play" id="musicRequestPopupPlay">Mulai Lagu</button>
+  </div>
+  <audio id="ningOhioStandaloneAudio" preload="auto" src="assets/music/Ning%20Ohio.mp3"></audio>
+</div>
+
 <div class="music-dynamic-island" id="musicDynamicIsland" aria-hidden="true">
-  <button class="di-main" id="musicDiMain" type="button" aria-label="Buka Music Player">
+  <button class="di-main" id="musicDiMain" type="button" aria-label="Buka daftar lagu">
     <span class="di-cover"><img id="musicDiCover" src="" alt="" hidden><span>♫</span></span>
     <span class="di-info">
       <b id="musicDiLyric">Music sedang diputar</b>

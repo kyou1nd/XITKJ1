@@ -85,5 +85,13 @@ window.LOCAL_MUSIC = [
     "cover": "https://i.ytimg.com/vi/tGv7CUutzqU/hqdefault.jpg",
     "type": "youtube",
     "youtubeId": "tGv7CUutzqU"
+  },
+  {
+    "name": "Breakbeat Golden Crown Terhalu This I Vow X Ramelia New Remix 2026",
+    "artist": "ReyLimitless",
+    "src": "https://www.youtube.com/watch?v=9CfbaeetcG4",
+    "cover": "https://i.ytimg.com/vi/9CfbaeetcG4/hqdefault.jpg",
+    "type": "youtube",
+    "youtubeId": "9CfbaeetcG4"
   }
 ];
